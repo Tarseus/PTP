@@ -15,7 +15,8 @@ class TSPModel(nn.Module):
         self.encoded_nodes = None
         # shape: (batch, problem, EMBEDDING_DIM)
 
-        self.entropy = torch.zeros(1)
+        # Track entropy as a registered buffer so it follows the model device.
+        self.register_buffer("entropy", torch.zeros(1))
     def pre_forward(self, reset_state):
         self.encoded_nodes = self.encoder(reset_state.problems)
         # shape: (batch, problem, EMBEDDING_DIM)
@@ -125,9 +126,13 @@ class TSPModel(nn.Module):
             dim=2,
         )
         return prob
-    @torch.no_grad
+
+    @torch.no_grad()
     def store_entropy(self, probs):
-        self.entropy = self.entropy - (probs.detach() * torch.log(probs+ 1e-10)).sum(dim=2).mean()
+        # probs is already on the correct device; entropy buffer moves with the model.
+        self.entropy = self.entropy - (probs.detach() * torch.log(probs + 1e-10)).sum(
+            dim=2
+        ).mean()
 
 def _get_encoding(encoded_nodes, node_index_to_pick):
     # encoded_nodes.shape: (batch, problem, embedding)
