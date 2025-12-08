@@ -67,17 +67,29 @@ def parse_ptp_dsl(source: str) -> PTPProgramSpec:
     if not isinstance(weight_raw, dict) or "primitive" not in weight_raw:
         raise ValueError("weight must be an object with a 'primitive' field.")
 
+    # Support both flattened parameters:
+    #   {"primitive": "best_of_k", "k": 8}
+    # and nested "params" objects:
+    #   {"primitive": "best_of_k", "params": {"k": 8}}
+    def _extract_params(obj: Mapping[str, Any]) -> Dict[str, Any]:
+        params_field = obj.get("params")
+        if isinstance(params_field, dict):
+            # Prefer explicit nested params block.
+            return dict(params_field)
+        # Fallback to treating all non-primitive, non-params keys as params.
+        return {k: v for k, v in obj.items() if k not in ("primitive", "params")}
+
     anchors = AnchorSpec(
         primitive=str(anchors_raw["primitive"]),
-        params={k: v for k, v in anchors_raw.items() if k != "primitive"},
+        params=_extract_params(anchors_raw),
     )
     build_preferences = BuildPreferencesSpec(
         primitive=str(build_raw["primitive"]),
-        params={k: v for k, v in build_raw.items() if k != "primitive"},
+        params=_extract_params(build_raw),
     )
     weight = WeightSpec(
         primitive=str(weight_raw["primitive"]),
-        params={k: v for k, v in weight_raw.items() if k != "primitive"},
+        params=_extract_params(weight_raw),
     )
 
     spec = PTPProgramSpec(
@@ -185,4 +197,3 @@ select_anchors = _compiled.select_anchors
 build_preferences = _compiled.build_preferences
 weight_preference = _compiled.weight_preference
 '''
-
