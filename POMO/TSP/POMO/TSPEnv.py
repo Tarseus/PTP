@@ -81,19 +81,36 @@ class TSPEnv:
             else:
                 raise NotImplementedError
 
-        self.BATCH_IDX = torch.arange(self.batch_size)[:, None].expand(self.batch_size, self.pomo_size)
-        self.POMO_IDX = torch.arange(self.pomo_size)[None, :].expand(self.batch_size, self.pomo_size)
+        self.BATCH_IDX = (
+            torch.arange(self.batch_size, device=self.device)[:, None]
+            .expand(self.batch_size, self.pomo_size)
+        )
+        self.POMO_IDX = (
+            torch.arange(self.pomo_size, device=self.device)[None, :]
+            .expand(self.batch_size, self.pomo_size)
+        )
 
     def reset(self):
         self.selected_count = 0
         self.current_node = None
         # shape: (batch, pomo)
-        self.selected_node_list = torch.zeros((self.batch_size, self.pomo_size, 0), dtype=torch.long)
+        self.selected_node_list = torch.zeros(
+            (self.batch_size, self.pomo_size, 0),
+            dtype=torch.long,
+            device=self.device,
+        )
         # shape: (batch, pomo, 0~problem)
 
         # CREATE STEP STATE
-        self.step_state = Step_State(BATCH_IDX=self.BATCH_IDX, POMO_IDX=self.POMO_IDX, selected_count=0)
-        self.step_state.ninf_mask = torch.zeros((self.batch_size, self.pomo_size, self.problem_size))
+        self.step_state = Step_State(
+            BATCH_IDX=self.BATCH_IDX,
+            POMO_IDX=self.POMO_IDX,
+            selected_count=0,
+        )
+        self.step_state.ninf_mask = torch.zeros(
+            (self.batch_size, self.pomo_size, self.problem_size),
+            device=self.device,
+        )
         # shape: (batch, pomo, problem)
 
         reward = None

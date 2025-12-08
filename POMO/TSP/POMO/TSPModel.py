@@ -27,10 +27,15 @@ class TSPModel(nn.Module):
         problem_size = state.ninf_mask.size(2)
 
         if state.current_node is None:
-            selected = torch.arange(pomo_size)[None, :].expand(batch_size, pomo_size)
+            selected = torch.arange(
+                pomo_size, device=self.encoded_nodes.device
+            )[None, :].expand(batch_size, pomo_size)
             selected = selected % problem_size
             # selected = state.START_IDX
-            prob = torch.ones(size=(batch_size, pomo_size))
+            prob = torch.ones(
+                size=(batch_size, pomo_size),
+                device=self.encoded_nodes.device,
+            )
 
             encoded_first_node = _get_encoding(self.encoded_nodes, selected)
             # shape: (batch, pomo, embedding)
@@ -46,8 +51,12 @@ class TSPModel(nn.Module):
             candidate_number = pomo_size // problem_size
             candidates = torch.topk(probs, candidate_number, dim=2)[1]
             # shape: (batch, pomo, candidate_num)
-            index = torch.arange(candidate_number)[None, None, :].expand(batch_size, problem_size, candidate_number) \
-                                    .transpose(1, 2).reshape(batch_size, pomo_size)
+            index = (
+                torch.arange(candidate_number, device=probs.device)[None, None, :]
+                .expand(batch_size, problem_size, candidate_number)
+                .transpose(1, 2)
+                .reshape(batch_size, pomo_size)
+            )
             
             selected = candidates[state.BATCH_IDX, state.POMO_IDX, index]
             # shape: (batch, pomo)
@@ -103,7 +112,18 @@ class TSPModel(nn.Module):
         node_index_to_pick = route[:, :, 1:, None]
         prob = probs.gather(3, node_index_to_pick).squeeze(3)
         # shape: (batch, pomo, problem - 1)
-        prob = torch.cat([torch.ones(batch_size, pomo_size, 1), prob], dim=2)
+        prob = torch.cat(
+            [
+                torch.ones(
+                    batch_size,
+                    pomo_size,
+                    1,
+                    device=probs.device,
+                ),
+                prob,
+            ],
+            dim=2,
+        )
         return prob
     @torch.no_grad
     def store_entropy(self, probs):
@@ -373,7 +393,8 @@ def multi_head_attention(q, k, v, rank2_ninf_mask=None, rank3_ninf_mask=None):
     score = torch.matmul(q, k.transpose(2, 3))
     # shape: (batch, head_num, n, problem)
 
-    score_scaled = score / torch.sqrt(torch.tensor(key_dim, dtype=torch.float))
+    scale = torch.sqrt(torch.tensor(key_dim, dtype=torch.float, device=q.device))
+    score_scaled = score / scale
     if rank2_ninf_mask is not None:
         score_scaled = score_scaled + rank2_ninf_mask[:, None, None, :].expand(batch_s, head_num, n, input_s)
     if rank3_ninf_mask is not None:
