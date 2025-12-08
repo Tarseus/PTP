@@ -167,7 +167,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--seed",
         type=int,
-        default=0,
+        default=1234,
         help="Random seed for HF evaluation.",
     )
     parser.add_argument(
