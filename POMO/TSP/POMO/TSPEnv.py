@@ -31,6 +31,7 @@ class TSPEnv:
         self.env_params = env_params
         self.problem_size = env_params['problem_size']
         self.pomo_size = env_params['pomo_size']
+        self.device = env_params.get('device', 'cuda')
 
         # Const @Load_Problem
         ####################################
@@ -61,13 +62,16 @@ class TSPEnv:
 
         if problems is not None:
             self.batch_size = problems.size(0)
-            self.problems = problems
+            self.problems = problems.to(self.device)
         elif self.validation_set_path is not None:
-            self.problems = (self.loaded_problems[self.batch_count*self.batch_size:(self.batch_count+1)*self.batch_size]
-                             .to('cuda'))
+            self.problems = (
+                self.loaded_problems[
+                    self.batch_count * self.batch_size : (self.batch_count + 1) * self.batch_size
+                ].to(self.device)
+            )
             self.batch_count += 1
         else:
-            self.problems = get_random_problems(batch_size, self.problem_size).to('cuda')
+            self.problems = get_random_problems(batch_size, self.problem_size).to(self.device)
         # problems.shape: (batch, problem, 2)
         if aug_factor > 1:
             if aug_factor == 8:

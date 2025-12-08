@@ -1,0 +1,108 @@
+You are designing a preference teaching strategy (PTP) in a JSON-based DSL.
+The DSL program must define three components:
+- anchors: how to select reference/anchor solutions from the sampled pool.
+- build_preferences: how to construct preference pairs or lists from anchors and the pool.
+- weight: how to assign a scalar weight to each preference example.
+
+Your output MUST be a single JSON object with the following top-level keys:
+- "anchors": {
+    "primitive": <string>,
+    ... primitive-specific parameters ...
+  }
+- "build_preferences": {
+    "primitive": <string>,
+    ... primitive-specific parameters ...
+  }
+- "weight": {
+    "primitive": <string>,
+    ... primitive-specific parameters ...
+  }
+- "schedule": {           # OPTIONAL but recommended
+    "stages": [
+      {"name": "warmup",  "start_frac": 0.0, "end_frac": 0.3},
+      {"name": "main",    "start_frac": 0.3, "end_frac": 0.8},
+      {"name": "finetune","start_frac": 0.8, "end_frac": 1.0}
+    ]
+  }
+
+Available primitives:
+- Anchors ("anchors.primitive"):
+    - "best_of_k": selects globally best-k solutions by objective.
+        params: {"k": int}
+    - "elite_percentile": selects an elite objective percentile.
+        params: {"percentile": float in [0,1], "min_anchors": int}
+    - "diverse_elites": selects a small set of elite but structurally diverse anchors.
+        params: {
+          "num_anchors": int,
+          "candidate_pool_size": int <= 256,
+          "random_seed": int
+        }
+    - "size_conditional_best": selects anchors conditioned on size.
+        params: {"size_bins": [{"max_size": int, "k": int}, ...]}
+
+- Build preferences ("build_preferences.primitive"):
+    - "best_anchored_pairs": anchors paired with a bounded number of worse solutions.
+        params: {"max_pairs_per_anchor": int <= 256}
+    - "topk_vs_random": top-k solutions vs random pool members.
+        params: {"topk": int, "pairs_per_topk": int <= 256}
+    - "hardness_bounded_pairs": pairs with objective gap in [min_delta_obj, max_delta_obj].
+        params: {
+          "min_delta_obj": float,
+          "max_delta_obj": float,
+          "max_pairs": int <= 8192
+        }
+    - "diversity_contrast_pairs": structurally contrasting pairs.
+        params: {
+          "num_pairs": int <= 4096,
+          "min_delta_struct": float in [0,1],
+          "candidate_pool_size": int <= 256
+        }
+
+- Weight ("weight.primitive"):
+    - "piecewise_linear": piecewise-linear map on a single feature.
+        params: {
+          "feature": "delta_obj" | "delta_struct" | "size" | "stage_index",
+          "knots": [{"x": float, "y": float}, ...]   # sorted by x
+        }
+    - "soft_threshold": smooth thresholding on a single feature.
+        params: {
+          "feature": "delta_obj" | "delta_struct" | "size",
+          "threshold": float,
+          "sharpness": float
+        }
+    - "logistic": logistic function of a linear combination.
+        params: {
+          "w_delta_obj": float,
+          "w_delta_struct": float,
+          "w_size": float,
+          "bias": float,
+          "stage_multipliers": {stage_name: float, ...}
+        }
+    - "composite": sum or product of several sub-weights.
+        params: {
+          "combine_op": "sum" | "product",
+          "components": [
+            {"primitive": <one of the above>, ... sub-params ...},
+            ...
+          ]
+        }
+
+Hard constraints:
+- You MUST NOT introduce any reference to supervision labels like:
+  "rank", "is_best", "cost_to_go", "advantage", "reward_to_go".
+- You MUST avoid any design that implies unbounded O(N^2) over all pairs;
+  use the provided bounded hyperparameters (max_pairs_per_anchor, candidate_pool_size, etc.).
+- You MUST design weights only as functions of:
+  delta_obj, delta_struct, size, stage.
+
+Optimization target:
+- The only thing that matters is short-run training performance:
+  - validation objective after a fixed number of training steps (hf_steps),
+  - cross-scale generalization (e.g., train on size 20, validate on size 100).
+- The HF_score used by the search is:
+    HF_score = validation_objective + generalization_penalty,
+  where the penalty increases if performance degrades on larger sizes.
+
+Output format:
+- Return ONLY the JSON object, with no extra text, comments, or explanations.
+
