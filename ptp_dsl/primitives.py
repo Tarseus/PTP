@@ -518,7 +518,11 @@ def weight_composite(
     weights: List[float] = []
     for component in components:
         primitive = component.get("primitive")
-        params = {k: v for k, v in component.items() if k != "primitive"}
+        # Support both flattened sub-params and nested "params" objects.
+        if isinstance(component.get("params"), dict):
+            params = dict(component["params"])
+        else:
+            params = {k: v for k, v in component.items() if k not in ("primitive", "params")}
         weight_fn = get_weight_primitive(primitive)
         weights.append(
             weight_fn(
@@ -587,4 +591,3 @@ def get_weight_primitive(name: str) -> Callable[..., float]:
     if name not in WEIGHT_PRIMITIVES:
         raise KeyError(f"Unknown weight primitive: {name}")
     return WEIGHT_PRIMITIVES[name]
-
