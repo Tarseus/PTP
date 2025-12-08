@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, Optional
@@ -10,6 +11,9 @@ from fitness.ptp_high_fidelity import (
     evaluate_ptp_dsl_high_fidelity,
 )
 from ptp_dsl.compiler import emit_ptp_program_python, parse_ptp_dsl
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -56,6 +60,14 @@ class PTPDiscoveryProblem:
 
     def evaluate(self, candidate: PTPDiscoveryCandidate) -> PTPDiscoveryResult:
         candidate_id = self._next_candidate_id()
+
+        logger.info(
+            "Evaluating candidate %s (origin=%s, parents=%s)",
+            candidate_id,
+            candidate.origin,
+            ",".join(candidate.parent_ids) if candidate.parent_ids else "-",
+        )
+
         hf_raw = evaluate_ptp_dsl_high_fidelity(candidate.dsl_source, self.hf_config)
 
         result = PTPDiscoveryResult(
@@ -68,6 +80,15 @@ class PTPDiscoveryProblem:
                 for k, v in hf_raw.get("generalization_objectives", {}).items()
             },
             hf_raw=hf_raw,
+        )
+
+        logger.info(
+            "Candidate %s results: HF_score=%.6f, validation_objective=%.6f, "
+            "generalization_penalty=%.6f",
+            candidate_id,
+            result.hf_score,
+            result.validation_objective,
+            result.generalization_penalty,
         )
 
         self._log_candidate(candidate_id, candidate, result)
@@ -105,4 +126,3 @@ class PTPDiscoveryProblem:
         metrics_path = os.path.join(candidate_dir, "metrics.json")
         with open(metrics_path, "w", encoding="utf-8") as f:
             json.dump(metrics, f, indent=2)
-

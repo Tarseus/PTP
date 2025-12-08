@@ -282,7 +282,34 @@ def _evaluate_tsp_model(
 ) -> float:
     """Evaluate a TSP model by running POMO rollouts on random instances."""
 
-    env = TSPEnv(problem_size=problem_size, pomo_size=pomo_size, device=str(device))
+    # TSPModel assumes that when pomo_size > problem_size we have
+    # pomo_size % problem_size == 0 for its early-evaluation branch.
+    # If that invariant is violated, we fall back to pomo_size <= problem_size
+    # to avoid shape mismatches in the model's reshape logic.
+    effective_pomo_size = pomo_size
+    if pomo_size > problem_size and pomo_size % problem_size != 0:
+        logger.warning(
+            "Adjusting pomo_size from %d to %d for evaluation (problem_size=%d) "
+            "to avoid invalid reshape in TSPModel.",
+            pomo_size,
+            problem_size,
+            problem_size,
+        )
+        effective_pomo_size = problem_size
+
+    logger.info(
+        "Evaluating TSP model: problem_size=%d, pomo_size=%d, episodes=%d, batch_size=%d",
+        problem_size,
+        effective_pomo_size,
+        num_episodes,
+        batch_size,
+    )
+
+    env = TSPEnv(
+        problem_size=problem_size,
+        pomo_size=effective_pomo_size,
+        device=str(device),
+    )
     model.eval()
 
     score_meter = AverageMeter()
@@ -306,6 +333,18 @@ def _evaluate_tsp_model(
         # Convert to objective (positive cost).
         score = (-max_pomo_reward.float()).mean().item()
         score_meter.update(score, n=current_batch)
+
+        logger.debug(
+            "Eval batch done: problem_size=%d, pomo_size=%d, batch=%d, "
+            "episodes_done=%d/%d, batch_score=%.6f, avg_score=%.6f",
+            problem_size,
+            effective_pomo_size,
+            current_batch,
+            episodes_done + current_batch,
+            num_episodes,
+            score,
+            float(score_meter.avg),
+        )
 
         episodes_done += current_batch
 
@@ -368,6 +407,18 @@ def evaluate_ptp_dsl_high_fidelity(
     score_meter = AverageMeter()
     loss_meter = AverageMeter()
 
+    logger.info(
+        "Starting HF training: steps=%d, train_problem_size=%d, pomo_size=%d, "
+        "batch_size=%d, device=%s",
+        config.hf_steps,
+        config.train_problem_size,
+        config.pomo_size,
+        config.train_batch_size,
+        str(device),
+    )
+
+    log_interval = max(config.hf_steps // 10, 1)
+
     for step_index in range(config.hf_steps):
         score, loss = _train_one_batch_with_ptp(
             env=env,
@@ -379,6 +430,17 @@ def evaluate_ptp_dsl_high_fidelity(
         )
         score_meter.update(score)
         loss_meter.update(loss)
+
+        if (step_index + 1) % log_interval == 0 or step_index == 0:
+            logger.info(
+                "HF train step %d/%d: score=%.6f (avg=%.6f), loss=%.6f (avg=%.6f)",
+                step_index + 1,
+                config.hf_steps,
+                score,
+                float(score_meter.avg),
+                loss,
+                float(loss_meter.avg),
+            )
 
     # Validation on the training scale.
     main_valid_obj = _evaluate_tsp_model(
@@ -408,6 +470,16 @@ def evaluate_ptp_dsl_high_fidelity(
     generalization_penalty = max(0.0, max_gen_obj - main_valid_obj)
 
     hf_score = main_valid_obj + config.generalization_penalty_weight * generalization_penalty
+
+    logger.info(
+        "HF evaluation complete: train_size=%d, valid_sizes=%s, "
+        "hf_score=%.6f, main_valid_obj=%.6f, gen_penalty=%.6f",
+        config.train_problem_size,
+        ",".join(str(int(s)) for s in config.valid_problem_sizes),
+        hf_score,
+        main_valid_obj,
+        generalization_penalty,
+    )
 
     return {
         "hf_score": hf_score,
