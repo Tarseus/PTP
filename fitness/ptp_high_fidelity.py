@@ -72,39 +72,6 @@ def _set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def _resolve_stage(schedule: Dict[str, Any], step: int, total_steps: int) -> str:
-    """Map global step index to a named stage based on the DSL schedule.
-
-    Expected schedule format:
-        {"stages": [
-            {"name": "warmup", "start_frac": 0.0, "end_frac": 0.2},
-            {"name": "main", "start_frac": 0.2, "end_frac": 0.8},
-            {"name": "finetune", "start_frac": 0.8, "end_frac": 1.0},
-        ]}
-    """
-
-    stages = schedule.get("stages")
-    if not stages:
-        # Simple default 3-phase schedule.
-        fraction = step / max(total_steps, 1)
-        if fraction < 0.3:
-            return "warmup"
-        if fraction < 0.8:
-            return "main"
-        return "finetune"
-
-    fraction = step / max(total_steps, 1)
-    for stage in stages:
-        name = stage.get("name", "stage")
-        start_frac = float(stage.get("start_frac", 0.0))
-        end_frac = float(stage.get("end_frac", 1.0))
-        if start_frac <= fraction < end_frac:
-            return str(name)
-
-    # Fallback to the last stage name.
-    return str(stages[-1].get("name", "stage"))
-
-
 def _build_struct_repr_from_tour(tour: torch.Tensor) -> Any:
     """Convert a TSP tour (sequence of node indices) into a structural
     representation suitable for delta_struct computations.
@@ -204,7 +171,8 @@ def _train_one_batch_with_ptp(
             struct_repr_list.append(struct_repr)
 
         pool_meta = {"solutions": solutions_meta}
-        stage_name = _resolve_stage(compiled_ptp.spec.schedule, step_index, total_steps)
+        # Stage support has been removed; use a single global stage identifier.
+        stage_name = "main"
 
         anchor_ids = compiled_ptp.select_anchors(instance_meta, pool_meta, stage_name)
         if not anchor_ids:
@@ -490,7 +458,6 @@ def evaluate_ptp_dsl_high_fidelity(
         "train_loss_mean": float(loss_meter.avg),
         "config": asdict(config),
         "ptp_dsl": ptp_dsl_source,
-        "ptp_compiled_schedule": compiled_ptp.spec.schedule,
     }
 
 

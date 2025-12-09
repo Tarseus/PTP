@@ -18,7 +18,7 @@ Your output MUST be a single JSON object with the following top-level keys:
     ... primitive-specific parameters ...
   }
 
-Available primitives:
+Available primitives (you can combine and parametrize these freely):
 - Anchors ("anchors.primitive"):
     - "best_of_k": selects globally best-k solutions by objective.
         params: {"k": int}
@@ -54,7 +54,7 @@ Available primitives:
 - Weight ("weight.primitive"):
     - "piecewise_linear": piecewise-linear map on a single feature.
         params: {
-          "feature": "delta_obj" | "delta_struct" | "size" | "stage_index",
+          "feature": "delta_obj" | "delta_struct" | "size",
           "knots": [{"x": float, "y": float}, ...]   # sorted by x
         }
     - "soft_threshold": smooth thresholding on a single feature.
@@ -68,8 +68,7 @@ Available primitives:
           "w_delta_obj": float,
           "w_delta_struct": float,
           "w_size": float,
-          "bias": float,
-          "stage_multipliers": {stage_name: float, ...}
+          "bias": float
         }
     - "composite": sum or product of several sub-weights.
         params: {
@@ -86,7 +85,7 @@ Hard constraints:
 - You MUST avoid any design that implies unbounded O(N^2) over all pairs;
   use the provided bounded hyperparameters (max_pairs_per_anchor, candidate_pool_size, etc.).
 - You MUST design weights only as functions of:
-  delta_obj, delta_struct, size, stage.
+  delta_obj, delta_struct, and size.
 
 Optimization target:
 - The only thing that matters is short-run training performance:

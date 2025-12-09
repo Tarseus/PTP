@@ -23,14 +23,14 @@ import argparse
 import json
 import logging
 import os
-from typing import Any
+from typing import Any, Sequence
 
 from dotenv import load_dotenv
 from openai import OpenAI
 
 from fitness.ptp_high_fidelity import HighFidelityConfig
-from ptp_discovery.problem import PTPDiscoveryCandidate
-from ptp_discovery.search import PTPDiscoverySearch
+from ptp_discovery.problem import PTPDiscoveryCandidate, PTPDiscoveryResult
+from ptp_discovery.search import PTPDiscoverySearch, EliteRecord
 from ptp_discovery.ptp_best import PTP_BEST_DSL
 
 
@@ -108,6 +108,79 @@ def generate_ptp_dsl(client: OpenAI, extra_hint: str = "") -> str:
     dsl_obj: Any = json.loads(json_str)
     # Re-dump with stable formatting for reproducibility.
     return json.dumps(dsl_obj, indent=2, sort_keys=True)
+
+
+def _build_mutation_hint(
+    elites: Sequence[EliteRecord],
+) -> str:
+    """Construct an extra hint for LLM-guided mutation/crossover.
+
+    This presents a small subset of elite candidates and their metrics,
+    and asks the model to propose a new child DSL that mutates or
+    recombines their design.
+    """
+
+    lines = []
+    lines.append("\nYou are now performing evolutionary mutation/crossover "
+                 "on existing PTP DSL programs.")
+    lines.append("Below are some elite parent candidates with their metrics:")
+
+    for rec in elites:
+        cid = rec.result.candidate_id
+        hf = rec.result.hf_score
+        val = rec.result.validation_objective
+        gen_pen = rec.result.generalization_penalty
+        lines.append(f"\nParent candidate_id={cid}")
+        lines.append(f"HF_score={hf:.6f}, validation_objective={val:.6f}, "
+                     f"generalization_penalty={gen_pen:.6f}")
+        lines.append("PTP_DSL_JSON:")
+        lines.append(rec.candidate.dsl_source)
+
+    lines.append(
+        "\nUsing these parents as inspiration, propose a NEW child PTP DSL "
+        "program that mutates or recombines their design.\n"
+        "- You may change anchors, build_preferences, and weight freely.\n"
+        "- You may mix ideas from multiple parents.\n"
+        "- Do NOT include any commentary; output ONLY the JSON object."
+    )
+
+    return "\n".join(lines)
+
+
+def _llm_mutate_candidates(
+    client: OpenAI,
+    elites: Sequence[EliteRecord],
+    population_size: int,
+) -> list[PTPDiscoveryCandidate]:
+    """Use the LLM to generate mutated/crossover candidates from elites."""
+
+    if not elites or population_size <= 0:
+        return []
+
+    # To keep prompts manageable, only show a small number of parents.
+    max_parents_in_prompt = 4
+    parents_for_prompt = list(elites[:max_parents_in_prompt])
+
+    new_candidates: list[PTPDiscoveryCandidate] = []
+
+    # Generate up to population_size children, cycling over the elite pool.
+    while len(new_candidates) < population_size:
+        mutation_hint = _build_mutation_hint(parents_for_prompt)
+        try:
+            dsl = generate_ptp_dsl(client, extra_hint=mutation_hint)
+            parent_ids = [rec.result.candidate_id for rec in parents_for_prompt]
+            new_candidates.append(
+                PTPDiscoveryCandidate(
+                    dsl_source=dsl,
+                    origin="llm_mutation",
+                    parent_ids=parent_ids,
+                )
+            )
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.error("Failed to generate mutated candidate via LLM: %s", exc)
+            break
+
+    return new_candidates
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
@@ -228,12 +301,15 @@ def main() -> None:
         best.result.candidate_id,
     )
 
-    # Subsequent generations: structured mutations + occasional new LLM seeds.
+    # Subsequent generations: LLM-driven mutation/crossover + occasional fresh seeds.
     for gen in range(1, args.generations + 1):
         LOGGER.info("=== Generation %d ===", gen)
 
-        mutated = search.propose_mutations()
-        LOGGER.info("Generated %d mutated/crossover candidates", len(mutated))
+        def _mutate_fn(elites: Sequence[EliteRecord], population_size: int):
+            return _llm_mutate_candidates(client, elites, population_size)
+
+        mutated = search.propose_mutations(_mutate_fn)
+        LOGGER.info("Generated %d mutated/crossover candidates via LLM", len(mutated))
 
         # Top up the population with fresh LLM candidates if needed.
         needed = max(0, args.population - len(mutated))
