@@ -43,8 +43,13 @@ def run_static_gates(
             reason=f"operators_used contains non-whitelisted operators: {sorted(ops - allowed)}",
         )
 
-    if ir.implementation_hint.returns.lower() != "scalar":
-        return StaticGateResult(ok=False, reason="implementation_hint.returns must be 'scalar'.")
+    returns_str = (ir.implementation_hint.returns or "").strip().lower()
+    # Be tolerant to descriptive strings like "a scalar loss value ...".
+    if returns_str and "scalar" not in returns_str:
+        return StaticGateResult(
+            ok=False,
+            reason="implementation_hint.returns must describe a scalar output.",
+        )
 
     for key, value in ir.hyperparams.items():
         if isinstance(value, (int, float)):
@@ -112,4 +117,3 @@ def run_dynamic_gates(
         loss_value=loss_val,
         grad_norm=grad_norm,
     )
-

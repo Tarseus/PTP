@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import logging
 
 from .free_loss_eoh_loop import run_free_loss_eoh
 
@@ -25,6 +26,11 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="[%(asctime)s] %(levelname)s:%(name)s: %(message)s",
+    )
+
     parser = _build_arg_parser()
     args = parser.parse_args()
 
@@ -37,4 +43,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import time
+import logging
 from dataclasses import asdict
 from typing import Any, Dict, List
 
@@ -32,6 +33,9 @@ from ptp_discovery.free_loss_llm_ops import (
 from TSPModel import TSPModel  # type: ignore  # noqa: E402
 
 
+LOGGER = logging.getLogger("ptp_discovery.free_loss_eoh")
+
+
 def _timestamp_dir(root: str) -> str:
     ts = time.strftime("%Y%m%d-%H%M%S")
     path = os.path.join(root, ts)
@@ -50,6 +54,8 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         cfg_yaml = yaml.safe_load(f)
 
     cfg_yaml.update({k: v for k, v in overrides.items() if v is not None})
+
+    LOGGER.info("Starting free loss EoH search with config=%s", config_path)
 
     seed = int(cfg_yaml.get("seed", 0))
     torch.manual_seed(seed)
@@ -94,6 +100,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
     out_root = cfg_yaml.get("output_root", "runs/free_loss_discovery")
     run_dir = _timestamp_dir(out_root)
+    LOGGER.info("Run directory: %s", os.path.abspath(run_dir))
 
     candidates_log: List[Dict[str, Any]] = []
     gates_log: List[Dict[str, Any]] = []
@@ -102,14 +109,22 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     elites: List[Dict[str, Any]] = []
 
     for gen in range(generations):
+        LOGGER.info("=== Generation %d/%d ===", gen, generations - 1)
         population: List[FreeLossIR] = []
         if gen == 0:
+            LOGGER.info("Generating initial population with %d LLM candidates", init_llm)
             for _ in range(init_llm):
                 ir = generate_free_loss_candidate(gen_prompt, operator_whitelist=operator_whitelist)
                 population.append(ir)
         else:
             parents = sorted(elites, key=lambda e: e["fitness"]["hf_like_score"])[:elite_size]
             parent_irs = [p["ir"] for p in parents]
+            LOGGER.info(
+                "Generating population via crossover/mutation: size=%d, elite_size=%d, available_elites=%d",
+                population_size,
+                elite_size,
+                len(parent_irs),
+            )
             for _ in range(population_size):
                 if len(parent_irs) >= 2 and crossover_prompt:
                     ir = crossover_free_loss(crossover_prompt, parent_irs[:2])
@@ -119,7 +134,12 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     ir = generate_free_loss_candidate(gen_prompt, operator_whitelist=operator_whitelist)
                 population.append(ir)
 
+        LOGGER.info("Population size for generation %d: %d", gen, len(population))
         gen_elites: List[Dict[str, Any]] = []
+
+        static_fail = 0
+        dynamic_fail = 0
+        evaluated = 0
 
         for idx, ir in enumerate(population):
             static_res: StaticGateResult
@@ -133,6 +153,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             }
 
             if not static_res.ok:
+                static_fail += 1
                 gates_log.append(gate_entry)
                 continue
 
@@ -185,9 +206,11 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             gates_log.append(gate_entry)
 
             if not dyn_res.ok:
+                dynamic_fail += 1
                 continue
 
             fitness = evaluate_free_loss_candidate(compiled, free_cfg)
+            evaluated += 1
 
             cand_entry = {
                 "generation": gen,
@@ -207,6 +230,14 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             gen_elites.append(cand_entry)
 
         gen_elites.sort(key=lambda e: e["fitness"]["hf_like_score"])
+        LOGGER.info(
+            "Generation %d summary: static_fail=%d, dynamic_fail=%d, evaluated=%d, new_elites=%d",
+            gen,
+            static_fail,
+            dynamic_fail,
+            evaluated,
+            len(gen_elites),
+        )
         elites.extend(gen_elites)
         elites.sort(key=lambda e: e["fitness"]["hf_like_score"])
         elites = elites[:elite_size]
@@ -220,4 +251,11 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         best_path = os.path.join(run_dir, "best_candidate.json")
         with open(best_path, "w", encoding="utf-8") as f:
             json.dump(best, f, indent=2)
-
+        LOGGER.info(
+            "Search complete. Best hf_like_score=%.6f (generation=%d, index=%d)",
+            best["fitness"]["hf_like_score"],
+            best["generation"],
+            best["index"],
+        )
+    else:
+        LOGGER.info("Search complete. No candidate passed dynamic gates; no elites selected.")
