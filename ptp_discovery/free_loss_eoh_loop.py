@@ -212,13 +212,13 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             fitness = evaluate_free_loss_candidate(compiled, free_cfg)
             evaluated += 1
 
-            cand_entry = {
+            cand_entry_log = {
                 "generation": gen,
                 "index": idx,
                 "ir": asdict(ir),
                 "fitness": fitness,
             }
-            candidates_log.append(cand_entry)
+            candidates_log.append(cand_entry_log)
             fitness_log.append(
                 {
                     "generation": gen,
@@ -227,7 +227,13 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     "validation_objective": fitness["validation_objective"],
                 }
             )
-            gen_elites.append(cand_entry)
+            elite_entry = {
+                "generation": gen,
+                "index": idx,
+                "ir": ir,
+                "fitness": fitness,
+            }
+            gen_elites.append(elite_entry)
 
         gen_elites.sort(key=lambda e: e["fitness"]["hf_like_score"])
         LOGGER.info(
@@ -248,9 +254,14 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
     if elites:
         best = elites[0]
+        best_ir = best.get("ir")
+        best_serializable = dict(best)
+        if isinstance(best_ir, FreeLossIR):
+            best_serializable["ir"] = asdict(best_ir)
+
         best_path = os.path.join(run_dir, "best_candidate.json")
         with open(best_path, "w", encoding="utf-8") as f:
-            json.dump(best, f, indent=2)
+            json.dump(best_serializable, f, indent=2)
         LOGGER.info(
             "Search complete. Best hf_like_score=%.6f (generation=%d, index=%d)",
             best["fitness"]["hf_like_score"],
