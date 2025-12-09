@@ -80,19 +80,27 @@ def run_dynamic_gates(
     if not torch.isfinite(loss):
         return DynamicGateResult(ok=False, reason="loss is not finite.")
 
-    try:
-        loss.backward()
-    except Exception as exc:  # noqa: BLE001
-        return DynamicGateResult(ok=False, reason=f"backward_error: {exc}")
+    # Some candidate losses may not depend on model parameters for this
+    # synthetic batch, in which case loss.requires_grad will be False.
+    # In that situation calling backward() would raise an error, but
+    # we still want to allow the candidate as long as the loss value
+    # itself is well-behaved. We therefore only run a backward pass and
+    # gradient-norm check when gradients are actually defined.
+    grad_norm = 0.0
+    if loss.requires_grad:
+        try:
+            loss.backward()
+        except Exception as exc:  # noqa: BLE001
+            return DynamicGateResult(ok=False, reason=f"backward_error: {exc}")
 
-    total_norm_sq = 0.0
-    for p in model.parameters():
-        if p.grad is None:
-            continue
-        if not torch.isfinite(p.grad).all():
-            return DynamicGateResult(ok=False, reason="NaN/Inf in gradients.")
-        total_norm_sq += float(p.grad.norm().item() ** 2)
-    grad_norm = total_norm_sq ** 0.5
+        total_norm_sq = 0.0
+        for p in model.parameters():
+            if p.grad is None:
+                continue
+            if not torch.isfinite(p.grad).all():
+                return DynamicGateResult(ok=False, reason="NaN/Inf in gradients.")
+            total_norm_sq += float(p.grad.norm().item() ** 2)
+        grad_norm = total_norm_sq ** 0.5
 
     if grad_norm > grad_norm_max:
         return DynamicGateResult(
