@@ -11,6 +11,6 @@ export CUDA_VISIBLE_DEVICES=6
 #     --device cuda > nohup_ptp_dsl.out 2>&1 &
 
 # Free-form loss discovery (EoH-style). Uncomment to enable.
-nohup python -u -m ptp_discovery.run_free_loss_eoh \
-    --config configs/free_loss_discovery.yaml \
-    --device cuda > nohup_free_loss.out 2>&1 &
+nohup python ptp_discovery/run_free_loss_eoh.py \
+  --config configs/free_loss_discovery.yaml \
+  --device cuda > nohup_free_loss.out 2>&1 &

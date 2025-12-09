@@ -2,6 +2,15 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
+import sys
+
+# Make this file usable both as a module (`-m ptp_discovery.run_free_loss_eoh`)
+# and as a direct script (`python ptp_discovery/run_free_loss_eoh.py`).
+if __package__ is None or __package__ == "":
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if repo_root not in sys.path:
+        sys.path.insert(0, repo_root)
 
 from ptp_discovery.free_loss_eoh_loop import run_free_loss_eoh
 
