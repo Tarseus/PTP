@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import inspect
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
@@ -115,16 +116,45 @@ def compile_ptp_program(spec: PTPProgramSpec) -> CompiledPTPProgram:
     )
     weight_primitive_fn = get_weight_primitive(spec.weight.primitive)
 
+    def _filter_kwargs(
+        fn: Callable[..., Any], params: Mapping[str, Any]
+    ) -> Dict[str, Any]:
+        """Filter a params dict to only those accepted by fn as keyword args.
+
+        This makes the system robust to DSL mutations that leave stale
+        hyperparameters when switching primitives (e.g. topk_vs_random ->
+        diversity_contrast_pairs), by simply ignoring unknown keys.
+        """
+
+        try:
+            sig = inspect.signature(fn)
+        except (TypeError, ValueError):
+            # Builtins or callables without signatures: pass params through.
+            return dict(params)
+
+        allowed: List[str] = []
+        for name, p in sig.parameters.items():
+            if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.VAR_POSITIONAL):
+                continue
+            # Accept both positional-or-keyword and keyword-only as kwargs.
+            if p.kind in (
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                inspect.Parameter.KEYWORD_ONLY,
+            ):
+                allowed.append(name)
+        return {k: v for k, v in params.items() if k in allowed}
+
     def select_anchors(
         instance_meta: Mapping[str, Any],
         pool_meta: Mapping[str, Any],
         stage: str,
     ) -> List[SolutionId]:
+        anchor_params = _filter_kwargs(anchor_primitive_fn, spec.anchors.params)
         return anchor_primitive_fn(
             instance_meta=instance_meta,
             pool_meta=pool_meta,
             stage=stage,
-            **spec.anchors.params,
+            **anchor_params,
         )
 
     def build_preferences(
@@ -132,11 +162,14 @@ def compile_ptp_program(spec: PTPProgramSpec) -> CompiledPTPProgram:
         pool_meta: Mapping[str, Any],
         stage: str,
     ) -> List[Tuple[SolutionId, SolutionId]]:
+        build_params = _filter_kwargs(
+            build_pref_primitive_fn, spec.build_preferences.params
+        )
         pairs = build_pref_primitive_fn(
             anchor_ids=anchor_ids,
             pool_meta=pool_meta,
             stage=stage,
-            **spec.build_preferences.params,
+            **build_params,
         )
         return list(pairs)
 
@@ -146,13 +179,14 @@ def compile_ptp_program(spec: PTPProgramSpec) -> CompiledPTPProgram:
         size: float,
         stage: str,
     ) -> float:
+        weight_params = _filter_kwargs(weight_primitive_fn, spec.weight.params)
         return float(
             weight_primitive_fn(
                 delta_obj=delta_obj,
                 delta_struct=delta_struct,
                 size=size,
                 stage=stage,
-                **spec.weight.params,
+                **weight_params,
             )
         )
 
