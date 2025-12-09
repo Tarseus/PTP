@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import logging
 
-from .free_loss_eoh_loop import run_free_loss_eoh
+from ptp_discovery.free_loss_eoh_loop import run_free_loss_eoh
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
