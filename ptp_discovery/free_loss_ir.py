@@ -47,8 +47,10 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
         operators_list = [str(op) for op in operators_raw]
     elif operators_raw is None:
         operators_list = []
+    elif isinstance(operators_raw, Mapping):
+        expects = [str(k) for k in operators_raw.keys()]
     else:
-        print(f"{debug_prefix} operators_used not array; raw={operators_raw!r}")
+        print(f"{debug_prefix} operators_used not array or Mapping; type of raw: {type(operators_raw)}, raw={operators_raw!r}")
         operators_list = [str(operators_raw)]
 
     # implementation_hint: prefer an object; if not, log and replace.
@@ -61,9 +63,11 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
         expects = [str(x) for x in expects_raw]
     elif expects_raw is None:
         expects = []
+    elif isinstance(expects_raw, Mapping):
+        expects = [str(k) for k in expects_raw.keys()]
     else:
         # Be tolerant to models that emit a single string or other scalar.
-        print(f"{debug_prefix} implementation_hint.expects not array; raw={expects_raw!r}")
+        print(f"{debug_prefix} implementation_hint.expects not array or Mapping; type of raw: {type(expects_raw)}, raw={expects_raw!r}")
         expects = [str(expects_raw)]
 
     returns = str(impl_raw.get("returns", "")).strip()

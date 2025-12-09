@@ -15,13 +15,13 @@ init_llm: 4
 # Multi-fidelity budget (in training steps).
 f0_only: false
 f1_steps: 32
-f2_steps: 0    # set >0 to enable F2
+f2_steps: 100    # set >0 to enable F2
 f3_enabled: false
 
 # Training / evaluation config for TSP.
 problem: tsp
 train_problem_size: 20
-valid_problem_sizes: [100]
+valid_problem_sizes: [20]
 train_batch_size: 64
 pomo_size: 64
 learning_rate: 0.0003
