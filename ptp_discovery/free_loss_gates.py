@@ -1,0 +1,115 @@
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Dict, Mapping, Sequence
+
+import torch
+
+from .free_loss_compiler import CompiledFreeLoss
+from .free_loss_ir import FreeLossIR
+
+
+@dataclass
+class StaticGateResult:
+    ok: bool
+    reason: str = ""
+
+
+@dataclass
+class DynamicGateResult:
+    ok: bool
+    reason: str = ""
+    loss_value: float | None = None
+    grad_norm: float | None = None
+
+
+def run_static_gates(
+    ir: FreeLossIR,
+    *,
+    operator_whitelist: Sequence[str],
+) -> StaticGateResult:
+    if not ir.name:
+        return StaticGateResult(ok=False, reason="Missing name.")
+    if not ir.pseudocode:
+        return StaticGateResult(ok=False, reason="Missing pseudocode.")
+    if not ir.operators_used:
+        return StaticGateResult(ok=False, reason="operators_used must be non-empty.")
+
+    ops = set(ir.operators_used)
+    allowed = set(operator_whitelist)
+    if not ops.issubset(allowed):
+        return StaticGateResult(
+            ok=False,
+            reason=f"operators_used contains non-whitelisted operators: {sorted(ops - allowed)}",
+        )
+
+    if ir.implementation_hint.returns.lower() != "scalar":
+        return StaticGateResult(ok=False, reason="implementation_hint.returns must be 'scalar'.")
+
+    for key, value in ir.hyperparams.items():
+        if isinstance(value, (int, float)):
+            if not torch.isfinite(torch.tensor(float(value))):
+                return StaticGateResult(ok=False, reason=f"hyperparameter {key} is non-finite.")
+
+    return StaticGateResult(ok=True)
+
+
+def run_dynamic_gates(
+    compiled: CompiledFreeLoss,
+    batch: Mapping[str, Any],
+    model: torch.nn.Module,
+    *,
+    grad_norm_max: float,
+    loss_soft_min: float,
+    loss_soft_max: float,
+) -> DynamicGateResult:
+    model.zero_grad()
+
+    dummy_output: Dict[str, torch.Tensor] = {}
+
+    try:
+        loss = compiled.loss_fn(batch=batch, model_output=dummy_output, extra={})
+    except Exception as exc:  # noqa: BLE001
+        return DynamicGateResult(ok=False, reason=f"forward_error: {exc}")
+
+    if not torch.isfinite(loss):
+        return DynamicGateResult(ok=False, reason="loss is not finite.")
+
+    try:
+        loss.backward()
+    except Exception as exc:  # noqa: BLE001
+        return DynamicGateResult(ok=False, reason=f"backward_error: {exc}")
+
+    total_norm_sq = 0.0
+    for p in model.parameters():
+        if p.grad is None:
+            continue
+        if not torch.isfinite(p.grad).all():
+            return DynamicGateResult(ok=False, reason="NaN/Inf in gradients.")
+        total_norm_sq += float(p.grad.norm().item() ** 2)
+    grad_norm = total_norm_sq ** 0.5
+
+    if grad_norm > grad_norm_max:
+        return DynamicGateResult(
+            ok=False,
+            reason=f"grad_norm {grad_norm:.4f} exceeds max {grad_norm_max:.4f}",
+            loss_value=float(loss.item()),
+            grad_norm=grad_norm,
+        )
+
+    loss_val = float(loss.item())
+    if loss_val < loss_soft_min or loss_val > loss_soft_max:
+        return DynamicGateResult(
+            ok=False,
+            reason=f"loss {loss_val:.4f} outside soft range [{loss_soft_min}, {loss_soft_max}]",
+            loss_value=loss_val,
+            grad_norm=grad_norm,
+        )
+
+    return DynamicGateResult(
+        ok=True,
+        reason="ok",
+        loss_value=loss_val,
+        grad_norm=grad_norm,
+    )
+

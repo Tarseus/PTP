@@ -37,6 +37,25 @@ python test_n100.py
 python train_n100_po.py
 ```
 
+### Free-form preference loss discovery (experimental)
+
+We provide an additional EoH-style subsystem that lets an LLM propose new
+pairwise preference losses in a free-form IR, compiles them into safe
+PyTorch loss functions, filters them via static/dynamic gates, and evaluates
+them with a short-run TSP training loop.
+
+- Config: `configs/free_loss_discovery.yaml`
+- Entry point: `python -m ptp_discovery.run_free_loss_eoh --config configs/free_loss_discovery.yaml --device cuda`
+- Logs and artefacts are stored under `runs/free_loss_discovery/<timestamp>/`:
+  - `candidates.jsonl`: IR + fitness for all evaluated losses
+  - `gate_reports.jsonl`: static/dynamic gate outcomes and reasons
+  - `fitness_scores.jsonl`: scalar fitness summaries
+  - `best_candidate.json`: best loss IR and metrics from the run
+
+The existing PTP-DSL discovery pipeline (`ptp_discovery.run_llm_search`) and
+baseline POMO training scripts remain unchanged, so you can continue to use
+them as before.
+
 ### Acknowledgments
 
 We would like to express our sincere gratitude to the anonymous reviewers and (S)ACs of ICML 2025 for their thoughtful feedback and insightful comments, which have been instrumental in enhancing the quality of this work.

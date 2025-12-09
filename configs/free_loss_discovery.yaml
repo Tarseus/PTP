@@ -1,0 +1,63 @@
+seed: 1234
+
+# Number of evolutionary generations (outer loop).
+generations: 3
+
+# Population size per generation.
+population_size: 8
+
+# Number of elites carried over between generations.
+elite_size: 4
+
+# Number of initial LLM-generated candidates.
+init_llm: 4
+
+# Multi-fidelity budget (in training steps).
+f0_only: false
+f1_steps: 32
+f2_steps: 0    # set >0 to enable F2
+f3_enabled: false
+
+# Training / evaluation config for TSP.
+problem: tsp
+train_problem_size: 20
+valid_problem_sizes: [100]
+train_batch_size: 64
+pomo_size: 64
+learning_rate: 0.0003
+weight_decay: 0.000001
+alpha: 0.05
+device: cuda
+num_validation_episodes: 128
+validation_batch_size: 64
+generalization_penalty_weight: 1.0
+
+# Gate thresholds for dynamic checks.
+grad_norm_max: 10.0
+loss_soft_min: -5.0
+loss_soft_max: 5.0
+
+# Whitelist of allowed operators in free-form losses.
+operator_whitelist:
+  - logsigmoid
+  - softplus
+  - sigmoid
+  - exp
+  - log
+  - tanh
+  - relu
+  - clamp
+  - normalize
+  - zscore
+  - rank_gap
+
+# Paths to prompt templates (relative to repo root).
+prompts:
+  generation: prompts/free_loss_generation.txt
+  crossover: prompts/free_loss_crossover.txt
+  mutation: prompts/free_loss_mutation.txt
+  repair: prompts/free_loss_repair.txt
+
+# Output directory pattern for discovery runs.
+output_root: runs/free_loss_discovery
+
