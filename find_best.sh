@@ -1,3 +1,4 @@
+export TZ=Asia/Shanghai
 export CUDA_VISIBLE_DEVICES=6
 
 nohup python -u -m ptp_discovery.run_llm_search \

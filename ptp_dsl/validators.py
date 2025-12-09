@@ -128,7 +128,6 @@ def validate_ptp_program_spec(spec: PTPProgramSpec) -> None:
     _ensure_no_forbidden_features(spec.anchors.params)
     _ensure_no_forbidden_features(spec.build_preferences.params)
     _ensure_no_forbidden_features(spec.weight.params)
-    _ensure_no_forbidden_features(spec.schedule)
 
     _ensure_complexity_bounds(spec)
 

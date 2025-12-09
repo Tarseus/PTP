@@ -17,13 +17,6 @@ Your output MUST be a single JSON object with the following top-level keys:
     "primitive": <string>,
     ... primitive-specific parameters ...
   }
-- "schedule": {           # OPTIONAL but recommended
-    "stages": [
-      {"name": "warmup",  "start_frac": 0.0, "end_frac": 0.3},
-      {"name": "main",    "start_frac": 0.3, "end_frac": 0.8},
-      {"name": "finetune","start_frac": 0.8, "end_frac": 1.0}
-    ]
-  }
 
 Available primitives:
 - Anchors ("anchors.primitive"):

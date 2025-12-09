@@ -42,7 +42,6 @@ def parse_ptp_dsl(source: str) -> PTPProgramSpec:
       "anchors": {"primitive": "best_of_k", "params": {...}},
       "build_preferences": {"primitive": "topk_vs_random", "params": {...}},
       "weight": {"primitive": "logistic", "params": {...}},
-      "schedule": {...}   # optional
     }
     """
 
@@ -57,7 +56,6 @@ def parse_ptp_dsl(source: str) -> PTPProgramSpec:
     anchors_raw = raw.get("anchors")
     build_raw = raw.get("build_preferences")
     weight_raw = raw.get("weight")
-    schedule = raw.get("schedule", {}) or {}
 
     if not isinstance(anchors_raw, dict) or "primitive" not in anchors_raw:
         raise ValueError("anchors must be an object with a 'primitive' field.")
@@ -97,7 +95,6 @@ def parse_ptp_dsl(source: str) -> PTPProgramSpec:
         anchors=anchors,
         build_preferences=build_preferences,
         weight=weight,
-        schedule=schedule,
         source=source,
     )
 

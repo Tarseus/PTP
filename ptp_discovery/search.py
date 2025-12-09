@@ -7,8 +7,6 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 from fitness.ptp_high_fidelity import HighFidelityConfig, evaluate_ptp_dsl_high_fidelity
 from .problem import PTPDiscoveryCandidate, PTPDiscoveryResult, PTPDiscoveryProblem
 from .structural_mutation import (
-    mutate_schedule_boundaries,
-    mutate_weight_thresholds,
     swap_build_preferences_primitive,
     crossover_modules,
 )
@@ -77,7 +75,6 @@ class PTPDiscoverySearch:
             mutated_sources = [
                 mutate_weight_thresholds(base_source),
                 swap_build_preferences_primitive(base_source),
-                mutate_schedule_boundaries(base_source),
             ]
 
             for mutated in mutated_sources:

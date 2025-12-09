@@ -68,7 +68,6 @@ class PTPProgramSpec:
         - an anchor selection strategy
         - a preference construction strategy
         - a preference weighting strategy
-        - an optional stage schedule describing training phases
 
     The *source* field stores the raw DSL text (JSON string in the current
     implementation) for logging and reproducibility.
@@ -77,6 +76,5 @@ class PTPProgramSpec:
     anchors: AnchorSpec
     build_preferences: BuildPreferencesSpec
     weight: WeightSpec
-    schedule: Dict[str, Any] = field(default_factory=dict)
     source: Optional[str] = None
 

@@ -82,42 +82,6 @@ def swap_build_preferences_primitive(source: str) -> Optional[str]:
     obj["build_preferences"] = build
     return _dump_dsl(obj)
 
-
-def mutate_schedule_boundaries(source: str) -> Optional[str]:
-    """Structured mutation: slightly move the fractional boundaries of stages."""
-
-    try:
-        obj = _load_dsl(source)
-    except json.JSONDecodeError:
-        return None
-
-    schedule = obj.get("schedule")
-    if not isinstance(schedule, dict):
-        return None
-
-    stages = schedule.get("stages")
-    if not isinstance(stages, list) or not stages:
-        return None
-
-    mutated = False
-    for stage in stages:
-        if "start_frac" in stage and "end_frac" in stage:
-            width = float(stage["end_frac"] - stage["start_frac"])
-            if width <= 0:
-                continue
-            shift = random.uniform(-0.05 * width, 0.05 * width)
-            stage["start_frac"] = max(0.0, float(stage["start_frac"]) + shift)
-            stage["end_frac"] = min(1.0, float(stage["end_frac"]) + shift)
-            mutated = True
-
-    if not mutated:
-        return None
-
-    schedule["stages"] = stages
-    obj["schedule"] = schedule
-    return _dump_dsl(obj)
-
-
 def crossover_modules(source_a: str, source_b: str) -> Optional[str]:
     """Module-level crossover: combine anchors from A and weighting from B."""
 
@@ -139,11 +103,6 @@ def crossover_modules(source_a: str, source_b: str) -> Optional[str]:
         "build_preferences": build_preferences,
         "weight": weight,
     }
-
-    # Prefer schedule from A if present, otherwise from B.
-    schedule = obj_a.get("schedule", obj_b.get("schedule"))
-    if isinstance(schedule, dict):
-        child["schedule"] = schedule
 
     return _dump_dsl(child)
 
