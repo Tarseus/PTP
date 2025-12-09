@@ -32,23 +32,44 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
     intuition = str(obj.get("intuition", "")).strip()
     pseudocode = str(obj.get("pseudocode", "")).strip()
     hyperparams_raw = obj.get("hyperparams", {}) or {}
-    operators_raw = obj.get("operators_used", []) or []
+    operators_raw = obj.get("operators_used", []) or {}
     impl_raw = obj.get("implementation_hint", {}) or {}
 
-    if not isinstance(hyperparams_raw, dict):
-        raise ValueError("hyperparams must be a JSON object.")
-    if not isinstance(operators_raw, (list, tuple)):
-        raise ValueError("operators_used must be a JSON array.")
-    if not isinstance(impl_raw, Mapping):
-        raise ValueError("implementation_hint must be a JSON object.")
+    debug_prefix = "[FreeLossIR debug]"
 
-    expects = impl_raw.get("expects", []) or []
-    if not isinstance(expects, (list, tuple)):
-        raise ValueError("implementation_hint.expects must be a JSON array.")
+    # hyperparams: prefer an object, but fall back to empty dict on mismatch.
+    if not isinstance(hyperparams_raw, dict):
+        print(f"{debug_prefix} hyperparams not object; raw={hyperparams_raw!r}")
+        hyperparams_raw = {}
+
+    # operators_used: prefer an array; if not, log and coerce.
+    if isinstance(operators_raw, (list, tuple)):
+        operators_list = [str(op) for op in operators_raw]
+    elif operators_raw is None:
+        operators_list = []
+    else:
+        print(f"{debug_prefix} operators_used not array; raw={operators_raw!r}")
+        operators_list = [str(operators_raw)]
+
+    # implementation_hint: prefer an object; if not, log and replace.
+    if not isinstance(impl_raw, Mapping):
+        print(f"{debug_prefix} implementation_hint not object; raw={impl_raw!r}")
+        impl_raw = {}
+
+    expects_raw = impl_raw.get("expects", []) or []
+    if isinstance(expects_raw, (list, tuple)):
+        expects = [str(x) for x in expects_raw]
+    elif expects_raw is None:
+        expects = []
+    else:
+        # Be tolerant to models that emit a single string or other scalar.
+        print(f"{debug_prefix} implementation_hint.expects not array; raw={expects_raw!r}")
+        expects = [str(expects_raw)]
+
     returns = str(impl_raw.get("returns", "")).strip()
 
     impl = FreeLossImplementationHint(
-        expects=[str(x) for x in expects],
+        expects=expects,
         returns=returns or "scalar",
     )
 
@@ -57,7 +78,6 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
         intuition=intuition,
         pseudocode=pseudocode,
         hyperparams=dict(hyperparams_raw),
-        operators_used=[str(op) for op in operators_raw],
+        operators_used=operators_list,
         implementation_hint=impl,
     )
-
