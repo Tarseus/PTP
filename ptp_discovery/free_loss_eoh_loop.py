@@ -487,9 +487,14 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
     if elites:
         best = elites[0]
+        # Make sure `ir` is JSON-serializable (convert FreeLossIR dataclass to dict).
+        best_serializable = dict(best)
+        ir_value = best_serializable.get("ir")
+        if isinstance(ir_value, FreeLossIR):
+            best_serializable["ir"] = asdict(ir_value)
         best_path = os.path.join(run_dir, "best_candidate.json")
         with open(best_path, "w", encoding="utf-8") as f:
-            json.dump(best, f, indent=2, ensure_ascii=False)
+            json.dump(best_serializable, f, indent=2, ensure_ascii=False)
         LOGGER.info(
             "Search complete. Best hf_like_score=%.6f (generation=%d, index=%d)",
             best["fitness"]["hf_like_score"],
