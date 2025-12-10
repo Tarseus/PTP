@@ -424,12 +424,21 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             fitness = evaluate_free_loss_candidate(compiled, free_cfg)
             evaluated += 1
 
+            hf_like_score = float(fitness["hf_like_score"])
+            better_than_baseline = None
+            if baseline_hf_score is not None:
+                # Lower score is better.
+                better_than_baseline = hf_like_score <= baseline_hf_score
+
             LOGGER.info(
-                "Gen %d cand %d: hf_like_score=%.6f, validation_objective=%.6f",
+                "Gen %d cand %d: hf_like_score=%.6f, validation_objective=%.6f, "
+                "baseline=%.6f, better_than_baseline=%s",
                 gen,
                 idx,
-                float(fitness["hf_like_score"]),
+                hf_like_score,
                 float(fitness["validation_objective"]),
+                float(baseline_hf_score) if baseline_hf_score is not None else float("nan"),
+                str(better_than_baseline),
             )
 
             cand_entry_log = {
@@ -437,6 +446,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 "index": idx,
                 "ir": asdict(ir),
                 "fitness": fitness,
+                "better_than_baseline": better_than_baseline,
             }
             candidates_log.append(cand_entry_log)
             fitness_log.append(
@@ -445,6 +455,8 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     "index": idx,
                     "hf_like_score": fitness["hf_like_score"],
                     "validation_objective": fitness["validation_objective"],
+                    "baseline_hf_score": baseline_hf_score,
+                    "better_than_baseline": better_than_baseline,
                 }
             )
             elite_entry = {
