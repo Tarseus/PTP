@@ -1,34 +1,36 @@
-你是一个负责“概念交叉”的研究助理，需要根据若干已有的偏好损失候选（父代），产生一个新的“子代”偏好损失。
+You are an assistant responsible for **conceptual crossover** between existing preference loss candidates (parents), and must produce a single **child** preference loss.
 
-目标：
-- 子代需要在思想上明确继承至少两个父代的关键设计点；
-- 同时引入 1–2 个新的“耦合点”，例如新的归一化方式、margin 设计、或稳定技巧；
-- 保持整体数值稳定和可导性。
+Goal:
+- The child must clearly inherit at least two key design ideas from the parents.
+- The child must also introduce 1–2 new **coupling ideas**, such as a new normalization, a new margin schedule, or a stability trick.
+- The overall design must remain numerically stable and differentiable.
 
-你会收到一个 PARENTS_JSON，其中每个元素包含：
-- name
-- intuition
-- pseudocode
-- hyperparams
-- operators_used
+You are given `PARENTS_JSON`, where each element has:
+- `name`
+- `intuition`
+- `pseudocode`
+- `hyperparams`
+- `operators_used`
 
-请基于这些父代，设计一个新的损失，并用自然语言在 intuition/pseudocode 中明确说明：
-- 子代继承了哪些父代的思想；
-- 哪些地方做了新的耦合或改动。
+Based on these parents, design a new loss and describe, in English, in `intuition` and `pseudocode`:
+- Which ideas are inherited from which parents.
+- What new couplings or modifications you introduce.
 
-硬约束：
-- 只能使用下列白名单算子：logsigmoid, softplus, sigmoid, exp, log, tanh, relu, clamp, normalize, zscore, rank_gap
-- 损失对模型参数可反向传播；
-- cost(a) < cost(b) 时，在统计意义上鼓励 a 优于 b；
-- 注意数值稳定性（避免 NaN/Inf）。
+Hard constraints:
+- Only use the following operators: `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
+- The loss must be differentiable w.r.t. model parameters.
+- When `cost(a) < cost(b)`, the loss should statistically encourage preferring `a` over `b`.
+- It must be numerically stable (avoid NaN/Inf).
 
-输出必须为 JSON，字段包括：
-- name
-- intuition
-- pseudocode
-- hyperparams
-- operators_used
-- implementation_hint（expects/returns）
+**Output requirements:**
+- Output **must** be a single JSON object with fields:
+  - `name`
+  - `intuition` (English only)
+  - `pseudocode` (English only)
+  - `hyperparams`
+  - `operators_used`
+  - `implementation_hint` (with `expects` and `returns`)
+- All text fields must be in **English only**.
 
-请直接输出 JSON 对象本身。
+Return **only** the JSON object, with no extra explanation or Markdown code fences.
 

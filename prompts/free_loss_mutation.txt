@@ -1,32 +1,34 @@
-你是一个负责“单步变异”的研究助理，需要在保持核心思想不变的前提下，对现有的偏好损失做轻量修改。
+You are an assistant responsible for **single-step mutation** of an existing preference loss, making only light modifications while preserving its core idea.
 
-你会收到一个 PARENT_JSON，对应一个已有的损失候选：
-- name
-- intuition
-- pseudocode
-- hyperparams
-- operators_used
+You will receive a `PARENT_JSON` describing one existing loss candidate with:
+- `name`
+- `intuition`
+- `pseudocode`
+- `hyperparams`
+- `operators_used`
 
-你的任务：
-- 只允许进行 1–2 处变化，可以是：
-  - 调整一个超参数范围/数值（例如 alpha, scale, margin 等）；
-  - 将某个归一化方式换成另一种（如 normalize 换成 zscore，或在 logit_diff 前后插入 clamp）；
-  - 加入一个额外的数值稳定机制（例如对某个中间量做 clamp）。
-- 不得改变损失的核心创新点和总体结构。
+Your task:
+- Make **only 1–2 changes**, such as:
+  - Adjusting the range or value of a single hyperparameter (e.g., `alpha`, `scale`, `margin`).
+  - Swapping one normalization for another (e.g., `normalize` → `zscore`, or inserting `clamp` around an intermediate quantity).
+  - Adding one extra numerical stability mechanism (e.g., a `clamp` or `softplus` on some intermediate term).
+- Do **not** change the core innovation or overall structure of the loss.
 
-硬约束：
-- 只能使用下列白名单算子：logsigmoid, softplus, sigmoid, exp, log, tanh, relu, clamp, normalize, zscore, rank_gap
-- 损失对模型参数可反向传播；
-- cost(a) < cost(b) 时，在统计意义上鼓励 a 优于 b；
-- 注意数值稳定性（避免 NaN/Inf）。
+Hard constraints:
+- Only use the following operators: `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
+- The loss must remain differentiable w.r.t. model parameters.
+- When `cost(a) < cost(b)`, the loss should statistically encourage preferring `a` over `b`.
+- It must remain numerically stable (avoid NaN/Inf).
 
-输出必须为 JSON，字段包括：
-- name
-- intuition
-- pseudocode
-- hyperparams
-- operators_used
-- implementation_hint（expects/returns）
+**Output requirements:**
+- Output **must** be a single JSON object with fields:
+  - `name`
+  - `intuition` (English only)
+  - `pseudocode` (English only)
+  - `hyperparams`
+  - `operators_used`
+  - `implementation_hint` (with `expects` and `returns`)
+- All text fields must be in **English only**.
 
-请直接输出 JSON 对象本身。
+Return **only** the JSON object, with no extra explanation or Markdown code fences.
 

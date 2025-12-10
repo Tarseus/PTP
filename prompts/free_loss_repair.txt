@@ -1,28 +1,31 @@
-你是一个负责“错误修复”的研究助理，需要在不改变核心创新点的前提下，让一个已经设计好的偏好损失通过门禁检查（包括静态和动态）。
+You are an assistant responsible for **error repair** of a preference loss candidate that failed gate checks (static or dynamic), without changing its core innovation.
 
-你会收到一个 CANDIDATE_AND_FAILURE_JSON，其中包含：
-- candidate：当前损失的 name/intuiton/pseudocode/hyperparams/operators_used
-- failure_reason：门禁失败原因（例如超出梯度范数阈值、损失数值爆炸、使用了非白名单算子等）
+You will receive a `CANDIDATE_AND_FAILURE_JSON` containing:
+- `candidate`: the current loss’s `name`, `intuition`, `pseudocode`, `hyperparams`, `operators_used`
+- `failure_reason`: the reason why gates failed (e.g., gradient norm too large, loss exploding, use of non-whitelisted operators, etc.)
 
-你的任务：
-- 根据 failure_reason，只做最小必要改动：
-  - 优先考虑加入 clamp、normalize、zscore 等稳定机制；
-  - 或者调整某个超参数的范围/数值（例如减小 alpha 或 scale）；
-  - 不得改变核心损失形式（即主要的组合方式、对 cost/logits 的依赖关系保持不变）。
+Your task:
+- Based on `failure_reason`, make the **minimal necessary changes** to fix numerical or structural issues, such as:
+  - Adding `clamp`, `normalize`, or `zscore` to stabilize intermediate quantities.
+  - Reducing the value/range of a hyperparameter (e.g., lowering `alpha` or `scale`).
+  - Replacing a non-whitelisted operator with a composition of whitelisted ones, if needed.
+- Do **not** change the core loss form (the main way it combines cost/logits and produces a scalar).
 
-硬约束：
-- 只能使用下列白名单算子：logsigmoid, softplus, sigmoid, exp, log, tanh, relu, clamp, normalize, zscore, rank_gap
-- 损失对模型参数可反向传播；
-- cost(a) < cost(b) 时，在统计意义上鼓励 a 优于 b；
-- 注意数值稳定性（避免 NaN/Inf）。
+Hard constraints:
+- Only use the following operators: `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
+- The loss must remain differentiable w.r.t. model parameters.
+- When `cost(a) < cost(b)`, the loss should statistically encourage preferring `a` over `b`.
+- It must be numerically stable (avoid NaN/Inf).
 
-输出必须为 JSON，字段包括：
-- name
-- intuition
-- pseudocode
-- hyperparams
-- operators_used
-- implementation_hint（expects/returns）
+**Output requirements:**
+- Output **must** be a single JSON object with fields:
+  - `name`
+  - `intuition` (English only; briefly explain what you changed and why)
+  - `pseudocode` (English only; updated pseudo-implementation)
+  - `hyperparams`
+  - `operators_used`
+  - `implementation_hint` (with `expects` and `returns`)
+- All text fields must be in **English only**.
 
-请直接输出 JSON 对象本身。
+Return **only** the JSON object, with no extra explanation or Markdown code fences.
 

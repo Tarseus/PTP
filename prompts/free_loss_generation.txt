@@ -1,36 +1,37 @@
-任务：为组合优化偏好轨迹学习提出一个新的偏好损失函数。
+Task: Propose a new **preference loss** for learning from pairwise preferences in combinatorial optimization (e.g., TSP), in a *free-form* way.
 
-你可以自由创新损失结构，不必局限于 Bradley-Terry、logistic、DPO 等传统形式。
+You may freely design the loss structure and are **not** restricted to Bradley–Terry, logistic, DPO, etc. Only three hard constraints:
+1. The loss must be differentiable w.r.t. model parameters (subgradients are allowed).
+2. For the same instance, if cost(a) < cost(b), the loss should *statistically* encourage the model to prefer a over b (weak preference consistency).
+3. It must be numerically stable: extreme Δcost or logits must not produce NaN/Inf.
 
-三条硬约束：
-1. 损失对模型参数可反向传播（尽量平滑，允许可次梯度）。
-2. 对同一实例两条解 a,b，如果 cost(a) < cost(b)，你的损失应在统计意义上更鼓励 a 优于 b（弱一致性）。
-3. 需要考虑数值稳定性（极端 Δcost / 极端 logits 不产生 NaN/Inf）。
+Setting:
+- You consider a pair of solutions (a, b) for the same instance.
+- `cost(a)` and `cost(b)` are scalar objective values (lower is better).
+- The model produces log probabilities `logp(a)` and `logp(b)`.
+- You may only use the following **whitelisted operators** to compose your loss:
+  `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
 
-你将针对「同一实例下的一对解 (a, b)」构造损失，其中：
-- cost(a), cost(b) 是标量「越小越好」的目标函数值；
-- 模型会为两条解产生 log 概率 logp(a), logp(b)；
-- 你只能使用下列白名单算子构造损失：
-  logsigmoid, softplus, sigmoid, exp, log, tanh, relu, clamp, normalize, zscore, rank_gap
+Design a loss that combines costs and log-probability differences via scaling, margins, normalization, or other *stable* nonlinear transforms so that:
+- If `cost(a) < cost(b)` and `logp(a) < logp(b)`, the loss tends to **increase** (pressure to raise `logp(a)`).
+- If `cost(a) < cost(b)` and `logp(a) > logp(b)`, the loss tends to **decrease** (reward current preference).
+- In extreme cases (very large cost differences or logit differences), the loss remains bounded and finite.
 
-请你设计一个损失，将 cost 与 log 概率差结合起来，例如通过缩放、margin、归一化、或其它稳定的非线性组合，使得：
-- 当 cost(a) < cost(b) 且 logp(a) < logp(b) 时，损失倾向于增大，从而推动模型提升 a 的概率；
-- 当 cost(a) < cost(b) 且 logp(a) > logp(b) 时，损失倾向于减小（鼓励当前偏好）；
-- 极端情况下（很大的 cost 差或 logit 差），损失不会爆炸到无穷大或出现 NaN。
+**Output requirements (IMPORTANT):**
+- Output **must be a single JSON object**, with fields:
+  - `name` (string, English)
+  - `intuition` (string, English; short explanation of the idea)
+  - `pseudocode` (string, English; high-level pseudo-implementation)
+  - `hyperparams` (JSON object of hyperparameters)
+  - `operators_used` (array, subset of the whitelist)
+  - `implementation_hint` (JSON object with `expects` and `returns`)
+- All text (including `intuition` and `pseudocode`) must be in **English only**.
 
-输出必须为 JSON，字段包括：
-- name
-- intuition
-- pseudocode
-- hyperparams
-- operators_used（仅从白名单中选）
-- implementation_hint（其中 expects/returns 字段，用于声明输入输出）
-
-JSON 结构示例：
+JSON structure example (for format only):
 {
   "name": "MyStablePreferenceLoss",
-  "intuition": "...用中文或英文简要说明设计动机...",
-  "pseudocode": "使用 rank_gap(cost_a, cost_b) 计算 Δcost，并用 zscore 或 normalize 标准化，然后与 logit_diff 线性或非线性组合，再通过 logsigmoid 或 softplus 得到稳定的损失...",
+  "intuition": "Explain in English the main design idea and why it is stable.",
+  "pseudocode": "Use rank_gap(cost_a, cost_b) to compute a signed cost gap; normalize or zscore it; combine it linearly or non-linearly with logit_diff = logp_a - logp_b; pass through logsigmoid or softplus to get a stable scalar loss.",
   "hyperparams": {
     "alpha": 5.0,
     "scale": 1.0,
@@ -38,10 +39,10 @@ JSON 结构示例：
   },
   "operators_used": ["rank_gap", "zscore", "logsigmoid"],
   "implementation_hint": {
-    "expects": ["pair_cost_a", "pair_cost_b", "logit_diff"],
+    "expects": ["cost_a", "cost_b", "logp_a", "logp_b"],
     "returns": "scalar"
   }
 }
 
-请直接输出 JSON 对象本身，不要加任何额外说明或 Markdown 代码块。
+Return **only** the JSON object, with no extra explanation or Markdown code fences, and use **English only** in all string fields.
 
