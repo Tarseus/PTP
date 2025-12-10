@@ -9,8 +9,6 @@ from torch.optim import Adam
 
 from .ptp_high_fidelity import (
     HighFidelityConfig,
-    _build_struct_repr_from_tour,
-    _estimate_struct_delta_from_edges,
     _set_seed,
     _evaluate_tsp_model,
 )
@@ -33,47 +31,23 @@ class FreeLossFidelityConfig:
 
 
 def _build_preference_pairs(
-    env: TSPEnv,
     objective: torch.Tensor,
-) -> Tuple[Sequence[Mapping[str, Any]], Sequence[Tuple[int, int]], Sequence[Any]]:
-    batch_size = objective.size(0)
-    pomo_size = objective.size(1)
+) -> Tuple[Tuple[torch.Tensor, torch.Tensor, torch.Tensor], int]:
+    """Vectorized construction of winner/loser indices.
 
-    all_pairs: list[Tuple[int, int]] = []
-    batch_meta: list[Dict[str, Any]] = []
-    struct_repr_list: list[Any] = []
+    For each instance in the batch, we consider all pairs (i, j) such that
+    objective[i] < objective[j] (i is better than j). This yields three
+    index tensors (batch_idx, winner_idx, loser_idx) plus the total pair
+    count. We intentionally do not compute structural features here to keep
+    the free-loss evaluation lightweight.
+    """
 
-    for batch_index in range(batch_size):
-        instance_meta = {
-            "size": int(env.problem_size),
-            "batch_index": int(batch_index),
-        }
-        batch_meta.append(instance_meta)
-
-        solutions_meta: list[Dict[str, Any]] = []
-        for pomo_index in range(pomo_size):
-            obj_value = float(objective[batch_index, pomo_index].item())
-            tour = env.selected_node_list[batch_index, pomo_index]
-            struct_repr = _build_struct_repr_from_tour(tour)
-            solutions_meta.append(
-                {
-                    "solution_id": int(pomo_index),
-                    "objective": obj_value,
-                    "size": int(env.problem_size),
-                    "struct_repr": struct_repr,
-                }
-            )
-            struct_repr_list.append(struct_repr)
-
-        sorted_indices = sorted(
-            range(pomo_size),
-            key=lambda idx: float(objective[batch_index, idx].item()),
-        )
-        for better_rank, better_idx in enumerate(sorted_indices):
-            for worse_idx in sorted_indices[better_rank + 1 :]:
-                all_pairs.append((better_idx, worse_idx))
-
-    return batch_meta, all_pairs, struct_repr_list
+    # objective: (batch, pomo)
+    # mask[b, i, j] = True if i is better (lower cost) than j for instance b.
+    mask = objective[:, :, None] < objective[:, None, :]
+    b_idx, winner_idx, loser_idx = mask.nonzero(as_tuple=True)
+    pair_count = int(b_idx.numel())
+    return (b_idx, winner_idx, loser_idx), pair_count
 
 
 def _train_one_batch_with_free_loss(
@@ -82,7 +56,7 @@ def _train_one_batch_with_free_loss(
     optimizer: Adam,
     compiled_loss: CompiledFreeLoss,
     hf_cfg: HighFidelityConfig,
-) -> Tuple[float, float]:
+) -> Tuple[float, float, int]:
     batch_size = hf_cfg.train_batch_size
     aug_factor = 1
 
@@ -103,31 +77,20 @@ def _train_one_batch_with_free_loss(
         state, reward, done = env.step(selected)
         prob_list = torch.cat((prob_list, prob[:, :, None]), dim=2)
 
-    objective = -reward
-    log_prob = torch.log(prob_list + 1e-8).sum(dim=2)
+    objective = -reward  # (batch, pomo)
+    log_prob = torch.log(prob_list + 1e-8).sum(dim=2)  # (batch, pomo)
 
-    _, pairs, _ = _build_preference_pairs(env, objective)
+    (b_idx, winner_idx, loser_idx), pair_count = _build_preference_pairs(objective)
 
-    if not pairs:
+    if pair_count == 0:
         advantage = reward - reward.mean(dim=1, keepdim=True)
         rl_log_prob = log_prob
         loss = -(advantage * rl_log_prob).mean()
     else:
-        costs_a = []
-        costs_b = []
-        logp_w = []
-        logp_l = []
-
-        for (winner_idx, loser_idx) in pairs:
-            costs_a.append(objective[:, winner_idx])
-            costs_b.append(objective[:, loser_idx])
-            logp_w.append(log_prob[:, winner_idx])
-            logp_l.append(log_prob[:, loser_idx])
-
-        cost_a_tensor = torch.stack(costs_a, dim=0).mean(dim=1)
-        cost_b_tensor = torch.stack(costs_b, dim=0).mean(dim=1)
-        logp_w_tensor = torch.stack(logp_w, dim=0).mean(dim=1)
-        logp_l_tensor = torch.stack(logp_l, dim=0).mean(dim=1)
+        cost_a_tensor = objective[b_idx, winner_idx]
+        cost_b_tensor = objective[b_idx, loser_idx]
+        logp_w_tensor = log_prob[b_idx, winner_idx]
+        logp_l_tensor = log_prob[b_idx, loser_idx]
 
         weight = torch.ones_like(cost_a_tensor)
         batch = {
@@ -146,7 +109,7 @@ def _train_one_batch_with_free_loss(
     loss.backward()
     optimizer.step()
 
-    return score_mean.item(), float(loss.item())
+    return score_mean.item(), float(loss.item()), pair_count
 
 
 def evaluate_free_loss_candidate(
@@ -187,6 +150,7 @@ def evaluate_free_loss_candidate(
 
     score_meter = AverageMeter()
     loss_meter = AverageMeter()
+    total_pairs = 0
 
     steps = max(int(cfg.f1_steps), 1)
     logger.info(
@@ -201,7 +165,7 @@ def evaluate_free_loss_candidate(
     log_interval = max(steps // 10, 1)
 
     for step in range(steps):
-        score, loss = _train_one_batch_with_free_loss(
+        score, loss, pair_count = _train_one_batch_with_free_loss(
             env=env,
             model=model,
             optimizer=optimizer,
@@ -210,16 +174,19 @@ def evaluate_free_loss_candidate(
         )
         score_meter.update(score)
         loss_meter.update(loss)
+        total_pairs += int(pair_count)
 
         if (step + 1) % log_interval == 0 or step == 0:
             logger.info(
-                "Free-loss step %d/%d: score=%.6f (avg=%.6f), loss=%.6f (avg=%.6f)",
+                "Free-loss step %d/%d: score=%.6f (avg=%.6f), loss=%.6f (avg=%.6f), pairs_step=%d, pairs_total=%d",
                 step + 1,
                 steps,
                 score,
                 float(score_meter.avg),
                 loss,
                 float(loss_meter.avg),
+                int(pair_count),
+                total_pairs,
             )
 
     main_valid_obj = _evaluate_tsp_model(
@@ -256,6 +223,7 @@ def evaluate_free_loss_candidate(
         "generalization_objectives": gen_objectives,
         "train_score_mean": float(score_meter.avg),
         "train_loss_mean": float(loss_meter.avg),
+        "pair_count": int(total_pairs),
         "config": {
             "hf": asdict(cfg.hf),
             "free_loss": {

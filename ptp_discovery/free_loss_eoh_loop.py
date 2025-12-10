@@ -257,11 +257,14 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         f3_enabled=bool(cfg_yaml.get("f3_enabled", False)),
     )
 
+    baseline_hf_score: float | None = None
+
     # Baseline: evaluate the original POMO po_loss once, using the same HF
     # configuration. This provides a reference score before searching over
     # free-form preference losses.
     try:
         baseline = evaluate_po_baseline(hf_cfg)
+        baseline_hf_score = float(baseline["hf_score"])
         LOGGER.info(
             "Baseline po_loss: hf_score=%.6f, validation_objective=%.6f, gen_penalty=%.6f",
             baseline["hf_score"],
@@ -422,7 +425,20 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             }
             gen_elites.append(elite_entry)
 
-        gen_elites.sort(key=lambda e: e["fitness"]["hf_like_score"])
+        def _elite_key(entry: Dict[str, Any]) -> Tuple[float, float, float]:
+            score = float(entry["fitness"]["hf_like_score"])
+            pair_count = float(entry["fitness"].get("pair_count", 0) or 0)
+            if baseline_hf_score is None:
+                # Fallback: purely score-based, with pair_count as a tie-breaker.
+                return (0.0, score, pair_count)
+            # Prefer candidates that beat the baseline (lower score).
+            better = score <= baseline_hf_score
+            flag = 0.0 if better else 1.0
+            # When better than baseline, fewer pairs is preferred; otherwise ignore pair_count.
+            effective_pairs = pair_count if better else 0.0
+            return (flag, score, effective_pairs)
+
+        gen_elites.sort(key=_elite_key)
         LOGGER.info(
             "Generation %d summary: static_fail=%d, dynamic_fail=%d, evaluated=%d, new_elites=%d",
             gen,
@@ -432,7 +448,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             len(gen_elites),
         )
         elites.extend(gen_elites)
-        elites.sort(key=lambda e: e["fitness"]["hf_like_score"])
+        elites.sort(key=_elite_key)
         elites = elites[:elite_size]
 
     _dump_jsonl(os.path.join(run_dir, "candidates.jsonl"), candidates_log)

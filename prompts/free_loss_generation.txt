@@ -25,7 +25,11 @@ Design a loss that combines costs and log-probability differences via scaling, m
   - `hyperparams` (JSON object of hyperparameters)
   - `operators_used` (array, subset of the whitelist)
   - `implementation_hint` (JSON object with `expects` and `returns`)
-- All text (including `intuition` and `pseudocode`) must be in **English only**.
+- For `implementation_hint`:
+  - `expects` **must** be a JSON array of short input names **only**, e.g. `["cost_a", "cost_b", "logp_a", "logp_b"]`.
+    Do **not** write descriptions or full sentences here. Do **not** use a single string or an object.
+  - `returns` **must** be exactly the string `"scalar"`.
+- All text fields (including `intuition` and `pseudocode`) must be in **English only**.
 
 JSON structure example (for format only):
 {
@@ -45,4 +49,3 @@ JSON structure example (for format only):
 }
 
 Return **only** the JSON object, with no extra explanation or Markdown code fences, and use **English only** in all string fields.
-
