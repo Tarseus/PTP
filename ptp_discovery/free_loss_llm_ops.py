@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from dataclasses import asdict
 from typing import Sequence
 
 from dotenv import load_dotenv
@@ -126,10 +127,27 @@ def repair_free_loss(
     return parse_free_loss_from_text(json_str)
 
 
+def repair_expects_with_prompt(
+    expects_repair_prompt_path: str,
+    ir: FreeLossIR,
+) -> FreeLossIR:
+    """Use a lightweight LLM prompt to normalize implementation_hint.expects.
+
+    This is only used when we already have an expects list, to coerce it into
+    a clean list of short input names.
+    """
+
+    prompt = _read_prompt(expects_repair_prompt_path)
+    payload = asdict(ir)
+    prompt = prompt + "\n\nIR_JSON:\n" + json.dumps(payload, indent=2)
+    raw = _call_llm(prompt)
+    json_str = _extract_json_object(raw)
+    return parse_free_loss_from_text(json_str)
+
+
 def compile_free_loss_candidate(
     ir: FreeLossIR,
     *,
     operator_whitelist: Sequence[str],
 ) -> CompiledFreeLoss:
     return compile_free_loss(ir, operator_whitelist=operator_whitelist)
-

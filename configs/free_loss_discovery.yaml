@@ -57,6 +57,7 @@ prompts:
   crossover: prompts/free_loss_crossover.txt
   mutation: prompts/free_loss_mutation.txt
   repair: prompts/free_loss_repair.txt
+  expects_repair: prompts/free_loss_expects_repair.txt
 
 # Output directory pattern for discovery runs.
 output_root: runs/free_loss_discovery

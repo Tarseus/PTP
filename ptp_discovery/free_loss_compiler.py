@@ -39,12 +39,33 @@ ALLOWED_OPERATORS = {
 
 
 def _extract_json_object(text: str) -> Mapping[str, Any]:
+    """Extract the first top-level JSON object from a string.
+
+    This is more robust than taking text between the first "{" and the last
+    "}", which can easily capture multiple objects or trailing data.
+    """
+
     start = text.find("{")
-    end = text.rfind("}")
-    if start == -1 or end == -1 or end <= start:
+    if start == -1:
         raise CompileError("No JSON object found in LLM output.")
+
+    depth = 0
+    end = None
+    for i, ch in enumerate(text[start:], start=start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+
+    if end is None or end <= start:
+        raise CompileError("Failed to locate a complete JSON object in LLM output.")
+
+    snippet = text[start : end + 1]
     try:
-        return json.loads(text[start : end + 1])
+        return json.loads(snippet)
     except json.JSONDecodeError as exc:
         raise CompileError(f"Failed to parse JSON from LLM output: {exc}") from exc
 
@@ -130,4 +151,3 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
         return loss.mean()
 
     return CompiledFreeLoss(ir=ir, loss_fn=loss_fn)
-

@@ -29,6 +29,7 @@ from ptp_discovery.free_loss_llm_ops import (
     crossover_free_loss,
     generate_free_loss_candidate,
     mutate_free_loss,
+    repair_expects_with_prompt,
 )
 
 from TSPEnv import TSPEnv  # type: ignore  # noqa: E402
@@ -293,6 +294,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     gen_prompt = prompts.get("generation")
     crossover_prompt = prompts.get("crossover")
     mutation_prompt = prompts.get("mutation")
+    expects_repair_prompt = prompts.get("expects_repair")
 
     out_root = cfg_yaml.get("output_root", "runs/free_loss_discovery")
     run_dir = _timestamp_dir(out_root)
@@ -304,6 +306,20 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
     elites: List[Dict[str, Any]] = []
 
+    def _maybe_repair_expects(ir: FreeLossIR) -> FreeLossIR:
+        if not expects_repair_prompt:
+            return ir
+        expects = ir.implementation_hint.expects or []
+        # Only call the repair prompt when we already have a list; this
+        # is meant to normalize names, not to infer them from scratch.
+        if not isinstance(expects, (list, tuple)) or not expects:
+            return ir
+        try:
+            return repair_expects_with_prompt(expects_repair_prompt, ir)
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.warning("Failed to repair expects via LLM: %s", exc)
+            return ir
+
     for gen in range(generations):
         LOGGER.info("=== Generation %d/%d ===", gen, generations - 1)
         population: List[FreeLossIR] = []
@@ -311,7 +327,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             LOGGER.info("Generating initial population with %d LLM candidates", init_llm)
             for _ in range(init_llm):
                 ir = generate_free_loss_candidate(gen_prompt, operator_whitelist=operator_whitelist)
-                population.append(ir)
+                population.append(_maybe_repair_expects(ir))
         else:
             parents = sorted(elites, key=lambda e: e["fitness"]["hf_like_score"])[:elite_size]
             parent_irs = [p["ir"] for p in parents]
@@ -328,7 +344,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     ir = mutate_free_loss(mutation_prompt, parent_irs[0])
                 else:
                     ir = generate_free_loss_candidate(gen_prompt, operator_whitelist=operator_whitelist)
-                population.append(ir)
+                population.append(_maybe_repair_expects(ir))
 
         LOGGER.info("Population size for generation %d: %d", gen, len(population))
         gen_elites: List[Dict[str, Any]] = []
