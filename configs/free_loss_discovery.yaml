@@ -1,7 +1,7 @@
 seed: 1234
 
 # Number of evolutionary generations (outer loop).
-generations: 3
+generations: 10
 
 # Population size per generation.
 population_size: 8
