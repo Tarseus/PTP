@@ -135,6 +135,9 @@ def evaluate_free_loss_candidate(
         "eval_type": "argmax",
     }
 
+    import time as _time  # local alias to avoid confusion
+    t_init_start = _time.perf_counter()
+
     env = TSPEnv(
         problem_size=cfg.hf.train_problem_size,
         pomo_size=cfg.hf.pomo_size,
@@ -147,6 +150,7 @@ def evaluate_free_loss_candidate(
         lr=float(cfg.hf.learning_rate),
         weight_decay=float(cfg.hf.weight_decay),
     )
+    t_init_end = _time.perf_counter()
 
     score_meter = AverageMeter()
     loss_meter = AverageMeter()
@@ -163,6 +167,8 @@ def evaluate_free_loss_candidate(
     )
 
     log_interval = max(steps // 10, 1)
+
+    t_train_start = _time.perf_counter()
 
     for step in range(steps):
         score, loss, pair_count = _train_one_batch_with_free_loss(
@@ -188,7 +194,9 @@ def evaluate_free_loss_candidate(
                 int(pair_count),
                 total_pairs,
             )
+    t_train_end = _time.perf_counter()
 
+    t_eval_start = _time.perf_counter()
     main_valid_obj = _evaluate_tsp_model(
         model=model,
         problem_size=cfg.hf.train_problem_size,
@@ -210,11 +218,19 @@ def evaluate_free_loss_candidate(
             batch_size=cfg.hf.validation_batch_size,
         )
         gen_objectives[size_int] = gen_obj
+    t_eval_end = _time.perf_counter()
 
     max_gen_obj = max(gen_objectives.values()) if gen_objectives else main_valid_obj
     generalization_penalty = max(0.0, max_gen_obj - main_valid_obj)
 
     hf_like_score = main_valid_obj + cfg.hf.generalization_penalty_weight * generalization_penalty
+
+    logger.info(
+        "Free-loss timing: init=%.3fs, train=%.3fs, eval=%.3fs",
+        t_init_end - t_init_start,
+        t_train_end - t_train_start,
+        t_eval_end - t_eval_start,
+    )
 
     return {
         "hf_like_score": hf_like_score,

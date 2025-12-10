@@ -129,6 +129,7 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
         "eval_type": "argmax",
     }
 
+    t_init_start = time.perf_counter()
     env = TSPEnv(
         problem_size=cfg.train_problem_size,
         pomo_size=cfg.pomo_size,
@@ -141,22 +142,25 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
         lr=float(cfg.learning_rate),
         weight_decay=float(cfg.weight_decay),
     )
+    t_init_end = time.perf_counter()
 
     score_meter = AverageMeter()
     loss_meter = AverageMeter()
 
     LOGGER.info(
         "Baseline PO training: steps=%d, train_problem_size=%d, pomo_size=%d, "
-        "batch_size=%d, device=%s",
+        "batch_size=%d, device=%s, init_time=%.3fs",
         cfg.hf_steps,
         cfg.train_problem_size,
         cfg.pomo_size,
         cfg.train_batch_size,
         str(device),
+        t_init_end - t_init_start,
     )
 
     log_interval = max(cfg.hf_steps // 10, 1)
 
+    t_train_start = time.perf_counter()
     for step in range(cfg.hf_steps):
         score, loss = _train_one_batch_with_po(env, model, optimizer, cfg)
         score_meter.update(score)
@@ -172,7 +176,9 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
                 loss,
                 float(loss_meter.avg),
             )
+    t_train_end = time.perf_counter()
 
+    t_eval_start = time.perf_counter()
     main_valid_obj = _evaluate_tsp_model(
         model=model,
         problem_size=cfg.train_problem_size,
@@ -194,11 +200,19 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
             batch_size=cfg.validation_batch_size,
         )
         gen_objectives[size_int] = gen_obj
+    t_eval_end = time.perf_counter()
 
     max_gen_obj = max(gen_objectives.values()) if gen_objectives else main_valid_obj
     generalization_penalty = max(0.0, max_gen_obj - main_valid_obj)
 
     hf_score = main_valid_obj + cfg.generalization_penalty_weight * generalization_penalty
+
+    LOGGER.info(
+        "Baseline PO timing: init=%.3fs, train=%.3fs, eval=%.3fs",
+        t_init_end - t_init_start,
+        t_train_end - t_train_start,
+        t_eval_end - t_eval_start,
+    )
 
     return {
         "hf_score": hf_score,
