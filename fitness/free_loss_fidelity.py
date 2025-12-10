@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, Mapping, Sequence, Tuple
 
+import logging
 import torch
 from torch.optim import Adam
 
@@ -18,6 +19,9 @@ from ptp_discovery.free_loss_compiler import CompiledFreeLoss
 from TSPEnv import TSPEnv  # type: ignore  # noqa: E402
 from TSPModel import TSPModel  # type: ignore  # noqa: E402
 from utils.utils import AverageMeter  # type: ignore  # noqa: E402
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -185,7 +189,18 @@ def evaluate_free_loss_candidate(
     loss_meter = AverageMeter()
 
     steps = max(int(cfg.f1_steps), 1)
-    for _ in range(steps):
+    logger.info(
+        "Free-loss training: steps=%d, train_problem_size=%d, pomo_size=%d, batch_size=%d, device=%s",
+        steps,
+        cfg.hf.train_problem_size,
+        cfg.hf.pomo_size,
+        cfg.hf.train_batch_size,
+        str(device),
+    )
+
+    log_interval = max(steps // 10, 1)
+
+    for step in range(steps):
         score, loss = _train_one_batch_with_free_loss(
             env=env,
             model=model,
@@ -195,6 +210,17 @@ def evaluate_free_loss_candidate(
         )
         score_meter.update(score)
         loss_meter.update(loss)
+
+        if (step + 1) % log_interval == 0 or step == 0:
+            logger.info(
+                "Free-loss step %d/%d: score=%.6f (avg=%.6f), loss=%.6f (avg=%.6f)",
+                step + 1,
+                steps,
+                score,
+                float(score_meter.avg),
+                loss,
+                float(loss_meter.avg),
+            )
 
     main_valid_obj = _evaluate_tsp_model(
         model=model,
@@ -245,4 +271,3 @@ def evaluate_free_loss_candidate(
             "operators_used": compiled_loss.ir.operators_used,
         },
     }
-
