@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Mapping, Sequence
 
@@ -64,8 +65,16 @@ def _extract_json_object(text: str) -> Mapping[str, Any]:
         raise CompileError("Failed to locate a complete JSON object in LLM output.")
 
     snippet = text[start : end + 1]
+
+    # Be tolerant to invalid backslash escapes that sometimes appear in LLM
+    # generated JSON (e.g., LaTeX-like `\alpha`). JSON only allows a limited
+    # set of escapes after `\`, so we rewrite any other `\x` into `\\x` so
+    # that it decodes as a literal backslash.
+    invalid_escape_pattern = re.compile(r'\\(?!["\\/bfnrtu])')
+    sanitized_snippet = invalid_escape_pattern.sub(r"\\\\", snippet)
+
     try:
-        return json.loads(snippet)
+        return json.loads(sanitized_snippet)
     except json.JSONDecodeError as exc:
         raise CompileError(f"Failed to parse JSON from LLM output: {exc}") from exc
 
