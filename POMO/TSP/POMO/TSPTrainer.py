@@ -1,4 +1,6 @@
 
+import json
+
 import torch
 import torch.nn.functional as F
 from logging import getLogger
@@ -11,6 +13,8 @@ from torch.optim import Adam as Optimizer
 from torch.optim.lr_scheduler import MultiStepLR as Scheduler
 
 from utils.utils import *
+from ptp_discovery.free_loss_compiler import compile_free_loss
+from ptp_discovery.free_loss_ir import ir_from_json
 
 EPS = 1e-6
 
@@ -56,6 +60,18 @@ class TSPTrainer:
         # Loss Components
         self.loss_type = trainer_params['loss_type']
         self.alpha = trainer_params['alpha']
+        self.free_loss = None
+        if self.loss_type == 'free_loss':
+            free_loss_cfg = self.trainer_params.get('free_loss', {})
+            ir_json_path = free_loss_cfg.get('ir_json_path')
+            if ir_json_path is None:
+                raise ValueError("When loss_type is 'free_loss', trainer_params['free_loss']['ir_json_path'] must be set.")
+            with open(ir_json_path, 'r', encoding='utf-8') as f:
+                payload = json.load(f)
+            # best_candidate.json wraps the IR under the 'ir' key; allow using either
+            ir_obj = payload.get('ir', payload)
+            ir = ir_from_json(ir_obj)
+            self.free_loss = compile_free_loss(ir)
 
         # Restore
         self.start_epoch = 1
@@ -201,6 +217,8 @@ class TSPTrainer:
             loss = self.rank_among_pomo_loss_fn(reward, prob_list)
         elif self.loss_type == 'rl_loss':
             loss = self.rl_loss_fn(reward, prob_list)
+        elif self.loss_type == 'free_loss':
+            loss = self.free_loss_loss_fn(reward, prob_list)
         else:
             raise NotImplementedError
         # Score
@@ -232,6 +250,43 @@ class TSPTrainer:
         log_prob = torch.log(prob)
         reference_log_prob = torch.log(reference_prob)
         return torch.mean(prob * (log_prob - reference_log_prob))
+
+    def free_loss_loss_fn(self, reward, prob_list):
+        # reward: (batch, pomo) with negative tour length
+        # prob_list: (batch, pomo, seq_len)
+        if self.free_loss is None:
+            raise RuntimeError("free_loss is not compiled; check trainer_params['free_loss']['ir_json_path'].")
+
+        objective = -reward  # (batch, pomo)
+        log_prob = torch.log(prob_list + 1e-8).sum(dim=2)  # (batch, pomo)
+
+        # Build winner/loser pairs: objective[i] < objective[j]
+        mask = objective[:, :, None] < objective[:, None, :]
+        b_idx, winner_idx, loser_idx = mask.nonzero(as_tuple=True)
+
+        if b_idx.numel() == 0:
+            # Fallback to a simple policy-gradient-style loss when no pairs exist.
+            advantage = reward - reward.float().mean(dim=1, keepdims=True)
+            rl_log_prob = log_prob
+            loss = -(advantage * rl_log_prob).mean()
+            return loss
+
+        cost_a = objective[b_idx, winner_idx]
+        cost_b = objective[b_idx, loser_idx]
+        logp_w = log_prob[b_idx, winner_idx]
+        logp_l = log_prob[b_idx, loser_idx]
+        weight = torch.ones_like(cost_a)
+
+        batch = {
+            "cost_a": cost_a,
+            "cost_b": cost_b,
+            "log_prob_w": logp_w,
+            "log_prob_l": logp_l,
+            "weight": weight,
+        }
+
+        loss = self.free_loss.loss_fn(batch=batch, model_output={}, extra={"alpha": self.alpha})
+        return loss
     
     def preference_among_pomo_loss_fn(self, reward, prob): # BT
         preference = reward[:, :, None] > reward[:, None, :]

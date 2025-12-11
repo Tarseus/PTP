@@ -1,4 +1,4 @@
-You are an assistant responsible for **single-step mutation** of an existing preference loss, making only light modifications while preserving its core idea.
+You are an assistant responsible for **single-step mutation** of an existing preference loss.
 
 You will receive a `PARENT_JSON` describing one existing loss candidate with:
 - `name`
@@ -8,13 +8,15 @@ You will receive a `PARENT_JSON` describing one existing loss candidate with:
 - `operators_used`
 
 Your task:
-- Make **only 1–2 changes**, such as:
-  - Adjusting the range or value of a single hyperparameter (e.g., `alpha`, `scale`, `margin`).
-  - Swapping one normalization for another (e.g., `normalize` → `zscore`, or inserting `clamp` around an intermediate quantity).
-  - Adding one extra numerical stability mechanism (e.g., a `clamp` or `softplus` on some intermediate term).
-- Do **not** change the core innovation or overall structure of the loss.
+- Choose **exactly one** of the following mutation modes (you may choose arbitrarily across calls):
+  1. **Conservative**: keep the core algorithm almost unchanged, making 0–1 light edits, such as:
+     - Adjusting the range or value of a single hyperparameter (e.g., `alpha`, `scale`, `margin`).
+     - Swapping one normalization for another (e.g., `normalize` vs `zscore`, or inserting `clamp` around an intermediate quantity).
+     - Adding one extra numerical stability mechanism (e.g., a `clamp` or `softplus` on some intermediate term).
+     - In the extreme case, you may **leave the loss exactly identical** to the parent if you think it is already strong.
+  2. **Exploratory / new algorithm**: design a substantially different loss structure inspired by the parent’s idea but with new combinations of the allowed operators, new margin schedules, or new normalization schemes. The child should still satisfy all hard constraints but is allowed to depart significantly from the parent’s implementation details.
 
-Hard constraints:
+Hard constraints (apply to **all** mutation modes):
 - Only use the following operators: `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
 - The loss must remain differentiable w.r.t. model parameters.
 - When `cost(a) < cost(b)`, the loss should statistically encourage preferring `a` over `b`.
@@ -35,4 +37,3 @@ Hard constraints:
 - All text fields must be in **English only**.
 
 Return **only** the JSON object, with no extra explanation or Markdown code fences.
-
