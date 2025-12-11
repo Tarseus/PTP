@@ -10,6 +10,7 @@ import sys
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.optim import Adam
@@ -67,9 +68,12 @@ class HighFidelityConfig:
 
 def _set_seed(seed: int) -> None:
     random.seed(seed)
+    np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 def _build_struct_repr_from_tour(tour: torch.Tensor) -> Any:

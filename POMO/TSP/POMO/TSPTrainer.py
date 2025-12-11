@@ -25,6 +25,7 @@ from torch.optim.lr_scheduler import MultiStepLR as Scheduler
 from utils.utils import *
 from ptp_discovery.free_loss_compiler import compile_free_loss
 from ptp_discovery.free_loss_ir import ir_from_json
+from fitness.ptp_high_fidelity import _set_seed
 
 EPS = 1e-6
 
@@ -47,6 +48,28 @@ class TSPTrainer:
         self.logger = getLogger(name='trainer')
         self.result_folder = get_result_folder()
         self.result_log = LogData()
+
+        # Seed: prefer an explicit trainer_params["seed"]. When using a
+        # discovered free-form loss, fall back to the HF seed stored in
+        # the discovery artefact so that full training and fitness
+        # evaluation share the same random seed.
+        seed = self.trainer_params.get('seed')
+        if seed is None and self.trainer_params.get('loss_type') == 'free_loss':
+            free_loss_cfg = self.trainer_params.get('free_loss', {})
+            ir_json_path = free_loss_cfg.get('ir_json_path')
+            if ir_json_path is not None and os.path.isfile(ir_json_path):
+                try:
+                    with open(ir_json_path, 'r', encoding='utf-8') as f:
+                        payload = json.load(f)
+                    fitness_cfg = payload.get('fitness', {}).get('config', {})
+                    hf_cfg = fitness_cfg.get('hf', {})
+                    if 'seed' in hf_cfg:
+                        seed = int(hf_cfg['seed'])
+                        self.logger.info("Using HF seed from discovery artefact: %d", seed)
+                except Exception as exc:
+                    self.logger.warning("Failed to read seed from free-loss artefact %s: %s", ir_json_path, exc)
+        if seed is not None:
+            _set_seed(int(seed))
 
         # cuda
         USE_CUDA = self.trainer_params['use_cuda']

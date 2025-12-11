@@ -238,9 +238,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     LOGGER.info("Starting free loss EoH search with config=%s", config_path)
 
     seed = int(cfg_yaml.get("seed", 0))
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
+    _set_seed(seed)
 
     generations = int(cfg_yaml.get("generations", 1))
     population_size = int(cfg_yaml.get("population_size", 8))
