@@ -1,9 +1,19 @@
 
 import json
+import os
+import sys
 
 import torch
 import torch.nn.functional as F
 from logging import getLogger
+
+# Ensure repository root is on sys.path so that ptp_discovery and fitness
+# modules are importable regardless of the CWD from which this trainer is run.
+REPO_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
 
 from TSPEnv import TSPEnv as Env
 from TSPModel import TSPModel as Model
