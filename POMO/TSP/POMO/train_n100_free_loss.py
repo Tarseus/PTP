@@ -3,7 +3,7 @@
 
 DEBUG_MODE = False
 USE_CUDA = not DEBUG_MODE
-CUDA_DEVICE_NUM = 0
+CUDA_DEVICE_NUM = 4
 
 
 ##########################################################################################
@@ -60,7 +60,7 @@ optimizer_params = {
 trainer_params = {
     'use_cuda': USE_CUDA,
     'cuda_device_num': CUDA_DEVICE_NUM,
-    'epochs': 2010,
+    'epochs': 10,
     'train_episodes': 100000,
     'train_batch_size': 64,
     # Use the discovered free-form preference loss instead of the built-in po_loss.
@@ -98,7 +98,7 @@ trainer_params = {
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
             'runs',
             'free_loss_discovery',
-            '20251209-225152',
+            '20251212-150525',
             'best_candidate.json',
         ),
     },
