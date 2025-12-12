@@ -147,18 +147,29 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
         def loss_fn(
             batch: Mapping[str, Any],
             model_output: Mapping[str, torch.Tensor],
-            extra: Mapping[str, Any],
+            extra: Mapping[str, Any] | None,
         ) -> torch.Tensor:
-            return fn(batch, model_output, extra)
+            merged_extra: Dict[str, Any] = {"hyperparams": ir.hyperparams}
+            if extra:
+                merged_extra.update(extra)
+            return fn(batch, model_output, merged_extra)
     else:
         # Backward-compatible fallback: use a simple template-based loss
         # when no explicit code is provided in the IR.
         table = _build_operator_table()
 
+        def _resolve_hparam(raw: Any, default: float) -> float:
+            if isinstance(raw, dict):
+                raw = raw.get("value", default)
+            try:
+                return float(raw)
+            except (TypeError, ValueError):
+                return float(default)
+
         def loss_fn(
             batch: Mapping[str, Any],
             model_output: Mapping[str, torch.Tensor],
-            extra: Mapping[str, Any],
+            extra: Mapping[str, Any] | None,
         ) -> torch.Tensor:
             pair_cost_a = batch["cost_a"]
             pair_cost_b = batch["cost_b"]
@@ -168,14 +179,19 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
                 log_prob_l = batch.get("log_prob_l")
                 if log_prob_w is None or log_prob_l is None:
                     raise RuntimeError("batch must provide either logit_diff or log_prob_w/log_prob_l")
-                alpha = float(ir.hyperparams.get("alpha", extra.get("alpha", 1.0)))
+                extra = extra or {}
+                alpha_cfg = ir.hyperparams.get("alpha", extra.get("alpha", 1.0))
+                alpha = _resolve_hparam(alpha_cfg, 1.0)
                 logit_diff = alpha * (log_prob_w - log_prob_l)
 
             cost_gap = _rank_gap(pair_cost_a, pair_cost_b)
             cost_gap_z = _safe_zscore(cost_gap)
 
-            scale = float(ir.hyperparams.get("scale", 1.0))
-            margin = float(ir.hyperparams.get("margin", 0.0))
+            extra = extra or {}
+            scale_cfg = ir.hyperparams.get("scale", extra.get("scale", 1.0))
+            margin_cfg = ir.hyperparams.get("margin", extra.get("margin", 0.0))
+            scale = _resolve_hparam(scale_cfg, 1.0)
+            margin = _resolve_hparam(margin_cfg, 0.0)
 
             x = scale * (logit_diff - margin * cost_gap_z)
             loss = -table["logsigmoid"](x)

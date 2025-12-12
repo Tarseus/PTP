@@ -417,6 +417,16 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
             if not dyn_res.ok:
                 dynamic_fail += 1
+                LOGGER.warning(
+                    "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s, "
+                    "loss_value=%s, grad_norm=%s",
+                    gen,
+                    idx,
+                    ir.name,
+                    dyn_res.reason,
+                    str(dyn_res.loss_value),
+                    str(dyn_res.grad_norm),
+                )
                 continue
 
             fitness = evaluate_free_loss_candidate(compiled, free_cfg)
