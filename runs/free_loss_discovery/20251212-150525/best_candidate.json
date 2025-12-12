@@ -1,0 +1,81 @@
+{
+  "generation": 8,
+  "index": 6,
+  "ir": {
+    "name": "Adaptive Rank-Modulated Tanh-Clipping Loss",
+    "intuition": "This loss function creates a stable and adaptive learning signal by dynamically controlling the scale and target of the log-probability difference based on the relative importance of a preference pair. It ensures the model focuses its capacity on pairs with significant cost differences while not being overly penalized for minor or ambiguous preferences.\n\nInherited Ideas:\n- From `Soft-Clipped Rank-Modulated Loss` (Parent 0): It inherits the core structure of using a **multiplicative scaler on a soft-clipped log-probability difference**. Specifically, it uses a `tanh` function to bound the logp difference and a `rank_modulator` to scale it, like `scaler * tanh(...)`.\n- From `Rank-Modulated Dual-Clipping Loss` (Parent 1): It inherits the idea of using an **additive margin derived from a rank-based signal**. The loss requires the scaled log-probability difference to exceed a margin, `... - margin`, where the margin adapts based on the cost difference's rank within the batch.\n\nNew Coupling Ideas & Modifications:\n1.  **Dynamic Tanh Scaling**: Instead of applying `tanh` directly to the raw `logp_diff`, this child introduces a new coupling where the `logp_diff` is first scaled by a hyperparameter `beta` *before* the `tanh` is applied: `tanh(beta * logp_diff)`. This `beta` parameter acts as an inverse temperature, controlling the steepness of the `tanh` function. A smaller `beta` makes the transition smoother, allowing for a wider range of `logp_diff` values to provide a gradient, while a larger `beta` makes it act more like a step function, focusing only on getting the sign correct.\n2.  **Unified Rank-Modulator for Scaler and Margin**: Both parents use a `rank_gap` signal to create a modulator. This child refines this by creating a single, unified `rank_modulator = softplus(alpha * rank_gap(cost_diff))`. This modulator is then coupled to the loss in two distinct roles: it acts as the multiplicative `scaler` for the `tanh` term and also as the additive `margin` to be overcome. The final loss argument becomes `rank_modulator * tanh(beta * logp_diff) - rank_modulator`, which can be simplified to `rank_modulator * (tanh(beta * logp_diff) - 1)`. This elegant structure forces the model to push `tanh(beta * logp_diff)` towards its maximum value of 1 for high-importance pairs, with the required `logp_diff` magnitude being influenced by `beta`.",
+    "pseudocode": "1. Calculate the difference in log probabilities: `logp_diff = logp_winner - logp_loser`.\n2. Calculate the absolute difference in costs: `cost_diff = abs(cost_winner - cost_loser)`.\n3. Create a normalized, scale-invariant signal from the cost difference using the `rank_gap` operator.\n4. (New Coupling) Create a single, unified `rank_modulator` by applying `softplus` to the scaled rank signal: `rank_modulator = softplus(alpha * rank_gap_signal)`. This value is non-negative and increases with the importance of the pair.\n5. (New Coupling) Scale the `logp_diff` by a hyperparameter `beta`: `scaled_logp_diff = beta * logp_diff`.\n6. (Inherited from Parent 0) Apply `tanh` to the scaled log-probability difference for stability: `clipped_logp_diff = tanh(scaled_logp_diff)`.\n7. (Inherited from Parent 0 & 1, New Coupling) Combine the components. Use the `rank_modulator` as both a multiplicative scaler and an additive margin. The loss argument is `scaler * clipped_logp_diff - margin`, which simplifies to `rank_modulator * (clipped_logp_diff - 1)`.\n8. Compute the final loss using a numerically stable logistic loss function: `loss = -logsigmoid(rank_modulator * (clipped_logp_diff - 1))`.\n9. Return the weighted mean of the loss over the batch.",
+    "hyperparams": {
+      "alpha": 4.0,
+      "beta": 0.5
+    },
+    "operators_used": [
+      "logsigmoid",
+      "softplus",
+      "tanh",
+      "rank_gap"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "log_prob_w",
+        "log_prob_l",
+        "weight"
+      ],
+      "returns": "scalar"
+    },
+    "code": "import torch\nimport torch.nn.functional as F\n\ndef generated_loss(batch, model_output, extra):\n    \"\"\"\n    Computes the Adaptive Rank-Modulated Tanh-Clipping Loss.\n\n    This loss combines a rank-based modulator, which serves as both a scaler and\n    a margin, with a tanh-clipped log-probability difference. The tanh clipping\n    is made adaptive via a `beta` scaling parameter.\n\n    Args:\n        batch (dict): A dictionary containing tensors.\n            'cost_a' (Tensor [N]): Cost of solution 'a'.\n            'cost_b' (Tensor [N]): Cost of solution 'b'.\n            'log_prob_w' (Tensor [N]): Log probability of the winning solution.\n            'log_prob_l' (Tensor [N]): Log probability of the losing solution.\n            'weight' (Tensor [N], optional): Per-pair loss weights.\n        model_output (dict): Model outputs (not used).\n        extra (dict): A dictionary for hyperparameters.\n            'alpha' (float): Controls the magnitude of the rank modulator.\n            'beta' (float): Scales the logp_diff before tanh, controlling steepness.\n\n    Returns:\n        torch.Tensor: A scalar tensor representing the mean loss.\n    \"\"\"\n\n    # Whitelisted operator implemented as a helper function\n    def rank_gap(x, eps=1e-9):\n        \"\"\"Converts a tensor to its normalized ranks within the range [-0.5, 0.5].\"\"\"\n        if x.numel() <= 1:\n            return torch.zeros_like(x)\n        ranks = x.to(torch.float32).argsort().argsort().to(x.dtype)\n        # Normalize ranks to [0, 1]\n        normalized_ranks = ranks / (x.numel() - 1 + eps)\n        # Shift to [-0.5, 0.5]\n        return normalized_ranks - 0.5\n\n    # Retrieve hyperparameters\n    alpha = extra.get('alpha', 4.0)\n    beta = extra.get('beta', 0.5)\n\n    # Unpack tensors from the batch\n    cost_a = batch['cost_a']\n    cost_b = batch['cost_b']\n    log_prob_w = batch['log_prob_w']\n    log_prob_l = batch['log_prob_l']\n    weights = batch.get('weight', None)\n\n    # 1. Calculate the difference in log probabilities\n    logp_diff = log_prob_w - log_prob_l\n\n    # 2. Calculate absolute cost difference\n    cost_diff = torch.abs(cost_a - cost_b)\n\n    # 3. Create a normalized, scale-invariant signal from cost_diff\n    rank_gap_signal = rank_gap(cost_diff)\n\n    # 4. (New Coupling) Create a unified rank modulator\n    rank_modulator = F.softplus(alpha * rank_gap_signal)\n\n    # 5. (New Coupling) Scale logp_diff by beta before clipping\n    scaled_logp_diff = beta * logp_diff\n\n    # 6. (Inherited from Parent 0) Soft-clip the scaled logp_diff\n    clipped_logp_diff = torch.tanh(scaled_logp_diff)\n\n    # 7. (Inherited from Parents & New Coupling) Combine components\n    # The rank_modulator is used as both a multiplicative scaler and an additive margin.\n    # The goal is for `modulator * clipped_logp_diff` to exceed `modulator`.\n    argument = rank_modulator * (clipped_logp_diff - 1)\n\n    # 8. Compute the final loss using numerically stable logsigmoid\n    loss_per_item = -F.logsigmoid(argument)\n\n    # 9. Apply optional weights and compute the mean loss\n    if weights is not None:\n        # Ensure weights sum is non-zero to avoid division by zero\n        loss = (loss_per_item * weights).sum() / weights.sum().clamp(min=1e-8)\n    else:\n        loss = loss_per_item.mean()\n\n    return loss"
+  },
+  "fitness": {
+    "hf_like_score": 8.394787788391113,
+    "validation_objective": 8.380303382873535,
+    "generalization_penalty": 0.014484405517578125,
+    "generalization_objectives": {
+      "100": 8.394787788391113
+    },
+    "train_score_mean": 11.140329208374023,
+    "train_loss_mean": 0.9303958714008331,
+    "pair_count": 12902390,
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 100,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          100
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 64,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 100,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "Adaptive Rank-Modulated Tanh-Clipping Loss",
+      "intuition": "This loss function creates a stable and adaptive learning signal by dynamically controlling the scale and target of the log-probability difference based on the relative importance of a preference pair. It ensures the model focuses its capacity on pairs with significant cost differences while not being overly penalized for minor or ambiguous preferences.\n\nInherited Ideas:\n- From `Soft-Clipped Rank-Modulated Loss` (Parent 0): It inherits the core structure of using a **multiplicative scaler on a soft-clipped log-probability difference**. Specifically, it uses a `tanh` function to bound the logp difference and a `rank_modulator` to scale it, like `scaler * tanh(...)`.\n- From `Rank-Modulated Dual-Clipping Loss` (Parent 1): It inherits the idea of using an **additive margin derived from a rank-based signal**. The loss requires the scaled log-probability difference to exceed a margin, `... - margin`, where the margin adapts based on the cost difference's rank within the batch.\n\nNew Coupling Ideas & Modifications:\n1.  **Dynamic Tanh Scaling**: Instead of applying `tanh` directly to the raw `logp_diff`, this child introduces a new coupling where the `logp_diff` is first scaled by a hyperparameter `beta` *before* the `tanh` is applied: `tanh(beta * logp_diff)`. This `beta` parameter acts as an inverse temperature, controlling the steepness of the `tanh` function. A smaller `beta` makes the transition smoother, allowing for a wider range of `logp_diff` values to provide a gradient, while a larger `beta` makes it act more like a step function, focusing only on getting the sign correct.\n2.  **Unified Rank-Modulator for Scaler and Margin**: Both parents use a `rank_gap` signal to create a modulator. This child refines this by creating a single, unified `rank_modulator = softplus(alpha * rank_gap(cost_diff))`. This modulator is then coupled to the loss in two distinct roles: it acts as the multiplicative `scaler` for the `tanh` term and also as the additive `margin` to be overcome. The final loss argument becomes `rank_modulator * tanh(beta * logp_diff) - rank_modulator`, which can be simplified to `rank_modulator * (tanh(beta * logp_diff) - 1)`. This elegant structure forces the model to push `tanh(beta * logp_diff)` towards its maximum value of 1 for high-importance pairs, with the required `logp_diff` magnitude being influenced by `beta`.",
+      "hyperparams": {
+        "alpha": 4.0,
+        "beta": 0.5
+      },
+      "operators_used": [
+        "logsigmoid",
+        "softplus",
+        "tanh",
+        "rank_gap"
+      ]
+    }
+  }
+}
