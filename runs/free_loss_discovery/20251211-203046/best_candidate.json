@@ -1,0 +1,81 @@
+{
+  "generation": 4,
+  "index": 4,
+  "ir": {
+    "name": "Soft-Gated Exponential Margin Loss",
+    "intuition": "This loss function creates a dynamically scaled margin that is sensitive to both the magnitude of the cost difference and the model's current confidence. The child loss inherits two key ideas from its parents. From 'Rank-Gated Exponential Margin Loss' (Parent 0), we inherit the use of an exponential function (`exp`) to create a powerful, non-saturating margin from the cost difference. This provides a strong learning signal for pairs with large cost gaps. From 'Rank-Gated Z-Score Margin Loss' (Parent 1), we inherit the general structure of applying a margin to a `logsigmoid` loss, which frames the problem as a preference classification task.\n\nThis child introduces two new coupling ideas. The first is a 'soft gating' mechanism. Instead of the hard binary gate (`is_preferred`) used by both parents, we use a `sigmoid` function applied to the model's log-probability difference (`logp_diff`). This `soft_gate` smoothly transitions from 0 to 1 as the model becomes more confident in the correct preference. This allows the margin to be applied proportionally to the model's confidence, preventing abrupt changes in the loss landscape and providing a smoother gradient when the model is uncertain. The second new idea is to use `softplus` to ensure the exponential margin base is always non-negative, which is a more numerically stable alternative to `relu` while still preventing the margin from being applied in the wrong direction.\n\nWhen `cost(a) < cost(b)`, the `preference` is -1. The `margin_base` becomes positive, calculated from the z-scored cost difference. The `soft_gate` will be close to 1 if the model is already correctly predicting `logp_a > logp_b`, and close to 0 if it is wrong. The loss then encourages `logp_a - logp_b` to be greater than a margin that grows exponentially with the cost difference, but this margin's influence is smoothly scaled by how confident the model already is.",
+    "pseudocode": "1. Compute the log-probability difference: logp_diff = logp_a - logp_b.\n2. Compute the cost difference: cost_diff = cost_a - cost_b.\n3. Normalize the cost differences across the batch: cost_diff_norm = zscore(cost_diff).\n4. Create a signed preference indicator: preference = rank_gap(cost_a, cost_b), which is -1 if 'a' is better, +1 if 'b' is better.\n5. Calculate a non-negative margin base using softplus: margin_base = softplus(preference * cost_diff_norm).\n6. Compute the non-saturating exponential margin: exponential_margin = margin_scale * (exp(margin_base) - 1.0).\n7. Create a soft, confidence-based gate using sigmoid: soft_gate = sigmoid(preference * logp_diff).\n8. Apply the soft gating to the margin: gated_margin = soft_gate * exponential_margin.\n9. The core loss argument combines the model's preference, the target preference, and the gated margin: argument = preference * logp_diff + gated_margin.\n10. Apply the logsigmoid function for a stable, one-sided loss: loss = -logsigmoid(argument).\n11. The final loss is a scalar value, typically the mean over the batch.",
+    "hyperparams": {
+      "margin_scale": 1.5
+    },
+    "operators_used": [
+      "zscore",
+      "rank_gap",
+      "softplus",
+      "exp",
+      "sigmoid",
+      "logsigmoid"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "logp_a",
+        "logp_b"
+      ],
+      "returns": "scalar"
+    }
+  },
+  "fitness": {
+    "hf_like_score": 8.420563220977783,
+    "validation_objective": 8.400651454925537,
+    "generalization_penalty": 0.019911766052246094,
+    "generalization_objectives": {
+      "100": 8.420563220977783
+    },
+    "train_score_mean": 10.44199821472168,
+    "train_loss_mean": 0.6026925498247147,
+    "pair_count": 12902392,
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 100,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          100
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 64,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 100,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "Soft-Gated Exponential Margin Loss",
+      "intuition": "This loss function creates a dynamically scaled margin that is sensitive to both the magnitude of the cost difference and the model's current confidence. The child loss inherits two key ideas from its parents. From 'Rank-Gated Exponential Margin Loss' (Parent 0), we inherit the use of an exponential function (`exp`) to create a powerful, non-saturating margin from the cost difference. This provides a strong learning signal for pairs with large cost gaps. From 'Rank-Gated Z-Score Margin Loss' (Parent 1), we inherit the general structure of applying a margin to a `logsigmoid` loss, which frames the problem as a preference classification task.\n\nThis child introduces two new coupling ideas. The first is a 'soft gating' mechanism. Instead of the hard binary gate (`is_preferred`) used by both parents, we use a `sigmoid` function applied to the model's log-probability difference (`logp_diff`). This `soft_gate` smoothly transitions from 0 to 1 as the model becomes more confident in the correct preference. This allows the margin to be applied proportionally to the model's confidence, preventing abrupt changes in the loss landscape and providing a smoother gradient when the model is uncertain. The second new idea is to use `softplus` to ensure the exponential margin base is always non-negative, which is a more numerically stable alternative to `relu` while still preventing the margin from being applied in the wrong direction.\n\nWhen `cost(a) < cost(b)`, the `preference` is -1. The `margin_base` becomes positive, calculated from the z-scored cost difference. The `soft_gate` will be close to 1 if the model is already correctly predicting `logp_a > logp_b`, and close to 0 if it is wrong. The loss then encourages `logp_a - logp_b` to be greater than a margin that grows exponentially with the cost difference, but this margin's influence is smoothly scaled by how confident the model already is.",
+      "hyperparams": {
+        "margin_scale": 1.5
+      },
+      "operators_used": [
+        "zscore",
+        "rank_gap",
+        "softplus",
+        "exp",
+        "sigmoid",
+        "logsigmoid"
+      ]
+    }
+  }
+}

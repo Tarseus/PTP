@@ -1,0 +1,81 @@
+{
+  "generation": 2,
+  "index": 8,
+  "ir": {
+    "name": "Adaptive Hinge-Sigmoid Hybrid Loss",
+    "intuition": "This loss function creates a hybrid structure that combines the hinge-like margin mechanism of the 'Normalized Rank-Gap Hinge Loss' (Parent 0) with the probabilistic sigmoid framework of the 'Rank-Calibrated Sigmoid Loss' (Parent 1).\n\nFrom Parent 0, we inherit the core idea of a dynamic margin based on a standardized rank gap (`dynamic_margin = beta * tanh(zscore(rank_gap(cost_a, cost_b)))`) and the use of `softplus` to create a smooth, non-negative hinge loss. This ensures the loss only penalizes the model when its preference alignment is insufficient.\n\nFrom Parent 1, we inherit the adaptive temperature mechanism (`adaptive_gamma`), which scales the loss based on the magnitude of the cost difference. This makes the loss more sensitive when the cost difference is large and more forgiving when it is small.\n\nAs a new coupling idea, we embed the hinge loss term *inside* a sigmoid function. Instead of a simple hinge loss `softplus(margin - logp_diff)`, we compute a 'preference error' term, `preference_error = softplus(dynamic_margin - logp_diff)`. This error is zero if the model's preference `logp_diff` correctly exceeds the `dynamic_margin`. We then use this non-negative error as the argument to a sigmoid-like expression, scaled by the adaptive temperature. The final loss is `log(1 + adaptive_gamma * preference_error)`. This can be seen as a smooth version of `log(1+x)`, which behaves like `x` for small `x` and `log(x)` for large `x`, providing a stable gradient. This structure combines the 'zero loss for correct preference' property of a hinge loss with the calibrated scaling of a sigmoid-based loss.\n\nWhen `cost(a) < cost(b)`, the `dynamic_margin` is negative. The loss encourages `logp_diff` to be positive and larger than this margin to make the `preference_error` zero, thus correctly preferring `a`.",
+    "pseudocode": "1. Compute the log-probability difference: logp_diff = logp_a - logp_b.\n2. Compute the signed, batch-relative rank gap: cost_gap_signed = rank_gap(cost_a, cost_b).\n3. Standardize the rank gap across the batch: cost_gap_zscored = zscore(cost_gap_signed).\n4. Create a bounded dynamic margin from the standardized rank gap (inherited from Parent 0): dynamic_margin = beta * tanh(cost_gap_zscored).\n5. Create an adaptive temperature based on the margin magnitude (inherited from Parent 1): adaptive_gamma = 1.0 + gamma * abs(dynamic_margin).\n6. Compute the preference error using a smooth hinge-like term (structure from Parent 0): preference_error = softplus(dynamic_margin - logp_diff).\n7. Couple the preference error with the adaptive temperature in a stable, logarithmic form (new coupling idea): loss = log(1.0 + adaptive_gamma * preference_error).",
+    "hyperparams": {
+      "beta": 1.0,
+      "gamma": 0.5
+    },
+    "operators_used": [
+      "rank_gap",
+      "zscore",
+      "tanh",
+      "softplus",
+      "log"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "logp_a",
+        "logp_b"
+      ],
+      "returns": "scalar"
+    }
+  },
+  "fitness": {
+    "hf_like_score": 8.375181198120117,
+    "validation_objective": 8.375181198120117,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "20": 4.033289194107056
+    },
+    "train_score_mean": 10.466032495498657,
+    "train_loss_mean": 0.6049032986164093,
+    "pair_count": 12902386,
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 100,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          20
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 64,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 100,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "Adaptive Hinge-Sigmoid Hybrid Loss",
+      "intuition": "This loss function creates a hybrid structure that combines the hinge-like margin mechanism of the 'Normalized Rank-Gap Hinge Loss' (Parent 0) with the probabilistic sigmoid framework of the 'Rank-Calibrated Sigmoid Loss' (Parent 1).\n\nFrom Parent 0, we inherit the core idea of a dynamic margin based on a standardized rank gap (`dynamic_margin = beta * tanh(zscore(rank_gap(cost_a, cost_b)))`) and the use of `softplus` to create a smooth, non-negative hinge loss. This ensures the loss only penalizes the model when its preference alignment is insufficient.\n\nFrom Parent 1, we inherit the adaptive temperature mechanism (`adaptive_gamma`), which scales the loss based on the magnitude of the cost difference. This makes the loss more sensitive when the cost difference is large and more forgiving when it is small.\n\nAs a new coupling idea, we embed the hinge loss term *inside* a sigmoid function. Instead of a simple hinge loss `softplus(margin - logp_diff)`, we compute a 'preference error' term, `preference_error = softplus(dynamic_margin - logp_diff)`. This error is zero if the model's preference `logp_diff` correctly exceeds the `dynamic_margin`. We then use this non-negative error as the argument to a sigmoid-like expression, scaled by the adaptive temperature. The final loss is `log(1 + adaptive_gamma * preference_error)`. This can be seen as a smooth version of `log(1+x)`, which behaves like `x` for small `x` and `log(x)` for large `x`, providing a stable gradient. This structure combines the 'zero loss for correct preference' property of a hinge loss with the calibrated scaling of a sigmoid-based loss.\n\nWhen `cost(a) < cost(b)`, the `dynamic_margin` is negative. The loss encourages `logp_diff` to be positive and larger than this margin to make the `preference_error` zero, thus correctly preferring `a`.",
+      "hyperparams": {
+        "beta": 1.0,
+        "gamma": 0.5
+      },
+      "operators_used": [
+        "rank_gap",
+        "zscore",
+        "tanh",
+        "softplus",
+        "log"
+      ]
+    }
+  }
+}

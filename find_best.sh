@@ -1,5 +1,5 @@
 export TZ=Asia/Shanghai
-export CUDA_VISIBLE_DEVICES=6
+export CUDA_VISIBLE_DEVICES=4
 
 # PTP-DSL discovery (original pipeline).
 # nohup python -u -m ptp_discovery.run_llm_search \

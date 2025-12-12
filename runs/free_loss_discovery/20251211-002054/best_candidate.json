@@ -1,0 +1,77 @@
+{
+  "generation": 7,
+  "index": 13,
+  "ir": {
+    "name": "Softplus-Gated Z-Scored LogSigmoid Loss",
+    "intuition": "This loss function creates a smooth, probabilistic preference objective that is robust to the scale of costs and log-probabilities.\n\nInherited Ideas:\n- From 'Z-Scored Rank-Gated LogSigmoid Loss' (Parent 1), it inherits the core probabilistic structure using `logsigmoid`. The loss is framed as a binary cross-entropy on the preference prediction, where `logsigmoid(logit)` models the probability of a correct preference.\n- Also from Parent 1, it inherits the use of `zscore` to normalize the raw cost difference (`cost_b - cost_a`). This makes the adaptive margin component robust to variations in the scale and distribution of costs within a batch, improving stability.\n- From 'Rank-Gated Adaptive Margin Loss' (Parent 0), it inherits the idea of creating a bounded, adaptive margin using `tanh`. This prevents the margin from growing uncontrollably with very large cost differences, which could otherwise dominate the loss signal.\n\nNew Coupling Ideas:\n1. The primary new coupling is the replacement of the discrete, hard `rank_gap` gating with a continuous, smooth gating mechanism using `softplus`. Instead of multiplying the loss term by a discrete +1 or -1, we use `softplus(rank_diff * logit)`. The `rank_diff` is still used to ensure the sign is correct, but `softplus` provides a smooth transition from a high-loss region (when the preference is wrong) to a zero-loss region (when the preference is correct). This avoids the sharp gradient changes associated with `relu` or the hard gating of Parent 0, potentially leading to smoother optimization.\n2. The second new coupling is how the margin and log-probability difference are combined before gating. The term `logp_a - logp_b - margin` forms a 'margin-adjusted logit'. The entire loss is then constructed as `softplus(rank_diff * -(margin_adjusted_logit))`. This is a novel structure that directly minimizes the positive part of the error when the model's preference opposes the ground truth, using `softplus` as a smooth hinge-loss approximation.",
+    "pseudocode": "1. Compute the log-probability difference: logp_diff = logp_a - logp_b.\n2. Compute the signed rank gap from costs: rank_diff = rank_gap(cost_a, cost_b). This will be +1 if 'a' is better, -1 if 'b' is better.\n3. Compute the raw cost difference, scaled to reflect the preference for 'a': cost_diff = cost_b - cost_a.\n4. Normalize the cost difference across the batch using z-score: normalized_cost_diff = zscore(cost_diff).\n5. Create a bounded, adaptive margin from the normalized cost difference using tanh: adaptive_margin = beta * tanh(normalized_cost_diff). This margin can be positive or negative, but is bounded.\n6. Form the margin-adjusted logit: margin_logit = logp_diff - adaptive_margin.\n7. Construct the argument for the softplus gate. The sign is flipped and multiplied by the rank gap: gate_arg = -rank_diff * margin_logit.\n8. Compute the final loss using the softplus function. This acts as a smooth one-sided penalty, only applying loss when the gate argument is positive (i.e., when the preference is incorrect): loss = softplus(gate_arg).",
+    "hyperparams": {
+      "beta": 2.0
+    },
+    "operators_used": [
+      "rank_gap",
+      "zscore",
+      "tanh",
+      "softplus"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "logp_a",
+        "logp_b"
+      ],
+      "returns": "scalar"
+    }
+  },
+  "fitness": {
+    "hf_like_score": 3.8914618492126465,
+    "validation_objective": 3.8914618492126465,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "20": 3.8443374633789062
+    },
+    "train_score_mean": 3.96173983335495,
+    "train_loss_mean": 0.678205913901329,
+    "pair_count": 12767213,
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 100,
+        "train_problem_size": 20,
+        "valid_problem_sizes": [
+          20
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 64,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 100,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "Softplus-Gated Z-Scored LogSigmoid Loss",
+      "intuition": "This loss function creates a smooth, probabilistic preference objective that is robust to the scale of costs and log-probabilities.\n\nInherited Ideas:\n- From 'Z-Scored Rank-Gated LogSigmoid Loss' (Parent 1), it inherits the core probabilistic structure using `logsigmoid`. The loss is framed as a binary cross-entropy on the preference prediction, where `logsigmoid(logit)` models the probability of a correct preference.\n- Also from Parent 1, it inherits the use of `zscore` to normalize the raw cost difference (`cost_b - cost_a`). This makes the adaptive margin component robust to variations in the scale and distribution of costs within a batch, improving stability.\n- From 'Rank-Gated Adaptive Margin Loss' (Parent 0), it inherits the idea of creating a bounded, adaptive margin using `tanh`. This prevents the margin from growing uncontrollably with very large cost differences, which could otherwise dominate the loss signal.\n\nNew Coupling Ideas:\n1. The primary new coupling is the replacement of the discrete, hard `rank_gap` gating with a continuous, smooth gating mechanism using `softplus`. Instead of multiplying the loss term by a discrete +1 or -1, we use `softplus(rank_diff * logit)`. The `rank_diff` is still used to ensure the sign is correct, but `softplus` provides a smooth transition from a high-loss region (when the preference is wrong) to a zero-loss region (when the preference is correct). This avoids the sharp gradient changes associated with `relu` or the hard gating of Parent 0, potentially leading to smoother optimization.\n2. The second new coupling is how the margin and log-probability difference are combined before gating. The term `logp_a - logp_b - margin` forms a 'margin-adjusted logit'. The entire loss is then constructed as `softplus(rank_diff * -(margin_adjusted_logit))`. This is a novel structure that directly minimizes the positive part of the error when the model's preference opposes the ground truth, using `softplus` as a smooth hinge-loss approximation.",
+      "hyperparams": {
+        "beta": 2.0
+      },
+      "operators_used": [
+        "rank_gap",
+        "zscore",
+        "tanh",
+        "softplus"
+      ]
+    }
+  }
+}
