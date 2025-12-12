@@ -14,7 +14,9 @@ class FreeLossImplementationHint:
 class FreeLossIR:
     """Intermediate representation for a free-form preference loss.
 
-    This mirrors the JSON contract expected from the LLM.
+    This mirrors the JSON contract expected from the LLM. In the new
+    code-first design, the JSON is expected to include a `code` field
+    containing a concrete Python implementation of the loss function.
     """
 
     name: str
@@ -23,6 +25,7 @@ class FreeLossIR:
     hyperparams: Dict[str, Any]
     operators_used: List[str]
     implementation_hint: FreeLossImplementationHint
+    code: str = ""
 
 
 def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
@@ -31,6 +34,7 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
     name = str(obj.get("name", "")).strip()
     intuition = str(obj.get("intuition", "")).strip()
     pseudocode = str(obj.get("pseudocode", "")).strip()
+    code = str(obj.get("code", "")).strip()
     hyperparams_raw = obj.get("hyperparams", {}) or {}
     operators_raw = obj.get("operators_used", []) or {}
     impl_raw = obj.get("implementation_hint", {}) or {}
@@ -84,4 +88,5 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
         hyperparams=dict(hyperparams_raw),
         operators_used=operators_list,
         implementation_hint=impl,
+        code=code,
     )

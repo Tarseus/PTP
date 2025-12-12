@@ -126,37 +126,64 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
         unknown = sorted(ops - allowed)
         raise CompileError(f"operators_used contains non-whitelisted operators: {unknown}")
 
-    table = _build_operator_table()
+    # Prefer a concrete Python implementation provided directly by the LLM
+    # in ir.code. This avoids a second model call during compilation and
+    # makes the search operate directly over executable loss functions.
+    code_str = (ir.code or "").strip()
+    if code_str:
+        local_ns: Dict[str, Any] = {"torch": torch, "F": F}
+        global_ns: Dict[str, Any] = {}
+        try:
+            exec(code_str, local_ns, global_ns)
+        except Exception as exc:  # noqa: BLE001
+            raise CompileError(f"Failed to exec loss code from IR: {exc}") from exc
 
-    def loss_fn(
-        batch: Mapping[str, Any],
-        model_output: Mapping[str, torch.Tensor],
-        extra: Mapping[str, Any],
-    ) -> torch.Tensor:
-        pair_cost_a = batch["cost_a"]
-        pair_cost_b = batch["cost_b"]
-        logit_diff = batch.get("logit_diff")
-        if logit_diff is None:
-            log_prob_w = batch.get("log_prob_w")
-            log_prob_l = batch.get("log_prob_l")
-            if log_prob_w is None or log_prob_l is None:
-                raise RuntimeError("batch must provide either logit_diff or log_prob_w/log_prob_l")
-            alpha = float(ir.hyperparams.get("alpha", extra.get("alpha", 1.0)))
-            logit_diff = alpha * (log_prob_w - log_prob_l)
+        fn = global_ns.get("generated_loss") or local_ns.get("generated_loss")
+        if not callable(fn):
+            raise CompileError(
+                "Loss code did not define a callable 'generated_loss(batch, model_output, extra)'."
+            )
 
-        cost_gap = _rank_gap(pair_cost_a, pair_cost_b)
-        cost_gap_z = _safe_zscore(cost_gap)
+        def loss_fn(
+            batch: Mapping[str, Any],
+            model_output: Mapping[str, torch.Tensor],
+            extra: Mapping[str, Any],
+        ) -> torch.Tensor:
+            return fn(batch, model_output, extra)
+    else:
+        # Backward-compatible fallback: use a simple template-based loss
+        # when no explicit code is provided in the IR.
+        table = _build_operator_table()
 
-        scale = float(ir.hyperparams.get("scale", 1.0))
-        margin = float(ir.hyperparams.get("margin", 0.0))
+        def loss_fn(
+            batch: Mapping[str, Any],
+            model_output: Mapping[str, torch.Tensor],
+            extra: Mapping[str, Any],
+        ) -> torch.Tensor:
+            pair_cost_a = batch["cost_a"]
+            pair_cost_b = batch["cost_b"]
+            logit_diff = batch.get("logit_diff")
+            if logit_diff is None:
+                log_prob_w = batch.get("log_prob_w")
+                log_prob_l = batch.get("log_prob_l")
+                if log_prob_w is None or log_prob_l is None:
+                    raise RuntimeError("batch must provide either logit_diff or log_prob_w/log_prob_l")
+                alpha = float(ir.hyperparams.get("alpha", extra.get("alpha", 1.0)))
+                logit_diff = alpha * (log_prob_w - log_prob_l)
 
-        x = scale * (logit_diff - margin * cost_gap_z)
-        loss = -table["logsigmoid"](x)
+            cost_gap = _rank_gap(pair_cost_a, pair_cost_b)
+            cost_gap_z = _safe_zscore(cost_gap)
 
-        weight = batch.get("weight")
-        if weight is not None:
-            loss = loss * weight
+            scale = float(ir.hyperparams.get("scale", 1.0))
+            margin = float(ir.hyperparams.get("margin", 0.0))
 
-        return loss.mean()
+            x = scale * (logit_diff - margin * cost_gap_z)
+            loss = -table["logsigmoid"](x)
+
+            weight = batch.get("weight")
+            if weight is not None:
+                loss = loss * weight
+
+            return loss.mean()
 
     return CompiledFreeLoss(ir=ir, loss_fn=loss_fn)

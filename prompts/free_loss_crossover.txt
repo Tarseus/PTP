@@ -11,6 +11,7 @@ You are given `PARENTS_JSON`, where each element has:
 - `pseudocode`
 - `hyperparams`
 - `operators_used`
+- `code` (a Python implementation of the loss function)
 
 Based on these parents, design a new loss and describe, in English, in `intuition` and `pseudocode`:
 - Which ideas are inherited from which parents.
@@ -26,15 +27,29 @@ Hard constraints:
 - Output **must** be a single JSON object with fields:
   - `name`
   - `intuition` (English only)
-  - `pseudocode` (English only)
+  - `pseudocode` (English only; high-level description, not executed)
   - `hyperparams`
   - `operators_used`
   - `implementation_hint` (with `expects` and `returns`)
+  - `code` (Python implementation of the child loss function)
 - For `implementation_hint`:
   - `expects` **must** be a JSON array of short input names **only**, e.g. `["cost_a", "cost_b", "logp_a", "logp_b"]`.
     Do **not** write descriptions or full sentences here. Do **not** use a single string or an object.
   - `returns` **must** be exactly the string `"scalar"`.
+- For `code`:
+  - It **must** define a function with the exact signature:
+
+    `def generated_loss(batch, model_output, extra):`
+
+  - The function must:
+    - Read tensors from `batch`:
+      * `cost_a`, `cost_b` (shape [N])
+      * `log_prob_w`, `log_prob_l` (shape [N])
+      * optional `weight` (shape [N]) which may be None.
+    - Optionally read hyperparameters from `hyperparams` and/or `extra`.
+    - Use only PyTorch (`torch`), `torch.nn.functional as F`, and the whitelisted operators listed above.
+    - Return a scalar tensor representing the mean loss over the batch.
+  - Do **not** wrap the code in Markdown fences. Encode it as a normal JSON string with escaped newlines (`\\n`).
 - All text fields must be in **English only**.
 
 Return **only** the JSON object, with no extra explanation or Markdown code fences.
-

@@ -21,31 +21,29 @@ Design a loss that combines costs and log-probability differences via scaling, m
 - Output **must be a single JSON object**, with fields:
   - `name` (string, English)
   - `intuition` (string, English; short explanation of the idea)
-  - `pseudocode` (string, English; high-level pseudo-implementation)
+  - `pseudocode` (string, English; high-level description of the idea; not executed)
   - `hyperparams` (JSON object of hyperparameters)
   - `operators_used` (array, subset of the whitelist)
   - `implementation_hint` (JSON object with `expects` and `returns`)
+  - `code` (string containing valid Python source code for the loss function)
 - For `implementation_hint`:
   - `expects` **must** be a JSON array of short input names **only**, e.g. `["cost_a", "cost_b", "logp_a", "logp_b"]`.
     Do **not** write descriptions or full sentences here. Do **not** use a single string or an object.
   - `returns` **must** be exactly the string `"scalar"`.
-- All text fields (including `intuition` and `pseudocode`) must be in **English only**.
+- For `code`:
+  - It **must** define a function with the exact signature:
 
-JSON structure example (for format only):
-{
-  "name": "MyStablePreferenceLoss",
-  "intuition": "Explain in English the main design idea and why it is stable.",
-  "pseudocode": "Use rank_gap(cost_a, cost_b) to compute a signed cost gap; normalize or zscore it; combine it linearly or non-linearly with logit_diff = logp_a - logp_b; pass through logsigmoid or softplus to get a stable scalar loss.",
-  "hyperparams": {
-    "alpha": 5.0,
-    "scale": 1.0,
-    "margin": 0.5
-  },
-  "operators_used": ["rank_gap", "zscore", "logsigmoid"],
-  "implementation_hint": {
-    "expects": ["cost_a", "cost_b", "logp_a", "logp_b"],
-    "returns": "scalar"
-  }
-}
+    `def generated_loss(batch, model_output, extra):`
+
+  - The function must:
+    - Read tensors from `batch`:
+      * `cost_a`, `cost_b` (shape [N])
+      * `log_prob_w`, `log_prob_l` (shape [N])
+      * optional `weight` (shape [N]) which may be None.
+    - Optionally read hyperparameters from `hyperparams` and/or `extra` (e.g. `alpha`).
+    - Use only PyTorch (`torch`), `torch.nn.functional as F`, and the whitelisted operators listed above.
+    - Return a **scalar tensor** representing the mean loss over the batch.
+  - Do **not** wrap the code in Markdown fences. Encode it as a normal JSON string with escaped newlines (`\n`).
+- All text fields (including `intuition` and `pseudocode`) must be in **English only**.
 
 Return **only** the JSON object, with no extra explanation or Markdown code fences, and use **English only** in all string fields.

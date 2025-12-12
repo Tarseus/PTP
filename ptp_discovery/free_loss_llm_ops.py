@@ -79,6 +79,7 @@ def crossover_free_loss(
             "pseudocode": parent.pseudocode,
             "hyperparams": parent.hyperparams,
             "operators_used": parent.operators_used,
+            "code": parent.code,
         }
         parent_blobs.append(blob)
     prompt = prompt + "\n\nPARENTS_JSON:\n" + json.dumps(parent_blobs, indent=2)
@@ -98,6 +99,7 @@ def mutate_free_loss(
         "pseudocode": parent.pseudocode,
         "hyperparams": parent.hyperparams,
         "operators_used": parent.operators_used,
+        "code": parent.code,
     }
     prompt = prompt + "\n\nPARENT_JSON:\n" + json.dumps(parent_blob, indent=2)
     raw = _call_llm(prompt)
