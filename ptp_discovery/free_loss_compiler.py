@@ -73,6 +73,41 @@ def _extract_json_object(text: str) -> Mapping[str, Any]:
     invalid_escape_pattern = re.compile(r'\\(?!["\\/bfnrtu])')
     sanitized_snippet = invalid_escape_pattern.sub(r"\\\\", snippet)
 
+    # Additionally, some models may emit raw control characters (e.g., literal
+    # newlines or tabs) inside JSON strings without escaping them, which is
+    # invalid JSON. We conservatively post-process the snippet to escape such
+    # characters only when they appear inside string literals.
+    def _escape_control_chars_in_strings(s: str) -> str:
+        out_chars: list[str] = []
+        in_string = False
+        escape = False
+        for ch in s:
+            if escape:
+                out_chars.append(ch)
+                escape = False
+                continue
+            if ch == "\\":
+                out_chars.append(ch)
+                escape = True
+                continue
+            if ch == '"':
+                out_chars.append(ch)
+                in_string = not in_string
+                continue
+            if in_string and ch in ("\n", "\r", "\t"):
+                # Replace raw control characters with escaped counterparts.
+                if ch == "\n":
+                    out_chars.append("\\n")
+                elif ch == "\r":
+                    out_chars.append("\\r")
+                elif ch == "\t":
+                    out_chars.append("\\t")
+                continue
+            out_chars.append(ch)
+        return "".join(out_chars)
+
+    sanitized_snippet = _escape_control_chars_in_strings(sanitized_snippet)
+
     try:
         return json.loads(sanitized_snippet)
     except json.JSONDecodeError as exc:
