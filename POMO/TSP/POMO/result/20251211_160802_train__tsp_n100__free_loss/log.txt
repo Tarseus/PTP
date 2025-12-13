@@ -1,0 +1,61 @@
+[2025-12-11 07:08:05] train_n100_free_loss.py(153) : DEBUG_MODE: False
+[2025-12-11 07:08:05] train_n100_free_loss.py(154) : USE_CUDA: True, CUDA_DEVICE_NUM: 4
+[2025-12-11 07:08:05] train_n100_free_loss.py(155) : env_params{'problem_size': 100, 'pomo_size': 100}
+[2025-12-11 07:08:05] train_n100_free_loss.py(155) : model_params{'embedding_dim': 128, 'sqrt_embedding_dim': 11.313708498984761, 'encoder_layer_num': 6, 'decoder_layer_num': 1, 'qkv_dim': 16, 'head_num': 8, 'logit_clipping': 50, 'ff_hidden_dim': 512, 'eval_type': 'argmax'}
+[2025-12-11 07:08:05] train_n100_free_loss.py(155) : optimizer_params{'optimizer': {'lr': 0.0003, 'weight_decay': 1e-06}, 'scheduler': {'milestones': [3001], 'gamma': 0.2}}
+[2025-12-11 07:08:05] train_n100_free_loss.py(155) : trainer_params{'use_cuda': True, 'cuda_device_num': 4, 'epochs': 10, 'train_episodes': 100000, 'train_batch_size': 64, 'loss_type': 'free_loss', 'alpha': 0.05, 'local_search': False, 'augmentation_enable': False, 'aug_factor': 8, 'aug_batch_size': 8, 'optimizer_step_interval': 1, 'logging': {'model_save_interval': 100, 'img_save_interval': 100, 'log_image_params_1': {'json_foldername': 'log_image_style', 'filename': 'style_tsp_100.json'}, 'log_image_params_2': {'json_foldername': 'log_image_style', 'filename': 'style_loss_1.json'}}, 'model_load': {'enable': False}, 'free_loss': {'ir_json_path': '/data1/gushengda/PTP/runs/free_loss_discovery/20251211-002054/best_candidate.json'}}
+[2025-12-11 07:08:05] train_n100_free_loss.py(155) : logger_params{'log_file': {'desc': 'train__tsp_n100__free_loss', 'filename': 'log.txt', 'filepath': './result/20251211_160802_train__tsp_n100__free_loss'}}
+[2025-12-11 07:08:06] TSPTrainer.py(105) : =================================================================
+[2025-12-11 07:08:07] TSPTrainer.py(182) : Epoch   1: Train  64/100000(0.1%)  Score: 41.6989,  Loss: 0.7420
+[2025-12-11 07:08:08] TSPTrainer.py(182) : Epoch   1: Train 128/100000(0.1%)  Score: 29.5073,  Loss: 0.7203
+[2025-12-11 07:08:08] TSPTrainer.py(182) : Epoch   1: Train 192/100000(0.2%)  Score: 24.1863,  Loss: 0.6865
+[2025-12-11 07:08:08] TSPTrainer.py(182) : Epoch   1: Train 256/100000(0.3%)  Score: 21.6156,  Loss: 0.6679
+[2025-12-11 07:08:09] TSPTrainer.py(182) : Epoch   1: Train 320/100000(0.3%)  Score: 20.1042,  Loss: 0.6535
+[2025-12-11 07:08:09] TSPTrainer.py(182) : Epoch   1: Train 384/100000(0.4%)  Score: 19.0973,  Loss: 0.6451
+[2025-12-11 07:08:09] TSPTrainer.py(182) : Epoch   1: Train 448/100000(0.4%)  Score: 18.3302,  Loss: 0.6398
+[2025-12-11 07:08:10] TSPTrainer.py(182) : Epoch   1: Train 512/100000(0.5%)  Score: 17.6833,  Loss: 0.6348
+[2025-12-11 07:08:10] TSPTrainer.py(182) : Epoch   1: Train 576/100000(0.6%)  Score: 17.1121,  Loss: 0.6306
+[2025-12-11 07:08:11] TSPTrainer.py(182) : Epoch   1: Train 640/100000(0.6%)  Score: 16.6260,  Loss: 0.6289
+[2025-12-11 07:17:02] TSPTrainer.py(187) : Epoch   1: Train (100%)  Score: 8.3721,  Loss: 0.6202
+[2025-12-11 07:17:02] TSPTrainer.py(119) : Epoch   1/ 10: Time Est.: Elapsed[8.93m], Remain[1.34h]
+[2025-12-11 07:17:02] TSPTrainer.py(105) : =================================================================
+[2025-12-11 07:25:57] TSPTrainer.py(187) : Epoch   2: Train (100%)  Score: 8.0669,  Loss: 0.6367
+[2025-12-11 07:25:57] TSPTrainer.py(119) : Epoch   2/ 10: Time Est.: Elapsed[17.84m], Remain[1.19h]
+[2025-12-11 07:25:57] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 07:25:57] TSPTrainer.py(105) : =================================================================
+[2025-12-11 07:34:54] TSPTrainer.py(187) : Epoch   3: Train (100%)  Score: 8.0231,  Loss: 0.6425
+[2025-12-11 07:34:54] TSPTrainer.py(119) : Epoch   3/ 10: Time Est.: Elapsed[26.79m], Remain[1.04h]
+[2025-12-11 07:34:54] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 07:34:54] TSPTrainer.py(105) : =================================================================
+[2025-12-11 07:43:48] TSPTrainer.py(187) : Epoch   4: Train (100%)  Score: 7.9944,  Loss: 0.6485
+[2025-12-11 07:43:48] TSPTrainer.py(119) : Epoch   4/ 10: Time Est.: Elapsed[35.69m], Remain[53.54m]
+[2025-12-11 07:43:48] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 07:43:48] TSPTrainer.py(105) : =================================================================
+[2025-12-11 07:52:44] TSPTrainer.py(187) : Epoch   5: Train (100%)  Score: 7.9775,  Loss: 0.6519
+[2025-12-11 07:52:44] TSPTrainer.py(119) : Epoch   5/ 10: Time Est.: Elapsed[44.63m], Remain[44.63m]
+[2025-12-11 07:52:44] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 07:52:44] TSPTrainer.py(105) : =================================================================
+[2025-12-11 08:01:43] TSPTrainer.py(187) : Epoch   6: Train (100%)  Score: 7.9620,  Loss: 0.6534
+[2025-12-11 08:01:43] TSPTrainer.py(119) : Epoch   6/ 10: Time Est.: Elapsed[53.62m], Remain[35.75m]
+[2025-12-11 08:01:43] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 08:01:44] TSPTrainer.py(105) : =================================================================
+[2025-12-11 08:10:40] TSPTrainer.py(187) : Epoch   7: Train (100%)  Score: 7.9492,  Loss: 0.6552
+[2025-12-11 08:10:40] TSPTrainer.py(119) : Epoch   7/ 10: Time Est.: Elapsed[1.04h], Remain[26.82m]
+[2025-12-11 08:10:40] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 08:10:40] TSPTrainer.py(105) : =================================================================
+[2025-12-11 08:19:27] TSPTrainer.py(187) : Epoch   8: Train (100%)  Score: 7.9363,  Loss: 0.6558
+[2025-12-11 08:19:27] TSPTrainer.py(119) : Epoch   8/ 10: Time Est.: Elapsed[1.19h], Remain[17.84m]
+[2025-12-11 08:19:27] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 08:19:27] TSPTrainer.py(105) : =================================================================
+[2025-12-11 08:28:18] TSPTrainer.py(187) : Epoch   9: Train (100%)  Score: 7.9247,  Loss: 0.6567
+[2025-12-11 08:28:18] TSPTrainer.py(119) : Epoch   9/ 10: Time Est.: Elapsed[1.34h], Remain[8.91m]
+[2025-12-11 08:28:18] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 08:28:18] TSPTrainer.py(105) : =================================================================
+[2025-12-11 08:37:13] TSPTrainer.py(187) : Epoch  10: Train (100%)  Score: 7.9139,  Loss: 0.6580
+[2025-12-11 08:37:13] TSPTrainer.py(119) : Epoch  10/ 10: Time Est.: Elapsed[1.49h], Remain[0.00m]
+[2025-12-11 08:37:13] TSPTrainer.py(127) : Saving log_image
+[2025-12-11 08:37:13] TSPTrainer.py(135) : Saving trained_model
+[2025-12-11 08:37:13] TSPTrainer.py(153) :  *** Training Done *** 
+[2025-12-11 08:37:13] TSPTrainer.py(154) : Now, printing log array...
+[2025-12-11 08:37:13] utils.py(236) : train_loss_list = [0.6202336748886108, 0.6366605504989624, 0.642453264503479, 0.6485484890174865, 0.6519023554039002, 0.653371914024353, 0.6552278191566467, 0.6558436639785766, 0.6567000310897827, 0.6579860120391846]
+[2025-12-11 08:37:13] utils.py(236) : train_score_list = [8.372072576904296, 8.066863496704102, 8.023116895751953, 7.994449337158203, 7.977527196960449, 7.962039252624511, 7.949206898345947, 7.936339593658447, 7.92466897857666, 7.913866379699707]

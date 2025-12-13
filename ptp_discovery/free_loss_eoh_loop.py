@@ -244,7 +244,7 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
         t_init_end - t_init_start,
     )
 
-    log_interval = max(cfg.hf_steps // 10, 1)
+    log_interval = max(cfg.hf_steps // 20, 1)
 
     t_train_start = time.perf_counter()
     for step in range(cfg.hf_steps):
