@@ -11,6 +11,7 @@ from .ptp_high_fidelity import (
     HighFidelityConfig,
     _set_seed,
     _evaluate_tsp_model,
+    get_total_hf_train_steps,
 )
 from ptp_discovery.free_loss_compiler import CompiledFreeLoss
 
@@ -163,7 +164,7 @@ def evaluate_free_loss_candidate(
     loss_meter = AverageMeter()
     total_pairs = 0
 
-    steps = max(int(cfg.f1_steps), 1)
+    steps = get_total_hf_train_steps(cfg.hf)
     logger.info(
         "Free-loss training: steps=%d, train_problem_size=%d, pomo_size=%d, batch_size=%d, device=%s",
         steps,
@@ -251,6 +252,7 @@ def evaluate_free_loss_candidate(
             "hf": asdict(cfg.hf),
             "free_loss": {
                 "f1_steps": cfg.f1_steps,
+                "total_train_steps": steps,
                 "f2_steps": cfg.f2_steps,
                 "f3_enabled": cfg.f3_enabled,
             },

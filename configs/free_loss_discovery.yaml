@@ -14,8 +14,14 @@ init_llm: 8
 
 # Multi-fidelity budget (in training steps).
 f0_only: false
-# Use full-training length on TSP20 instead of a few HF steps.
+# High-fidelity training budget for F1.
+# Option 1 (legacy): specify the total number of training *steps* directly.
 f1_steps: 100000
+# Option 2: specify epochs and instances per epoch. When both are > 0,
+# they are used to derive the total number of training steps as:
+#   total_steps = hf_epochs * ceil(hf_instances_per_epoch / train_batch_size)
+hf_epochs: 0
+hf_instances_per_epoch: 0
 f2_steps: 100    # set >0 to enable F2
 f3_enabled: false
 

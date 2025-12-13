@@ -51,6 +51,13 @@ class HighFidelityConfig:
 
     problem: str = "tsp"
     hf_steps: int = 200
+    # Optional epoch-style configuration. When both hf_epochs and
+    # hf_instances_per_epoch are > 0, they are used to derive the
+    # total number of training steps as:
+    #   total_steps = hf_epochs * ceil(hf_instances_per_epoch / train_batch_size)
+    # and hf_steps is treated as a fallback/legacy setting.
+    hf_epochs: int = 0
+    hf_instances_per_epoch: int = 0
     train_problem_size: int = 20
     valid_problem_sizes: Sequence[int] = (100,)
     train_batch_size: int = 64
@@ -64,6 +71,23 @@ class HighFidelityConfig:
     validation_batch_size: int = 64
     generalization_penalty_weight: float = 1.0
     pool_version: str = "v0"
+
+
+def get_total_hf_train_steps(config: HighFidelityConfig) -> int:
+    """Return total training *steps* given an HF config.
+
+    - If both hf_epochs and hf_instances_per_epoch are > 0, derive the total
+      number of steps from an epoch-style configuration.
+    - Otherwise, fall back to hf_steps (legacy behaviour).
+    """
+
+    if config.hf_epochs > 0 and config.hf_instances_per_epoch > 0:
+        batch_size = max(int(config.train_batch_size), 1)
+        steps_per_epoch = math.ceil(config.hf_instances_per_epoch / batch_size)
+        total_steps = config.hf_epochs * steps_per_epoch
+        return max(int(total_steps), 1)
+
+    return max(int(config.hf_steps), 1)
 
 
 def _set_seed(seed: int) -> None:
@@ -379,19 +403,21 @@ def evaluate_ptp_dsl_high_fidelity(
     score_meter = AverageMeter()
     loss_meter = AverageMeter()
 
+    total_steps = get_total_hf_train_steps(config)
+
     logger.info(
         "Starting HF training: steps=%d, train_problem_size=%d, pomo_size=%d, "
         "batch_size=%d, device=%s",
-        config.hf_steps,
+        total_steps,
         config.train_problem_size,
         config.pomo_size,
         config.train_batch_size,
         str(device),
     )
 
-    log_interval = max(config.hf_steps // 10, 1)
+    log_interval = max(total_steps // 10, 1)
 
-    for step_index in range(config.hf_steps):
+    for step_index in range(total_steps):
         score, loss = _train_one_batch_with_ptp(
             env=env,
             model=model,
@@ -482,6 +508,27 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="Number of short-run training steps for high-fidelity evaluation.",
     )
     parser.add_argument(
+        "--hf_epochs",
+        type=int,
+        default=0,
+        help=(
+            "Number of epochs for high-fidelity evaluation. "
+            "If both --hf_epochs and --hf_instances_per_epoch are > 0, they "
+            "are used to derive the total number of training steps instead "
+            "of --hf_steps."
+        ),
+    )
+    parser.add_argument(
+        "--hf_instances_per_epoch",
+        type=int,
+        default=0,
+        help=(
+            "Number of training instances per epoch for high-fidelity "
+            "evaluation. Used together with --hf_epochs to derive the total "
+            "number of training steps when both are > 0."
+        ),
+    )
+    parser.add_argument(
         "--problem",
         type=str,
         default="tsp",
@@ -530,6 +577,8 @@ def main_cli() -> None:
     config = HighFidelityConfig(
         problem=args.problem,
         hf_steps=args.hf_steps,
+        hf_epochs=args.hf_epochs,
+        hf_instances_per_epoch=args.hf_instances_per_epoch,
         train_problem_size=args.train_problem_size,
         valid_problem_sizes=tuple(args.valid_problem_sizes),
         device=args.device,

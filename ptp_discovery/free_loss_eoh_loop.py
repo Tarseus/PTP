@@ -16,7 +16,12 @@ from fitness.free_loss_fidelity import (
     FreeLossFidelityConfig,
     evaluate_free_loss_candidate,
 )
-from fitness.ptp_high_fidelity import HighFidelityConfig, _set_seed, _evaluate_tsp_model
+from fitness.ptp_high_fidelity import (
+    HighFidelityConfig,
+    _set_seed,
+    _evaluate_tsp_model,
+    get_total_hf_train_steps,
+)
 from ptp_discovery.free_loss_compiler import CompileError
 from ptp_discovery.free_loss_gates import (
     DynamicGateResult,
@@ -232,11 +237,12 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
 
     score_meter = AverageMeter()
     loss_meter = AverageMeter()
+    total_steps = get_total_hf_train_steps(cfg)
 
     LOGGER.info(
         "Baseline PO training: steps=%d, train_problem_size=%d, pomo_size=%d, "
         "batch_size=%d, device=%s, init_time=%.3fs",
-        cfg.hf_steps,
+        total_steps,
         cfg.train_problem_size,
         cfg.pomo_size,
         cfg.train_batch_size,
@@ -244,10 +250,10 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
         t_init_end - t_init_start,
     )
 
-    log_interval = max(cfg.hf_steps // 20, 1)
+    log_interval = max(total_steps // 20, 1)
 
     t_train_start = time.perf_counter()
-    for step in range(cfg.hf_steps):
+    for step in range(total_steps):
         score, loss = _train_one_batch_with_po(env, model, optimizer, cfg)
         score_meter.update(score)
         loss_meter.update(loss)
@@ -330,9 +336,14 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     elite_size = int(cfg_yaml.get("elite_size", 4))
     init_llm = int(cfg_yaml.get("init_llm", 4))
 
+    hf_epochs = int(cfg_yaml.get("hf_epochs", 0) or 0)
+    hf_instances_per_epoch = int(cfg_yaml.get("hf_instances_per_epoch", 0) or 0)
+
     hf_cfg = HighFidelityConfig(
         problem=cfg_yaml.get("problem", "tsp"),
         hf_steps=int(cfg_yaml.get("f1_steps", 32)),
+        hf_epochs=hf_epochs,
+        hf_instances_per_epoch=hf_instances_per_epoch,
         train_problem_size=int(cfg_yaml.get("train_problem_size", 20)),
         valid_problem_sizes=tuple(int(v) for v in cfg_yaml.get("valid_problem_sizes", [100])),
         train_batch_size=int(cfg_yaml.get("train_batch_size", 64)),
