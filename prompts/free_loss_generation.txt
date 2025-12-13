@@ -12,6 +12,11 @@ Setting:
 - You may only use the following **whitelisted operators** to compose your loss:
   `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
 
+The baseline preference loss used in our method is derived from an entropy-regularized RL objective and can be viewed as a Bradley–Terry / logistic-style loss on the log-probability difference `logp(a) - logp(b)` with a temperature parameter and a margin that depends on the cost gap. Your proposed loss should be **theoretically compatible** with this family, in the sense that:
+- It can be interpreted as optimizing a probabilistic preference model where the probability that `a` is preferred over `b` is a monotone function of `logp(a) - logp(b)` and the cost difference.
+- It preserves the correct *sign* of the learning signal: when `cost(a) < cost(b)`, the expected gradient pushes `logp(a) - logp(b)` upwards, and when `cost(a) > cost(b)` it pushes it downwards.
+- Any margins, normalizations, or reweightings you introduce should be functions of cost differences (and optionally their normalized versions) rather than arbitrary labels.
+
 Design a loss that combines costs and log-probability differences via scaling, margins, normalization, or other *stable* nonlinear transforms so that:
 - If `cost(a) < cost(b)` and `logp(a) < logp(b)`, the loss tends to **increase** (pressure to raise `logp(a)`).
 - If `cost(a) < cost(b)` and `logp(a) > logp(b)`, the loss tends to **decrease** (reward current preference).

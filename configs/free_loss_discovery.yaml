@@ -14,16 +14,20 @@ init_llm: 8
 
 # Multi-fidelity budget (in training steps).
 f0_only: false
-f1_steps: 1000
+# Use full-training length on TSP20 instead of a few HF steps.
+f1_steps: 100000
 f2_steps: 100    # set >0 to enable F2
 f3_enabled: false
 
 # Training / evaluation config for TSP.
+# Use TSP20 for both training and evaluation so that each candidate's
+# fitness reflects full training behaviour on the canonical small-scale
+# benchmark.
 problem: tsp
-train_problem_size: 100
-valid_problem_sizes: [100]
+train_problem_size: 20
+valid_problem_sizes: [20]
 train_batch_size: 64
-pomo_size: 64
+pomo_size: 20
 learning_rate: 0.0003
 weight_decay: 0.000001
 alpha: 0.05
@@ -61,4 +65,3 @@ prompts:
 
 # Output directory pattern for discovery runs.
 output_root: runs/free_loss_discovery
-

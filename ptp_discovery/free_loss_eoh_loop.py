@@ -4,6 +4,7 @@ import json
 import os
 import time
 import logging
+import multiprocessing as mp
 from dataclasses import asdict
 from typing import Any, Dict, List, Tuple
 
@@ -23,7 +24,7 @@ from ptp_discovery.free_loss_gates import (
     run_dynamic_gates,
     run_static_gates,
 )
-from ptp_discovery.free_loss_ir import FreeLossIR
+from ptp_discovery.free_loss_ir import FreeLossIR, ir_from_json
 from ptp_discovery.free_loss_llm_ops import (
     compile_free_loss_candidate,
     crossover_free_loss,
@@ -39,6 +40,90 @@ from torch.optim import Adam
 
 
 LOGGER = logging.getLogger("ptp_discovery.free_loss_eoh")
+
+
+def _get_available_devices(base_device: str) -> List[str]:
+    """Return a list of logical device strings for parallel evaluation.
+
+    - If base_device is 'cuda', expose all visible CUDA devices as
+      ['cuda:0', 'cuda:1', ...].
+    - If base_device has an explicit index (e.g., 'cuda:3'), keep it as a
+      single-device list.
+    - For CPU or unknown strings, fall back to [base_device].
+    """
+
+    base_device = str(base_device)
+    if base_device.startswith("cuda:"):
+        return [base_device]
+    if base_device == "cuda" and torch.cuda.is_available():
+        count = torch.cuda.device_count()
+        if count <= 0:
+            return [base_device]
+        return [f"cuda:{i}" for i in range(count)]
+    return [base_device]
+
+
+def _worker_evaluate_candidate(args: Tuple[
+    Dict[str, Any],
+    Dict[str, Any],
+    Dict[str, Any],
+    str,
+    List[str],
+    str,
+    int,
+    int,
+]) -> Tuple[int, Dict[str, Any]]:
+    """Worker process: compile and evaluate a single candidate loss.
+
+    To keep the top-level discovery log readable, this worker redirects
+    training logs for each candidate into a dedicated file under the run
+    directory instead of emitting them to stdout/stderr.
+    """
+
+    (
+        ir_payload,
+        hf_cfg_dict,
+        free_cfg_dict,
+        device_str,
+        operator_whitelist,
+        run_dir,
+        gen,
+        idx,
+    ) = args
+
+    # Reduce noise on stdout/stderr from worker processes.
+    root_logger = logging.getLogger()
+    for handler in list(root_logger.handlers):
+        root_logger.removeHandler(handler)
+    root_logger.setLevel(logging.WARNING)
+
+    # Route free-loss training logs to a per-candidate file.
+    log_path = os.path.join(run_dir, f"gen{gen:03d}_cand{idx:03d}.log")
+    fmt = logging.Formatter("[%(asctime)s] %(levelname)s:%(name)s: %(message)s")
+
+    fl_logger = logging.getLogger("fitness.free_loss_fidelity")
+    fl_logger.handlers = []
+    fl_logger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler(log_path, mode="w", encoding="utf-8")
+    file_handler.setFormatter(fmt)
+    fl_logger.addHandler(file_handler)
+
+    # Reconstruct configs for this worker and override device.
+    hf_cfg = HighFidelityConfig(**hf_cfg_dict)
+    hf_cfg.device = device_str
+    free_cfg = FreeLossFidelityConfig(
+        hf=hf_cfg,
+        f1_steps=int(free_cfg_dict.get("f1_steps", 32)),
+        f2_steps=int(free_cfg_dict.get("f2_steps", 0)),
+        f3_enabled=bool(free_cfg_dict.get("f3_enabled", False)),
+    )
+
+    # Reconstruct IR and compiled loss in the worker.
+    ir = ir_from_json(ir_payload)
+    compiled = compile_free_loss_candidate(ir, operator_whitelist=operator_whitelist)
+
+    fitness = evaluate_free_loss_candidate(compiled, free_cfg)
+    return idx, fitness
 
 
 def _timestamp_dir(root: str) -> str:
@@ -269,6 +354,12 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         f2_steps=int(cfg_yaml.get("f2_steps", 0)),
         f3_enabled=bool(cfg_yaml.get("f3_enabled", False)),
     )
+    hf_cfg_dict: Dict[str, Any] = dict(hf_cfg.__dict__)
+    free_cfg_dict: Dict[str, Any] = {
+        "f1_steps": free_cfg.f1_steps,
+        "f2_steps": free_cfg.f2_steps,
+        "f3_enabled": free_cfg.f3_enabled,
+    }
 
     baseline_hf_score: float | None = None
 
@@ -351,6 +442,11 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         dynamic_fail = 0
         evaluated = 0
 
+        # Collect candidates that pass all gates and evaluate them in
+        # parallel across available devices.
+        eval_jobs: List[Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], str, List[str], str, int, int]] = []
+        eval_candidates: Dict[int, FreeLossIR] = {}
+
         for idx, ir in enumerate(population):
             static_res: StaticGateResult
             static_res = run_static_gates(ir, operator_whitelist=operator_whitelist)
@@ -429,8 +525,55 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 )
                 continue
 
-            fitness = evaluate_free_loss_candidate(compiled, free_cfg)
+            # Candidate passes all gates; queue it for evaluation.
+            eval_candidates[idx] = ir
+            ir_payload = asdict(ir)
+            eval_jobs.append(
+                (
+                    ir_payload,
+                    hf_cfg_dict,
+                    free_cfg_dict,
+                    "",  # device to be filled after we know available devices
+                    operator_whitelist,
+                    run_dir,
+                    gen,
+                    idx,
+                )
+            )
+
+        # Evaluate all surviving candidates in parallel across GPUs / devices.
+        results: List[Tuple[int, Dict[str, Any]]] = []
+        if eval_jobs:
+            devices = _get_available_devices(hf_cfg.device)
+            if not devices:
+                devices = [hf_cfg.device]
+
+            # Assign one candidate per device in a round-robin fashion.
+            jobs_with_devices: List[Tuple[
+                Dict[str, Any],
+                Dict[str, Any],
+                Dict[str, Any],
+                str,
+                List[str],
+                str,
+                int,
+                int,
+            ]] = []
+            for j_idx, job in enumerate(eval_jobs):
+                device_str = devices[j_idx % len(devices)]
+                job_with_dev = list(job)
+                job_with_dev[3] = device_str
+                jobs_with_devices.append(tuple(job_with_dev))  # type: ignore[arg-type]
+
+            ctx = mp.get_context("spawn")
+            num_workers = min(len(devices), len(jobs_with_devices))
+            with ctx.Pool(processes=num_workers) as pool:
+                results = pool.map(_worker_evaluate_candidate, jobs_with_devices)
+
+        # Integrate evaluation results back into the evolutionary loop.
+        for idx, fitness in sorted(results, key=lambda x: x[0]):
             evaluated += 1
+            ir = eval_candidates[idx]
 
             hf_like_score = float(fitness["hf_like_score"])
             better_than_baseline = None

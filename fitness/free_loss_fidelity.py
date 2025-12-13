@@ -83,6 +83,9 @@ def _train_one_batch_with_free_loss(
     (b_idx, winner_idx, loser_idx), pair_count = _build_preference_pairs(objective)
 
     if pair_count == 0:
+        # Fallback to a simple policy-gradient-style loss when no preference
+        # pairs exist. This keeps training stable without imposing additional
+        # theoretical structure beyond the candidate loss itself.
         advantage = reward - reward.mean(dim=1, keepdim=True)
         rl_log_prob = log_prob
         loss = -(advantage * rl_log_prob).mean()
@@ -100,7 +103,11 @@ def _train_one_batch_with_free_loss(
             "log_prob_l": logp_l_tensor,
             "weight": weight,
         }
-        loss = compiled_loss.loss_fn(batch=batch, model_output={}, extra={"alpha": hf_cfg.alpha})
+        loss = compiled_loss.loss_fn(
+            batch=batch,
+            model_output={},
+            extra={"alpha": hf_cfg.alpha},
+        )
 
     max_pomo_reward, _ = reward.max(dim=1)
     score_mean = -max_pomo_reward.float().mean()
