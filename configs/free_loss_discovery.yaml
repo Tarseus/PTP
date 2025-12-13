@@ -14,7 +14,7 @@ init_llm: 8
 
 # Multi-fidelity budget (in training steps).
 f0_only: false
-f1_steps: 100
+f1_steps: 1000
 f2_steps: 100    # set >0 to enable F2
 f3_enabled: false
 

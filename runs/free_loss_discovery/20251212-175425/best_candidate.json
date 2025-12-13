@@ -1,0 +1,82 @@
+{
+  "generation": 7,
+  "index": 1,
+  "ir": {
+    "name": "Sigmoid-Gated Adaptive Margin Loss with Rank-Gap Normalization",
+    "intuition": "This loss function creates a robust, adaptive preference signal by combining a smooth, non-saturating margin from one parent with a batch-aware weighting scheme from the other, coupled with a new gating mechanism.\n\nInherited Ideas:\n- From 'Softplus Adaptive Margin Loss' (Parent 1), it inherits the core idea of using `softplus(delta_cost)` to create a smooth, unbounded, and non-negative adaptive margin. This ensures that larger cost differences result in a proportionally larger target separation for the model's log probabilities, without the saturation issues of functions like `tanh`.\n- From 'Adaptive Margin Loss with Z-Score Normalization and Rank Gap' (Parent 0), it inherits the concept of using the relative rank of costs within a batch to modulate the loss. Specifically, it uses the rank difference to create a dynamic weighting factor, focusing the model's attention on pairs that are far apart in the batch's cost distribution.\n\nNew Coupling Ideas:\n1.  **Rank-Gap Normalization of Margin**: Instead of just using `rank_gap` as a final loss weight, it is used to directly normalize the adaptive margin itself. The margin is divided by `1 + beta * rank_gap_normalized`, where `rank_gap_normalized` is the rank difference scaled by the batch size. This couples the margin's scale directly to the pair's relative importance in the batch. For pairs with a small rank gap, the margin is larger (less division), pushing the model to learn fine-grained distinctions. For pairs with a large rank gap, the margin is smaller, as the `softplus(delta_cost)` term is already large and a huge margin is not needed, preventing potential gradient explosion.\n2.  **Sigmoid Gating on Log-Probability Difference**: The model's log-probability difference (`delta_logp`) is passed through a sigmoid gate: `delta_logp * sigmoid(delta_logp)`. This serves two purposes: it down-weights the contribution of pairs where the model is already very confident (large positive `delta_logp`), preventing it from wasting capacity on already-learned examples. It also heavily penalizes pairs where the model is confidently wrong (large negative `delta_logp`), as the sigmoid approaches zero, amplifying the negative term.",
+    "pseudocode": "1. For each pair (w, l) where cost(w) < cost(l), calculate the cost difference `delta_cost = cost(l) - cost(w)` and the log probability difference `delta_logp = logp(w) - logp(l)`.\n2. Inherit from Parent 1: Calculate a smooth, non-saturating adaptive margin base using `softplus`: `margin_base = alpha * softplus(delta_cost / temp_cost)`.\n3. Inherit from Parent 0: Determine the cost ranks for all `cost_w` and `cost_l` in the batch. Calculate the absolute rank difference `rank_diff = abs(rank(cost_l) - rank(cost_w))`.\n4. New Coupling (Rank-Gap Normalization): Normalize the rank difference by the batch size. Use this to create a denominator that modulates the margin: `margin_normalizer = 1.0 + beta * (rank_diff / batch_size)`. The modulated margin is `margin = margin_base / margin_normalizer`.\n5. New Coupling (Sigmoid Gating): Apply a sigmoid gate to the model's log-probability difference to modulate its contribution: `gated_delta_logp = delta_logp * sigmoid(delta_logp)`.\n6. Compute the core per-sample loss using the main softplus structure: `loss = softplus(margin - gated_delta_logp)`.\n7. Return the weighted mean of the per-sample losses over the batch.",
+    "hyperparams": {
+      "alpha": 1.0,
+      "temp_cost": 1.0,
+      "beta": 0.5
+    },
+    "operators_used": [
+      "softplus",
+      "sigmoid",
+      "rank_gap",
+      "log"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_w",
+        "cost_l",
+        "log_prob_w",
+        "log_prob_l"
+      ],
+      "returns": "scalar"
+    },
+    "code": "import torch\nimport torch.nn.functional as F\n\ndef generated_loss(batch, model_output, extra):\n    \"\"\"\n    Computes the Sigmoid-Gated Adaptive Margin Loss with Rank-Gap Normalization.\n\n    Inherits:\n    - The use of `softplus(delta_cost)` for a non-saturating margin (from Parent 1).\n    - The use of rank differences for batch-aware modulation (from Parent 0).\n\n    Introduces:\n    - A new coupling where the rank gap normalizes the margin itself, not the final loss.\n    - A sigmoid gate on the model's log-probability difference to focus on uncertain or incorrect predictions.\n    \"\"\"\n    # For preference learning, we assume cost_w < cost_l.\n    cost_w = torch.min(batch['cost_a'], batch['cost_b'])\n    cost_l = torch.max(batch['cost_a'], batch['cost_b'])\n    log_prob_w = batch['log_prob_w']\n    log_prob_l = batch['log_prob_l']\n\n    # Retrieve hyperparameters\n    alpha = extra.get('alpha', 1.0)\n    temp_cost = extra.get('temp_cost', 1.0)\n    beta = extra.get('beta', 0.5)\n\n    # 1. Calculate cost and log probability differences\n    delta_cost = cost_l - cost_w\n    delta_logp = log_prob_w - log_prob_l\n    batch_size = delta_cost.shape[0]\n\n    # 2. Inherited from Parent 1: Calculate a smooth, non-saturating margin base.\n    margin_base = alpha * F.softplus(delta_cost / temp_cost)\n\n    # 3. Inherited from Parent 0: Calculate rank differences.\n    # Combine all costs to establish a batch-wide ranking.\n    all_costs = torch.cat([cost_w, cost_l], dim=0)\n    sorted_costs, _ = torch.sort(all_costs)\n    \n    # Find ranks efficiently using searchsorted.\n    rank_w = torch.searchsorted(sorted_costs, cost_w)\n    rank_l = torch.searchsorted(sorted_costs, cost_l)\n    rank_diff = (rank_l - rank_w).float()\n\n    # 4. New Coupling: Rank-Gap Normalization of the margin.\n    # Normalize rank diff by batch size to keep the term scale-invariant to N.\n    # For pairs far apart in rank, the denominator increases, reducing the margin.\n    # This prevents extremely large margins for pairs that are already easy to distinguish.\n    # Adding 1.0 ensures the denominator is always >= 1.\n    margin_normalizer = 1.0 + beta * (rank_diff / (2 * batch_size))\n    adaptive_margin = margin_base / margin_normalizer.detach() # Detach to treat as a pure weighting factor\n\n    # 5. New Coupling: Sigmoid Gating on delta_logp.\n    # This penalizes confident incorrect predictions more and reduces focus on already-correct ones.\n    gated_delta_logp = delta_logp * torch.sigmoid(delta_logp)\n\n    # 6. Compute the core loss structure.\n    loss = F.softplus(adaptive_margin - gated_delta_logp)\n\n    # 7. Apply optional weights and compute the mean.\n    weights = batch.get('weight', None)\n    if weights is not None:\n        loss = loss * weights\n        return loss.sum() / weights.sum().clamp(min=1e-8)\n    else:\n        return loss.mean()"
+  },
+  "fitness": {
+    "hf_like_score": 8.128266334533691,
+    "validation_objective": 8.128266334533691,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "100": 8.108760833740234
+    },
+    "train_score_mean": 8.764982051849366,
+    "train_loss_mean": 0.25869439728558064,
+    "pair_count": 129023864,
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 1000,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          100
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 64,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 1000,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "Sigmoid-Gated Adaptive Margin Loss with Rank-Gap Normalization",
+      "intuition": "This loss function creates a robust, adaptive preference signal by combining a smooth, non-saturating margin from one parent with a batch-aware weighting scheme from the other, coupled with a new gating mechanism.\n\nInherited Ideas:\n- From 'Softplus Adaptive Margin Loss' (Parent 1), it inherits the core idea of using `softplus(delta_cost)` to create a smooth, unbounded, and non-negative adaptive margin. This ensures that larger cost differences result in a proportionally larger target separation for the model's log probabilities, without the saturation issues of functions like `tanh`.\n- From 'Adaptive Margin Loss with Z-Score Normalization and Rank Gap' (Parent 0), it inherits the concept of using the relative rank of costs within a batch to modulate the loss. Specifically, it uses the rank difference to create a dynamic weighting factor, focusing the model's attention on pairs that are far apart in the batch's cost distribution.\n\nNew Coupling Ideas:\n1.  **Rank-Gap Normalization of Margin**: Instead of just using `rank_gap` as a final loss weight, it is used to directly normalize the adaptive margin itself. The margin is divided by `1 + beta * rank_gap_normalized`, where `rank_gap_normalized` is the rank difference scaled by the batch size. This couples the margin's scale directly to the pair's relative importance in the batch. For pairs with a small rank gap, the margin is larger (less division), pushing the model to learn fine-grained distinctions. For pairs with a large rank gap, the margin is smaller, as the `softplus(delta_cost)` term is already large and a huge margin is not needed, preventing potential gradient explosion.\n2.  **Sigmoid Gating on Log-Probability Difference**: The model's log-probability difference (`delta_logp`) is passed through a sigmoid gate: `delta_logp * sigmoid(delta_logp)`. This serves two purposes: it down-weights the contribution of pairs where the model is already very confident (large positive `delta_logp`), preventing it from wasting capacity on already-learned examples. It also heavily penalizes pairs where the model is confidently wrong (large negative `delta_logp`), as the sigmoid approaches zero, amplifying the negative term.",
+      "hyperparams": {
+        "alpha": 1.0,
+        "temp_cost": 1.0,
+        "beta": 0.5
+      },
+      "operators_used": [
+        "softplus",
+        "sigmoid",
+        "rank_gap",
+        "log"
+      ]
+    }
+  }
+}
