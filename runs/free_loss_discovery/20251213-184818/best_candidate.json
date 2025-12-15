@@ -1,0 +1,81 @@
+{
+  "generation": 9,
+  "index": 0,
+  "ir": {
+    "name": "Rank-Modulated Tanh-Saturated Logistic Loss",
+    "intuition": "This loss function creates a highly adaptive and stable learning signal by combining rank-based modulation with a saturated, z-score-normalized margin. The goal is to produce a loss that is robust to the scale and distribution of costs within a batch, while focusing learning on pairs where the model's preference is misaligned with the ground truth, and gracefully handling pairs with very small or very large cost differences.\n\nInherited Ideas:\n- From both Parent 0 and Parent 1, it inherits the core idea of using `rank_gap(delta_cost)` to understand the relative importance of a preference pair within the batch. This makes the loss adaptive to the distribution of cost differences.\n- From both Parent 0 and Parent 1, it inherits the use of `zscore(delta_cost)` to normalize the cost differences. This makes the loss robust to the absolute scale of costs by considering the batch's mean and standard deviation.\n\nNew Coupling Ideas:\n1.  **Saturated Z-Score Margin (tanh(zscore))**: This idea is inspired by Parent 1's `tanh(zscore(delta_cost))` margin. We use this coupling to create a margin that is adaptive to the batch's statistical properties (due to `zscore`) and is also stable against extreme outliers (due to `tanh` saturation). This prevents single pairs with massive cost differences from dominating the learning signal by creating an unbounded margin.\n2.  **Rank-Modulated Loss (rank_gap * loss)**: Instead of using the rank to define the margin (as in Parent 0) or as a simple weight with an offset (as in Parent 1), we use it to directly modulate the entire logistic loss term. The loss for each pair is calculated as `rank_gap(delta_cost) * softplus(margin - delta_logp)`. This coupling ensures that the contribution of each pair to the total loss is directly proportional to its relative importance (its rank). Pairs with the smallest cost difference (rank_gap ≈ 0) will have their loss smoothly scaled down to near zero, effectively ignoring them, while the most significant pairs (rank_gap ≈ 1) contribute their full loss. This provides a smooth and principled way to focus the learning.",
+    "pseudocode": "1. Calculate the cost difference: delta_cost = cost(b) - cost(a).\n2. Calculate the log-probability difference: delta_logp = logp(a) - logp(b).\n3. (Inherited from both Parents) Normalize the cost difference using z-scoring: normalized_delta_cost = zscore(delta_cost).\n4. (Inherited from both Parents) Compute a rank-based modulation factor from the raw delta_cost: rank_modulator = rank_gap(delta_cost).\n5. (New Coupling 1) Compute a saturated, z-score-normalized margin. Apply a `tanh` function to the normalized_delta_cost and scale it by a hyperparameter `gamma`: margin = gamma * tanh(normalized_delta_cost).\n6. Compute the core logistic loss using the adaptive margin: core_loss = softplus(margin - delta_logp).\n7. (New Coupling 2) The final loss for each pair is the product of the rank modulator and the core loss: instance_loss = rank_modulator * core_loss.\n8. The final loss is the average of instance_loss over the batch.",
+    "hyperparams": {
+      "gamma": 1.5,
+      "eps": 1e-08
+    },
+    "operators_used": [
+      "softplus",
+      "tanh",
+      "zscore",
+      "rank_gap"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "log_prob_w",
+        "log_prob_l",
+        "weight"
+      ],
+      "returns": "scalar"
+    },
+    "code": "import torch\nimport torch.nn.functional as F\n\ndef generated_loss(batch, model_output, extra):\n    \"\"\"\n    Rank-Modulated Tanh-Saturated Logistic Loss.\n\n    This loss combines a saturated, z-score-normalized margin with a rank-based\n    modulation of the final loss value.\n\n    - Inherits `rank_gap` from both parents to determine a pair's relative importance.\n    - Inherits `zscore` from both parents for batch-adaptive cost normalization.\n    - New Coupling 1: Uses a `tanh(zscore(delta_cost))` margin, making it robust\n      to both the scale of costs and extreme outliers.\n    - New Coupling 2: The entire `softplus` loss is directly modulated by the `rank_gap`,\n      smoothly scaling the contribution of each pair from 0 to 1 based on its importance.\n    \"\"\"\n    # Read hyperparameters from the 'extra' dictionary\n    gamma = extra.get('gamma', 1.5)\n    eps = extra.get('eps', 1e-8)\n\n    # Unpack tensors from the batch\n    cost_w = batch['cost_a']\n    cost_l = batch['cost_b']\n    logp_w = batch['log_prob_w']\n    logp_l = batch['log_prob_l']\n\n    # Sanity check: cost_w should be less than or equal to cost_l\n    # This ensures delta_cost is non-negative.\n    assert torch.all(cost_w <= cost_l), \"Assumption failed: cost_a (winner) must be <= cost_b (loser)\"\n\n    # 1. Calculate cost and log-probability differences\n    delta_cost = cost_l - cost_w\n    delta_logp = logp_w - logp_l\n\n    # Handle batch size of 1 to avoid division by zero in z-score and rank_gap\n    if delta_cost.numel() > 1:\n        # 2. (Inherited) Normalize delta_cost using z-scoring\n        mean_delta_cost = delta_cost.mean()\n        std_delta_cost = delta_cost.std() + eps\n        normalized_delta_cost = (delta_cost - mean_delta_cost) / std_delta_cost\n\n        # 3. (Inherited) Compute rank-based modulation factor\n        ranks = delta_cost.argsort().argsort().float()\n        rank_modulator = ranks / (delta_cost.numel() - 1)  # Maps to [0, 1]\n    else:\n        normalized_delta_cost = torch.zeros_like(delta_cost)\n        rank_modulator = torch.ones_like(delta_cost)\n\n    # 4. (New Coupling 1) Compute a saturated, z-score-normalized margin\n    margin = gamma * torch.tanh(normalized_delta_cost)\n\n    # 5. Compute the core logistic loss using the adaptive margin\n    core_loss = F.softplus(margin - delta_logp)\n\n    # 6. (New Coupling 2) Modulate the loss by the rank factor\n    instance_loss = rank_modulator * core_loss\n\n    # Apply optional sample weights if provided\n    weights = batch.get('weight')\n    if weights is not None:\n        instance_loss = instance_loss * weights\n\n    # 7. Return the mean loss over the batch\n    return instance_loss.mean()"
+  },
+  "fitness": {
+    "hf_like_score": 3.8834586143493652,
+    "validation_objective": 3.8297005891799927,
+    "generalization_penalty": 0.05375802516937256,
+    "generalization_objectives": {
+      "20": 3.8834586143493652
+    },
+    "train_score_mean": 4.016293186890452,
+    "train_loss_mean": 0.17066118589005755,
+    "pair_count": 20099512,
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 1653,
+        "train_problem_size": 20,
+        "valid_problem_sizes": [
+          20
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 20,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:0",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 1653,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "Rank-Modulated Tanh-Saturated Logistic Loss",
+      "intuition": "This loss function creates a highly adaptive and stable learning signal by combining rank-based modulation with a saturated, z-score-normalized margin. The goal is to produce a loss that is robust to the scale and distribution of costs within a batch, while focusing learning on pairs where the model's preference is misaligned with the ground truth, and gracefully handling pairs with very small or very large cost differences.\n\nInherited Ideas:\n- From both Parent 0 and Parent 1, it inherits the core idea of using `rank_gap(delta_cost)` to understand the relative importance of a preference pair within the batch. This makes the loss adaptive to the distribution of cost differences.\n- From both Parent 0 and Parent 1, it inherits the use of `zscore(delta_cost)` to normalize the cost differences. This makes the loss robust to the absolute scale of costs by considering the batch's mean and standard deviation.\n\nNew Coupling Ideas:\n1.  **Saturated Z-Score Margin (tanh(zscore))**: This idea is inspired by Parent 1's `tanh(zscore(delta_cost))` margin. We use this coupling to create a margin that is adaptive to the batch's statistical properties (due to `zscore`) and is also stable against extreme outliers (due to `tanh` saturation). This prevents single pairs with massive cost differences from dominating the learning signal by creating an unbounded margin.\n2.  **Rank-Modulated Loss (rank_gap * loss)**: Instead of using the rank to define the margin (as in Parent 0) or as a simple weight with an offset (as in Parent 1), we use it to directly modulate the entire logistic loss term. The loss for each pair is calculated as `rank_gap(delta_cost) * softplus(margin - delta_logp)`. This coupling ensures that the contribution of each pair to the total loss is directly proportional to its relative importance (its rank). Pairs with the smallest cost difference (rank_gap ≈ 0) will have their loss smoothly scaled down to near zero, effectively ignoring them, while the most significant pairs (rank_gap ≈ 1) contribute their full loss. This provides a smooth and principled way to focus the learning.",
+      "hyperparams": {
+        "gamma": 1.5,
+        "eps": 1e-08
+      },
+      "operators_used": [
+        "softplus",
+        "tanh",
+        "zscore",
+        "rank_gap"
+      ]
+    }
+  }
+}

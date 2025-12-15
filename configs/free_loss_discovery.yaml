@@ -16,12 +16,12 @@ init_llm: 8
 f0_only: false
 # High-fidelity training budget for F1.
 # Option 1 (legacy): specify the total number of training *steps* directly.
-f1_steps: 100000
+f1_steps: 0
 # Option 2: specify epochs and instances per epoch. When both are > 0,
 # they are used to derive the total number of training steps as:
 #   total_steps = hf_epochs * ceil(hf_instances_per_epoch / train_batch_size)
-hf_epochs: 0
-hf_instances_per_epoch: 0
+hf_epochs: 1
+hf_instances_per_epoch: 100000
 f2_steps: 100    # set >0 to enable F2
 f3_enabled: false
 
@@ -30,8 +30,8 @@ f3_enabled: false
 # fitness reflects full training behaviour on the canonical small-scale
 # benchmark.
 problem: tsp
-train_problem_size: 20
-valid_problem_sizes: [20]
+train_problem_size: 100
+valid_problem_sizes: [100]
 train_batch_size: 64
 pomo_size: 20
 learning_rate: 0.0003

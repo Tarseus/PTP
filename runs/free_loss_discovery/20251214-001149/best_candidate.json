@@ -1,0 +1,90 @@
+{
+  "generation": 3,
+  "index": 6,
+  "ir": {
+    "name": "Clipped Tanh-Normalized Adaptive Margin Loss",
+    "intuition": "This loss function combines the stable, batch-independent normalization from the 'Adaptive Sigmoid Margin Loss with Tanh Normalization' (Parent 0) with the robustness-enhancing clipping mechanism from the 'Clipped Adaptive Sigmoid Margin Loss' (Parent 1). Specifically, it inherits the use of a scaled `tanh` function to normalize the cost difference, which provides a bounded and predictable normalization that is not dependent on batch statistics. From Parent 1, it inherits the `clamp` operator, which is applied to the output of the tanh function before it is used to compute the margin. This acts as a secondary stability control, ensuring the input to the sigmoid function is well-behaved, even if the tanh scaling is miscalibrated. The core loss remains a logistic objective (`-logsigmoid`) where the model's log-probability difference is pushed to exceed this adaptive margin, and the entire loss term is scaled by a `softplus` of the raw cost difference, an idea common to both parents.\n\nAs a new coupling idea, this child loss introduces a dynamic `beta` schedule based on the tanh-normalized cost difference. The `beta` parameter, which scales the importance of the loss based on the raw cost gap, is now modulated by `tanh(delta_cost)`. This means that for pairs with very small cost differences, the `beta` scaling is reduced, preventing the model from being over-penalized on noisy or insignificant preferences. As the cost difference grows, `beta`'s effect ramps up towards its maximum configured value, smoothly focusing the training on more meaningful preference pairs. This creates a more nuanced weighting scheme than the fixed `beta` used by the parents.",
+    "pseudocode": "1. Calculate the cost difference: delta_cost = cost(b) - cost(a).\n2. Normalize the cost difference using a scaled tanh function: norm_delta_cost = tanh(delta_cost / norm_scale). This is inherited from Parent 0.\n3. Clip the normalized cost difference to a range [-clip_value, clip_value] for added stability. This idea is inherited from Parent 1.\n4. Compute an adaptive margin based on the clipped, normalized value: margin = max_margin * sigmoid(clipped_norm_delta_cost).\n5. Calculate the log-probability difference: delta_logp = logp(a) - logp(b).\n6. Compute the core preference loss: core_loss = -logsigmoid(delta_logp - margin).\n7. (New Coupling) Compute a dynamic beta schedule: dynamic_beta = base_beta * norm_delta_cost. This reduces the weight for pairs with small cost differences.\n8. Calculate a cost-based weight using the dynamic beta: weight_scale = softplus(dynamic_beta * delta_cost). This is a modification of the weighting scheme from both parents.\n9. Combine them: final_loss = weight_scale * core_loss.\n10. Return the mean of final_loss over the batch.",
+    "hyperparams": {
+      "base_beta": 1.0,
+      "max_margin": 2.0,
+      "norm_scale": 10.0,
+      "clip_value": 0.99
+    },
+    "operators_used": [
+      "logsigmoid",
+      "softplus",
+      "sigmoid",
+      "tanh",
+      "clamp"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "log_prob_w",
+        "log_prob_l",
+        "weight"
+      ],
+      "returns": "scalar"
+    },
+    "code": "import torch\nimport torch.nn.functional as F\n\ndef generated_loss(batch, model_output, extra):\n    \"\"\"\n    Clipped Tanh-Normalized Adaptive Margin Loss.\n\n    Args:\n        batch (dict): A dictionary containing tensors from the data loader.\n                      Expected keys: 'cost_a', 'cost_b', 'log_prob_w', 'log_prob_l'.\n                      'cost_a' and 'log_prob_w' correspond to the preferred solution (winner).\n                      'cost_b' and 'log_prob_l' correspond to the non-preferred solution (loser).\n                      An optional 'weight' tensor can be used for sample weighting.\n        model_output (dict): Output from the model (not used in this loss structure).\n        extra (dict): A dictionary for hyperparameters, e.g., {'base_beta': 1.0, 'max_margin': 2.0, 'norm_scale': 10.0, 'clip_value': 0.99}.\n\n    Returns:\n        torch.Tensor: A scalar tensor representing the mean loss.\n    \"\"\"\n    # Read hyperparameters\n    base_beta = extra.get('base_beta', 1.0)\n    max_margin = extra.get('max_margin', 2.0)\n    norm_scale = extra.get('norm_scale', 10.0)\n    clip_value = extra.get('clip_value', 0.99) # Clip inside tanh's range\n\n    # In our setting, 'a' is the winner (w) and 'b' is the loser (l).\n    # cost_a < cost_b\n    cost_a = batch['cost_a']\n    cost_b = batch['cost_b']\n    logp_a = batch['log_prob_w']\n    logp_b = batch['log_prob_l']\n\n    # 1. Calculate cost and log-probability differences\n    delta_cost = cost_b - cost_a\n    delta_logp = logp_a - logp_b\n\n    # 2. Normalize cost difference with tanh (inherited from Parent 0)\n    norm_delta_cost = torch.tanh(delta_cost / norm_scale)\n\n    # 3. Clip the normalized cost for stability (inherited from Parent 1)\n    # The clip_value should be <= 1 to be effective with tanh output.\n    clipped_norm_delta_cost = torch.clamp(norm_delta_cost, -clip_value, clip_value)\n\n    # 4. Compute the adaptive sigmoid margin\n    margin = max_margin * torch.sigmoid(clipped_norm_delta_cost)\n\n    # 5. Compute the core preference loss (Bradley-Terry style with margin)\n    core_loss = -F.logsigmoid(delta_logp - margin)\n\n    # 6. (New Coupling) Compute a dynamic beta, modulated by the normalized cost difference.\n    # This reduces the weight for pairs with very small cost differences, making beta's effect smoother.\n    dynamic_beta = base_beta * norm_delta_cost.abs() # Use abs to ensure beta is positive\n\n    # 7. Compute a cost-based scaling factor using dynamic beta and softplus\n    weight_scale = F.softplus(dynamic_beta * delta_cost)\n\n    # 8. Combine core loss and scaling factor\n    loss_per_sample = weight_scale * core_loss\n\n    # 9. Apply optional sample weights if provided\n    sample_weights = batch.get('weight', None)\n    if sample_weights is not None:\n        loss_per_sample = loss_per_sample * sample_weights\n\n    # 10. Return the mean loss over the batch\n    return loss_per_sample.mean()"
+  },
+  "fitness": {
+    "hf_like_score": 3.8443875312805176,
+    "validation_objective": 3.8443875312805176,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "20": 3.8414416313171387
+    },
+    "train_score_mean": 4.079995856129505,
+    "train_loss_mean": 0.3759007084878759,
+    "pair_count": 188522405,
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 10,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 20,
+        "valid_problem_sizes": [
+          20
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 20,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:3",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 15630,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "Clipped Tanh-Normalized Adaptive Margin Loss",
+      "intuition": "This loss function combines the stable, batch-independent normalization from the 'Adaptive Sigmoid Margin Loss with Tanh Normalization' (Parent 0) with the robustness-enhancing clipping mechanism from the 'Clipped Adaptive Sigmoid Margin Loss' (Parent 1). Specifically, it inherits the use of a scaled `tanh` function to normalize the cost difference, which provides a bounded and predictable normalization that is not dependent on batch statistics. From Parent 1, it inherits the `clamp` operator, which is applied to the output of the tanh function before it is used to compute the margin. This acts as a secondary stability control, ensuring the input to the sigmoid function is well-behaved, even if the tanh scaling is miscalibrated. The core loss remains a logistic objective (`-logsigmoid`) where the model's log-probability difference is pushed to exceed this adaptive margin, and the entire loss term is scaled by a `softplus` of the raw cost difference, an idea common to both parents.\n\nAs a new coupling idea, this child loss introduces a dynamic `beta` schedule based on the tanh-normalized cost difference. The `beta` parameter, which scales the importance of the loss based on the raw cost gap, is now modulated by `tanh(delta_cost)`. This means that for pairs with very small cost differences, the `beta` scaling is reduced, preventing the model from being over-penalized on noisy or insignificant preferences. As the cost difference grows, `beta`'s effect ramps up towards its maximum configured value, smoothly focusing the training on more meaningful preference pairs. This creates a more nuanced weighting scheme than the fixed `beta` used by the parents.",
+      "hyperparams": {
+        "base_beta": 1.0,
+        "max_margin": 2.0,
+        "norm_scale": 10.0,
+        "clip_value": 0.99
+      },
+      "operators_used": [
+        "logsigmoid",
+        "softplus",
+        "sigmoid",
+        "tanh",
+        "clamp"
+      ]
+    }
+  }
+}
