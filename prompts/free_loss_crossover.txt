@@ -12,10 +12,21 @@ You are given `PARENTS_JSON`, where each element has:
 - `hyperparams`
 - `operators_used`
 - `code` (a Python implementation of the loss function)
+- `metrics` (empirical metrics for that parent, including `hf_like_score`, `validation_objective`, `generalization_penalty`, `pair_count`).
 
-Based on these parents, design a new loss and describe, in English, in `intuition` and `pseudocode`:
+You may also be given a `GLOBAL_FEEDBACK_JSON` object, which summarizes the search history:
+- `burn_in_objectives`: baseline objectives (such as the original `po_loss`) and their metrics.
+- `recent_elites`: a small set of top-performing discovered losses, each with operators, hyperparameters, and metrics.
+- `recent_failures`: aggregated gate failures with error codes like `E_OPERATOR_VIOLATION`, `E_GRAD_EXPLODE`, `E_LOSS_OUT_OF_RANGE`, `E_RUNTIME_NAN_LOSS`, etc., plus representative failing IRs.
+- `suggested_mode`: one of `"explore"`, `"refine"`, or `"combine"` indicating whether you should prioritize:
+  - **explore**: more radical new couplings and structures;
+  - **refine**: small numerical/stability improvements to patterns that already work well;
+  - **combine**: hybridize complementary ideas from multiple strong parents.
+
+Based on these parents and the global feedback, design a new loss and describe, in English, in `intuition` and `pseudocode`:
 - Which ideas are inherited from which parents.
 - What new couplings or modifications you introduce.
+Explicitly indicate in the `intuition` string which conceptual mode you chose (explore / refine / combine), for example by including `Mode: combine`.
 
 Hard constraints:
 - Only use the following operators: `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.

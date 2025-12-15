@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import asdict
-from typing import Sequence
+from typing import Any, Mapping, Sequence
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -57,10 +57,15 @@ def generate_free_loss_candidate(
     generation_prompt_path: str,
     *,
     operator_whitelist: Sequence[str],
+    global_feedback: Mapping[str, Any] | None = None,
 ) -> FreeLossIR:
     del operator_whitelist
     base_prompt = _read_prompt(generation_prompt_path)
-    raw = _call_llm(base_prompt)
+    prompt = base_prompt
+    if global_feedback is not None:
+        feedback_blob = json.dumps(global_feedback, indent=2, ensure_ascii=False)
+        prompt = prompt + "\n\nGLOBAL_FEEDBACK_JSON:\n" + feedback_blob
+    raw = _call_llm(prompt)
     json_str = _extract_json_object(raw)
     return parse_free_loss_from_text(json_str)
 
@@ -68,10 +73,15 @@ def generate_free_loss_candidate(
 def crossover_free_loss(
     crossover_prompt_path: str,
     parents: Sequence[FreeLossIR],
+    parents_fitness: Sequence[Mapping[str, Any]] | None = None,
+    global_feedback: Mapping[str, Any] | None = None,
 ) -> FreeLossIR:
     prompt = _read_prompt(crossover_prompt_path)
     parent_blobs = []
     for idx, parent in enumerate(parents):
+        metrics: Mapping[str, Any] = {}
+        if parents_fitness is not None and idx < len(parents_fitness):
+            metrics = parents_fitness[idx]
         blob = {
             "index": idx,
             "name": parent.name,
@@ -80,9 +90,24 @@ def crossover_free_loss(
             "hyperparams": parent.hyperparams,
             "operators_used": parent.operators_used,
             "code": parent.code,
+            "metrics": {
+                "hf_like_score": float(metrics.get("hf_like_score", float("inf")))
+                if metrics
+                else None,
+                "validation_objective": float(metrics.get("validation_objective", float("inf")))
+                if metrics
+                else None,
+                "generalization_penalty": float(metrics.get("generalization_penalty", 0.0))
+                if metrics
+                else None,
+                "pair_count": int(metrics.get("pair_count", 0) or 0) if metrics else 0,
+            },
         }
         parent_blobs.append(blob)
-    prompt = prompt + "\n\nPARENTS_JSON:\n" + json.dumps(parent_blobs, indent=2)
+    prompt = prompt + "\n\nPARENTS_JSON:\n" + json.dumps(parent_blobs, indent=2, ensure_ascii=False)
+    if global_feedback is not None:
+        feedback_blob = json.dumps(global_feedback, indent=2, ensure_ascii=False)
+        prompt = prompt + "\n\nGLOBAL_FEEDBACK_JSON:\n" + feedback_blob
     raw = _call_llm(prompt)
     json_str = _extract_json_object(raw)
     return parse_free_loss_from_text(json_str)
@@ -91,8 +116,11 @@ def crossover_free_loss(
 def mutate_free_loss(
     mutation_prompt_path: str,
     parent: FreeLossIR,
+    parent_fitness: Mapping[str, Any] | None = None,
+    global_feedback: Mapping[str, Any] | None = None,
 ) -> FreeLossIR:
     prompt = _read_prompt(mutation_prompt_path)
+    metrics: Mapping[str, Any] = parent_fitness or {}
     parent_blob = {
         "name": parent.name,
         "intuition": parent.intuition,
@@ -100,8 +128,21 @@ def mutate_free_loss(
         "hyperparams": parent.hyperparams,
         "operators_used": parent.operators_used,
         "code": parent.code,
+        "metrics": {
+            "hf_like_score": float(metrics.get("hf_like_score", float("inf"))) if metrics else None,
+            "validation_objective": float(metrics.get("validation_objective", float("inf")))
+            if metrics
+            else None,
+            "generalization_penalty": float(metrics.get("generalization_penalty", 0.0))
+            if metrics
+            else None,
+            "pair_count": int(metrics.get("pair_count", 0) or 0) if metrics else 0,
+        },
     }
-    prompt = prompt + "\n\nPARENT_JSON:\n" + json.dumps(parent_blob, indent=2)
+    prompt = prompt + "\n\nPARENT_JSON:\n" + json.dumps(parent_blob, indent=2, ensure_ascii=False)
+    if global_feedback is not None:
+        feedback_blob = json.dumps(global_feedback, indent=2, ensure_ascii=False)
+        prompt = prompt + "\n\nGLOBAL_FEEDBACK_JSON:\n" + feedback_blob
     raw = _call_llm(prompt)
     json_str = _extract_json_object(raw)
     return parse_free_loss_from_text(json_str)
@@ -110,7 +151,7 @@ def mutate_free_loss(
 def repair_free_loss(
     repair_prompt_path: str,
     failed_ir: FreeLossIR,
-    failure_reason: str,
+    failure_reason: Mapping[str, Any],
 ) -> FreeLossIR:
     prompt = _read_prompt(repair_prompt_path)
     payload = {
@@ -120,6 +161,7 @@ def repair_free_loss(
             "pseudocode": failed_ir.pseudocode,
             "hyperparams": failed_ir.hyperparams,
             "operators_used": failed_ir.operators_used,
+            "code": failed_ir.code,
         },
         "failure_reason": failure_reason,
     }

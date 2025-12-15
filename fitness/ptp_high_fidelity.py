@@ -433,7 +433,7 @@ def evaluate_ptp_dsl_high_fidelity(
             logger.info(
                 "HF train step %d/%d: score=%.6f (avg=%.6f), loss=%.6f (avg=%.6f)",
                 step_index + 1,
-                config.hf_steps,
+                total_steps,
                 score,
                 float(score_meter.avg),
                 loss,

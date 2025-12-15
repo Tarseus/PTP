@@ -75,7 +75,7 @@ def _extract_json_object(text: str) -> str:
     return text[start : end + 1]
 
 
-def generate_ptp_dsl(client: OpenAI, extra_hint: str = "") -> str:
+def generate_ptp_dsl(client: OpenAI, extra_hint: str = "", burn_in_json: str | None = None) -> str:
     """Call the LLM to generate a single PTP DSL JSON program."""
 
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -85,11 +85,17 @@ def generate_ptp_dsl(client: OpenAI, extra_hint: str = "") -> str:
     system_prompt = _read_prompt(system_path)
     task_prompt = _read_prompt(task_path)
 
+    user_content = task_prompt
+    if burn_in_json:
+        user_content += "\n\nBURN_IN_OBJECTIVES_JSON:\n" + burn_in_json
+    if extra_hint:
+        user_content += "\n" + extra_hint
+
     messages = [
         {"role": "system", "content": system_prompt},
         {
             "role": "user",
-            "content": task_prompt + ("\n" + extra_hint if extra_hint else ""),
+            "content": user_content,
         },
     ]
 
@@ -151,6 +157,7 @@ def _llm_mutate_candidates(
     client: OpenAI,
     elites: Sequence[EliteRecord],
     population_size: int,
+    burn_in_json: str | None,
 ) -> list[PTPDiscoveryCandidate]:
     """Use the LLM to generate mutated/crossover candidates from elites."""
 
@@ -167,7 +174,7 @@ def _llm_mutate_candidates(
     while len(new_candidates) < population_size:
         mutation_hint = _build_mutation_hint(parents_for_prompt)
         try:
-            dsl = generate_ptp_dsl(client, extra_hint=mutation_hint)
+            dsl = generate_ptp_dsl(client, extra_hint=mutation_hint, burn_in_json=burn_in_json)
             parent_ids = [rec.result.candidate_id for rec in parents_for_prompt]
             new_candidates.append(
                 PTPDiscoveryCandidate(
@@ -274,6 +281,21 @@ def main() -> None:
         seed=args.seed,
     )
 
+    # Burn-in: evaluate the baseline PTP_BEST program once to obtain
+    # reference metrics that are fed into the LLM context.
+    from fitness.ptp_high_fidelity import evaluate_ptp_dsl_high_fidelity
+
+    baseline_metrics = evaluate_ptp_dsl_high_fidelity(PTP_BEST_DSL, hf_cfg)
+    burn_in_objectives = [
+        {
+            "name": "PTP_BEST",
+            "type": "ptp_dsl_program",
+            "dsl_source": PTP_BEST_DSL,
+            "metrics": baseline_metrics,
+        }
+    ]
+    burn_in_json = json.dumps(burn_in_objectives, indent=2)
+
     search = PTPDiscoverySearch(
         hf_config=hf_cfg,
         log_dir=args.log_dir,
@@ -287,7 +309,7 @@ def main() -> None:
     ]
     for _ in range(max(0, args.init_llm)):
         try:
-            dsl = generate_ptp_dsl(client)
+            dsl = generate_ptp_dsl(client, burn_in_json=burn_in_json)
             init_candidates.append(PTPDiscoveryCandidate(dsl_source=dsl, origin="llm"))
         except Exception as exc:  # noqa: BLE001
             LOGGER.error("Failed to generate initial LLM candidate: %s", exc)
@@ -306,7 +328,7 @@ def main() -> None:
         LOGGER.info("=== Generation %d ===", gen)
 
         def _mutate_fn(elites: Sequence[EliteRecord], population_size: int):
-            return _llm_mutate_candidates(client, elites, population_size)
+            return _llm_mutate_candidates(client, elites, population_size, burn_in_json)
 
         mutated = search.propose_mutations(_mutate_fn)
         LOGGER.info("Generated %d mutated/crossover candidates via LLM", len(mutated))
@@ -315,7 +337,7 @@ def main() -> None:
         needed = max(0, args.population - len(mutated))
         for _ in range(needed):
             try:
-                dsl = generate_ptp_dsl(client)
+                dsl = generate_ptp_dsl(client, burn_in_json=burn_in_json)
                 mutated.append(PTPDiscoveryCandidate(dsl_source=dsl, origin="llm"))
             except Exception as exc:  # noqa: BLE001
                 LOGGER.error("Failed to generate LLM candidate in gen %d: %s", gen, exc)
@@ -340,4 +362,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

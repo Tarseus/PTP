@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 import re
 from dataclasses import dataclass
@@ -114,6 +115,70 @@ def _extract_json_object(text: str) -> Mapping[str, Any]:
         raise CompileError(f"Failed to parse JSON from LLM output: {exc}") from exc
 
 
+class _SafeCodeValidator(ast.NodeVisitor):
+    """Best-effort static validation for user-provided loss code.
+
+    The goal is to rule out obviously dangerous constructs (imports, exec,
+    file I/O, process control, etc.) before executing the code in a tightly
+    restricted environment.
+    """
+
+    _FORBIDDEN_CALL_NAMES = {
+        "__import__",
+        "eval",
+        "exec",
+        "compile",
+        "open",
+        "input",
+        "globals",
+        "locals",
+        "vars",
+        "getattr",
+        "setattr",
+        "delattr",
+    }
+
+    _FORBIDDEN_ATTR_BASES = {
+        "os",
+        "sys",
+        "subprocess",
+        "socket",
+        "pathlib",
+    }
+
+    def visit_Import(self, node: ast.Import) -> None:  # type: ignore[override]
+        raise CompileError("Loss code must not use import statements.")
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:  # type: ignore[override]
+        raise CompileError("Loss code must not use import-from statements.")
+
+    def visit_Call(self, node: ast.Call) -> None:  # type: ignore[override]
+        func = node.func
+        if isinstance(func, ast.Name) and func.id in self._FORBIDDEN_CALL_NAMES:
+            raise CompileError(f"Loss code calls forbidden function '{func.id}'.")
+        if isinstance(func, ast.Attribute):
+            # Disallow e.g. os.system, sys.exit, subprocess.Popen, etc.
+            base = func.value
+            if isinstance(base, ast.Name) and base.id in self._FORBIDDEN_ATTR_BASES:
+                raise CompileError(
+                    f"Loss code must not access '{base.id}.{func.attr}'. "
+                    "Only tensor-level math using torch/F is allowed."
+                )
+        self.generic_visit(node)
+
+
+def _validate_user_code(code_str: str) -> None:
+    """Run lightweight static checks on user-provided loss code."""
+
+    try:
+        tree = ast.parse(code_str, mode="exec")
+    except SyntaxError as exc:
+        raise CompileError(f"Loss code has syntax error: {exc}") from exc
+
+    validator = _SafeCodeValidator()
+    validator.visit(tree)
+
+
 def _safe_normalize(x: torch.Tensor, dim: int = -1, eps: float = 1e-8) -> torch.Tensor:
     x = x - x.mean(dim=dim, keepdim=True)
     std = x.std(dim=dim, keepdim=True)
@@ -166,14 +231,22 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
     # makes the search operate directly over executable loss functions.
     code_str = (ir.code or "").strip()
     if code_str:
-        local_ns: Dict[str, Any] = {"torch": torch, "F": F}
-        global_ns: Dict[str, Any] = {}
+        _validate_user_code(code_str)
+
+        # Execute in a tightly restricted namespace. We deliberately strip
+        # builtins to avoid access to filesystem, subprocesses, etc.
+        safe_globals: Dict[str, Any] = {
+            "__builtins__": {},
+            "torch": torch,
+            "F": F,
+        }
+        local_ns: Dict[str, Any] = {}
         try:
-            exec(code_str, local_ns, global_ns)
+            exec(code_str, safe_globals, local_ns)
         except Exception as exc:  # noqa: BLE001
             raise CompileError(f"Failed to exec loss code from IR: {exc}") from exc
 
-        fn = global_ns.get("generated_loss") or local_ns.get("generated_loss")
+        fn = local_ns.get("generated_loss")
         if not callable(fn):
             raise CompileError(
                 "Loss code did not define a callable 'generated_loss(batch, model_output, extra)'."

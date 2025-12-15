@@ -68,19 +68,34 @@ class PTPDiscoveryProblem:
             ",".join(candidate.parent_ids) if candidate.parent_ids else "-",
         )
 
-        hf_raw = evaluate_ptp_dsl_high_fidelity(candidate.dsl_source, self.hf_config)
-
-        result = PTPDiscoveryResult(
-            candidate_id=candidate_id,
-            hf_score=float(hf_raw["hf_score"]),
-            validation_objective=float(hf_raw["validation_objective"]),
-            generalization_penalty=float(hf_raw["generalization_penalty"]),
-            generalization_objectives={
-                int(k): float(v)
-                for k, v in hf_raw.get("generalization_objectives", {}).items()
-            },
-            hf_raw=hf_raw,
-        )
+        try:
+            hf_raw = evaluate_ptp_dsl_high_fidelity(candidate.dsl_source, self.hf_config)
+            result = PTPDiscoveryResult(
+                candidate_id=candidate_id,
+                hf_score=float(hf_raw["hf_score"]),
+                validation_objective=float(hf_raw["validation_objective"]),
+                generalization_penalty=float(hf_raw["generalization_penalty"]),
+                generalization_objectives={
+                    int(k): float(v)
+                    for k, v in hf_raw.get("generalization_objectives", {}).items()
+                },
+                hf_raw=hf_raw,
+            )
+        except Exception as exc:  # noqa: BLE001
+            logger.error("HF evaluation failed for candidate %s: %s", candidate_id, exc)
+            hf_raw = {
+                "status": "error",
+                "error_type": type(exc).__name__,
+                "error_message": str(exc),
+            }
+            result = PTPDiscoveryResult(
+                candidate_id=candidate_id,
+                hf_score=float("inf"),
+                validation_objective=float("inf"),
+                generalization_penalty=float("inf"),
+                generalization_objectives={},
+                hf_raw=hf_raw,
+            )
 
         logger.info(
             "Candidate %s results: HF_score=%.6f, validation_objective=%.6f, "
@@ -110,12 +125,15 @@ class PTPDiscoveryProblem:
         with open(dsl_path, "w", encoding="utf-8") as f:
             f.write(candidate.dsl_source)
 
-        # Compiled Python wrapper.
-        spec = parse_ptp_dsl(candidate.dsl_source)
-        compiled_py = emit_ptp_program_python(spec)
-        compiled_path = os.path.join(candidate_dir, "program_compiled.py")
-        with open(compiled_path, "w", encoding="utf-8") as f:
-            f.write(compiled_py)
+        # Compiled Python wrapper (best-effort; failures are logged but non-fatal).
+        try:
+            spec = parse_ptp_dsl(candidate.dsl_source)
+            compiled_py = emit_ptp_program_python(spec)
+            compiled_path = os.path.join(candidate_dir, "program_compiled.py")
+            with open(compiled_path, "w", encoding="utf-8") as f:
+                f.write(compiled_py)
+        except Exception as exc:  # noqa: BLE001
+            logger.error("Failed to compile candidate %s for logging: %s", candidate_id, exc)
 
         # Metrics and meta-data.
         metrics = {

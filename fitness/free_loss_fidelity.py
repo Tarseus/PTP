@@ -164,9 +164,23 @@ def evaluate_free_loss_candidate(
     loss_meter = AverageMeter()
     total_pairs = 0
 
-    steps = get_total_hf_train_steps(cfg.hf)
+    # Multi-phase training: first run a short F1 phase determined by the
+    # HF config (hf_steps / hf_epochs / hf_instances_per_epoch), then
+    # optionally extend with an additional F2 budget specified in the
+    # free-loss config. This keeps phase boundaries explicit in the
+    # returned metrics while still sharing a single model.
+    steps_f1 = get_total_hf_train_steps(cfg.hf)
+    steps_f2 = max(int(cfg.f2_steps), 0)
+    steps = steps_f1 + steps_f2
+
+    score_meter_f1 = AverageMeter()
+    loss_meter_f1 = AverageMeter()
+    total_pairs_f1 = 0
+
     logger.info(
-        "Free-loss training: steps=%d, train_problem_size=%d, pomo_size=%d, batch_size=%d, device=%s",
+        "Free-loss training: f1_steps=%d, f2_steps=%d, total_steps=%d, train_problem_size=%d, pomo_size=%d, batch_size=%d, device=%s",
+        steps_f1,
+        steps_f2,
         steps,
         cfg.hf.train_problem_size,
         cfg.hf.pomo_size,
@@ -189,6 +203,11 @@ def evaluate_free_loss_candidate(
         score_meter.update(score)
         loss_meter.update(loss)
         total_pairs += int(pair_count)
+
+        if step < steps_f1:
+            score_meter_f1.update(score)
+            loss_meter_f1.update(loss)
+            total_pairs_f1 += int(pair_count)
 
         if (step + 1) % log_interval == 0 or step == 0:
             logger.info(
@@ -248,6 +267,22 @@ def evaluate_free_loss_candidate(
         "train_score_mean": float(score_meter.avg),
         "train_loss_mean": float(loss_meter.avg),
         "pair_count": int(total_pairs),
+        "phases": {
+            "f1": {
+                "steps": int(steps_f1),
+                "train_score_mean": float(score_meter_f1.avg) if steps_f1 > 0 else None,
+                "train_loss_mean": float(loss_meter_f1.avg) if steps_f1 > 0 else None,
+                "pair_count": int(total_pairs_f1),
+            },
+            "f2": {
+                "steps": int(steps_f2),
+                "train_score_mean": float(score_meter.avg) if steps_f2 > 0 else None,
+                # For f2 we report the overall mean, since it is evaluated on the
+                # full trajectory; callers can combine this with the f1 view.
+                "train_loss_mean": float(loss_meter.avg) if steps_f2 > 0 else None,
+                "pair_count": int(total_pairs - total_pairs_f1),
+            },
+        },
         "config": {
             "hf": asdict(cfg.hf),
             "free_loss": {

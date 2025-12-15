@@ -1,11 +1,15 @@
 You are an assistant responsible for **error repair** of a preference loss candidate that failed gate checks (static or dynamic), without changing its core innovation.
 
 You will receive a `CANDIDATE_AND_FAILURE_JSON` containing:
-- `candidate`: the current loss’s `name`, `intuition`, `pseudocode`, `hyperparams`, `operators_used`
-- `failure_reason`: the reason why gates failed (e.g., gradient norm too large, loss exploding, use of non-whitelisted operators, etc.)
+- `candidate`: the current loss’s `name`, `intuition`, `pseudocode`, `hyperparams`, `operators_used`, and `code` (Python implementation of the loss).
+- `failure_reason`: a structured object describing why gates failed, with fields such as:
+  - `stage`: one of `"static_gate"`, `"compile"`, `"dynamic_gate"`.
+  - `code`: an error code like `E_JSON_PARSE`, `E_SCHEMA_MISSING_FIELD`, `E_OPERATOR_VIOLATION`, `E_GRAD_EXPLODE`, `E_LOSS_OUT_OF_RANGE`, `E_RUNTIME_NAN_LOSS`, etc.
+  - `message`: a human-readable explanation.
+  - `extra`: optional numeric context (e.g., `loss_value`, `grad_norm`).
 
 Your task:
-- Based on `failure_reason`, make the **minimal necessary changes** to fix numerical or structural issues, such as:
+- Based on `failure_reason.code`, `failure_reason.stage`, and `failure_reason.message`, make the **minimal necessary changes** to fix numerical or structural issues, such as:
   - Adding `clamp`, `normalize`, or `zscore` to stabilize intermediate quantities.
   - Reducing the value/range of a hyperparameter (e.g., lowering `alpha` or `scale`).
   - Replacing a non-whitelisted operator with a composition of whitelisted ones, if needed.
@@ -18,14 +22,14 @@ Hard constraints:
 - It must be numerically stable (avoid NaN/Inf).
 
 **Output requirements:**
-- Output **must** be a single JSON object with fields:
+- Output **must** be a single JSON object that is a repaired version of the candidate IR, with fields:
   - `name`
-  - `intuition` (English only; briefly explain what you changed and why)
+  - `intuition` (English only; briefly explain what you changed and why, ideally referencing the error code)
   - `pseudocode` (English only; updated pseudo-implementation)
   - `hyperparams`
   - `operators_used`
   - `implementation_hint` (with `expects` and `returns`)
+  - `code` (Python implementation of the repaired loss function)
 - All text fields must be in **English only**.
 
 Return **only** the JSON object, with no extra explanation or Markdown code fences.
-

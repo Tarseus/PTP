@@ -22,6 +22,22 @@ Design a loss that combines costs and log-probability differences via scaling, m
 - If `cost(a) < cost(b)` and `logp(a) > logp(b)`, the loss tends to **decrease** (reward current preference).
 - In extreme cases (very large cost differences or logit differences), the loss remains bounded and finite.
 
+You may also be given a `GLOBAL_FEEDBACK_JSON` object with fields:
+- `burn_in_objectives`: a list of baseline objectives (e.g., the original `po_loss`) and their metrics (`hf_like_score`, `validation_objective`, `generalization_penalty`).
+- `recent_elites`: a small set of strong discovered losses, each with:
+  - `name`, `operators_used`, `hyperparams`
+  - metrics: `hf_like_score`, `validation_objective`, `generalization_penalty`, `pair_count`
+- `recent_failures`: statistics about recent gate failures, including:
+  - `by_code`: aggregated counts for error codes such as `E_OPERATOR_VIOLATION`, `E_GRAD_EXPLODE`, `E_LOSS_OUT_OF_RANGE`, `E_RUNTIME_NAN_LOSS`, etc.
+  - `examples`: representative failing IRs and their `static_reason` / `dynamic_reason`.
+- `suggested_mode`: one of `"explore"`, `"refine"`, or `"combine"`, indicating whether you should focus on:
+  - **explore**: propose qualitatively new structures far from existing elites;
+  - **refine**: make targeted improvements to common successful patterns;
+  - **combine**: fuse complementary ideas from multiple strong losses.
+
+Use this feedback to avoid repeated failure modes and bias your design toward losses that are likely to perform well under the same evaluation protocol.
+In the `intuition` field, explicitly mention which mode you conceptually followed using a phrase like `Mode: explore` / `Mode: refine` / `Mode: combine`.
+
 **Output requirements (IMPORTANT):**
 - Output **must be a single JSON object**, with fields:
   - `name` (string, English)

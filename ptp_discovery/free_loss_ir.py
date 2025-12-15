@@ -52,7 +52,7 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
     elif operators_raw is None:
         operators_list = []
     elif isinstance(operators_raw, Mapping):
-        expects = [str(k) for k in operators_raw.keys()]
+        operators_list = [str(k) for k in operators_raw.keys()]
     else:
         print(f"{debug_prefix} operators_used not array or Mapping; type of raw: {type(operators_raw)}, raw={operators_raw!r}")
         operators_list = [str(operators_raw)]
