@@ -7,6 +7,7 @@ You will receive a `PARENT_JSON` describing one existing loss candidate with:
 - `hyperparams`
 - `operators_used`
 - `code` (a Python implementation of the loss function)
+- `theoretical_basis` (a short English description of the underlying theoretical framework used by the parent, e.g. "Bradley–Terry logistic preference model", "maximum-entropy RL", "margin-based classification on log-probabilities")
 - `metrics` (empirical metrics for that parent, including `hf_like_score`, `validation_objective`, `generalization_penalty`, `pair_count`).
 
 You may also be given a `GLOBAL_FEEDBACK_JSON` object, which summarizes the search history:
@@ -28,6 +29,7 @@ Your task:
   2. **Exploratory / new algorithm**: design a substantially different loss structure inspired by the parent’s idea but with new combinations of the allowed operators, new margin schedules, or new normalization schemes. The child should still satisfy all hard constraints but is allowed to depart significantly from the parent’s implementation details.
 
 In the `intuition` field of the child, explicitly mention which mode you chose (e.g., `Mode: conservative` or `Mode: exploratory`) and how the change relates to the parent metrics and the failure statistics, if relevant.
+Also state whether you keep the same theoretical basis or switch to a different one, and reflect this in the `theoretical_basis` field.
 
 Hard constraints (apply to **all** mutation modes):
 - Only use the following operators: `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
@@ -43,6 +45,7 @@ Hard constraints (apply to **all** mutation modes):
   - `pseudocode` (English only; high-level description, not executed)
   - `hyperparams`
   - `operators_used`
+  - `theoretical_basis` (English only; updated to reflect the theory you actually use in the mutated loss)
   - `implementation_hint` (with `expects` and `returns`)
   - `code` (Python implementation of the mutated loss function)
 - For `implementation_hint`:

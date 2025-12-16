@@ -39,6 +39,9 @@ def main() -> None:
         level=logging.INFO,
         format="[%(asctime)s] %(levelname)s:%(name)s: %(message)s",
     )
+    # Enable verbose IR parsing diagnostics so that FreeLossIR debug
+    # information is visible in the discovery logs.
+    logging.getLogger("ptp_discovery.free_loss_ir").setLevel(logging.DEBUG)
 
     parser = _build_arg_parser()
     args = parser.parse_args()

@@ -25,21 +25,6 @@ class CompiledFreeLoss:
     loss_fn: LossFn
 
 
-ALLOWED_OPERATORS = {
-    "logsigmoid",
-    "softplus",
-    "sigmoid",
-    "exp",
-    "log",
-    "tanh",
-    "relu",
-    "clamp",
-    "normalize",
-    "zscore",
-    "rank_gap",
-}
-
-
 def _extract_json_object(text: str) -> Mapping[str, Any]:
     """Extract the first top-level JSON object from a string.
 
@@ -217,14 +202,9 @@ def parse_free_loss_from_text(text: str) -> FreeLossIR:
 
 
 def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | None = None) -> CompiledFreeLoss:
-    ops = set(ir.operators_used)
-    if operator_whitelist is None:
-        operator_whitelist = ALLOWED_OPERATORS
-    allowed = set(operator_whitelist)
-
-    if not ops.issubset(allowed):
-        unknown = sorted(ops - allowed)
-        raise CompileError(f"operators_used contains non-whitelisted operators: {unknown}")
+    # We no longer enforce a hard whitelist over operators_used. The IR is
+    # free to reference any conceptual operators; safety is enforced via
+    # AST-based validation of the actual Python code and dynamic gate checks.
 
     # Prefer a concrete Python implementation provided directly by the LLM
     # in ir.code. This avoids a second model call during compilation and

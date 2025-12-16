@@ -9,8 +9,7 @@ Setting:
 - You consider a pair of solutions (a, b) for the same instance.
 - `cost(a)` and `cost(b)` are scalar objective values (lower is better).
 - The model produces log probabilities `logp(a)` and `logp(b)`.
-- You may only use the following **whitelisted operators** to compose your loss:
-  `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
+- You may use any differentiable tensor operations available in PyTorch (`torch`, `torch.nn.functional`). The following operators are particularly relevant and well-tested for this task (but not mandatory): `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
 
 The baseline preference loss used in our method is derived from an entropy-regularized RL objective and can be viewed as a Bradley–Terry / logistic-style loss on the log-probability difference `logp(a) - logp(b)` with a temperature parameter and a margin that depends on the cost gap. Your proposed loss should be **theoretically compatible** with this family, in the sense that:
 - It can be interpreted as optimizing a probabilistic preference model where the probability that `a` is preferred over `b` is a monotone function of `logp(a) - logp(b)` and the cost difference.
@@ -44,7 +43,8 @@ In the `intuition` field, explicitly mention which mode you conceptually followe
   - `intuition` (string, English; short explanation of the idea)
   - `pseudocode` (string, English; high-level description of the idea; not executed)
   - `hyperparams` (JSON object of hyperparameters)
-  - `operators_used` (array, subset of the whitelist)
+  - `operators_used` (array of operator names you conceptually rely on, e.g. `["logsigmoid", "tanh", "clamp"]`)
+  - `theoretical_basis` (string, English; a short description of the main theoretical framework or principle behind this loss, such as "Bradley–Terry logistic preference model with cost-dependent margins", "maximum-entropy RL with KL-regularized advantage shaping", or "margin-based classification style hinge loss on log-probability differences")
   - `implementation_hint` (JSON object with `expects` and `returns`)
   - `code` (string containing valid Python source code for the loss function)
 - For `implementation_hint`:
@@ -62,7 +62,7 @@ In the `intuition` field, explicitly mention which mode you conceptually followe
       * `log_prob_w`, `log_prob_l` (shape [N])
       * optional `weight` (shape [N]) which may be None.
     - Optionally read hyperparameters from `hyperparams` and/or `extra` (e.g. `alpha`).
-    - Use only PyTorch (`torch`), `torch.nn.functional as F`, and the whitelisted operators listed above.
+    - Use only PyTorch (`torch`), `torch.nn.functional as F`, and standard differentiable tensor operations; do **not** use non-numerical APIs such as file I/O, subprocesses, networking, or reflection.
     - Return a **scalar tensor** representing the mean loss over the batch.
   - Do **not** wrap the code in Markdown fences. Encode it as a normal JSON string with escaped newlines (`\n`).
 - All text fields (including `intuition` and `pseudocode`) must be in **English only**.

@@ -90,6 +90,7 @@ def crossover_free_loss(
             "hyperparams": parent.hyperparams,
             "operators_used": parent.operators_used,
             "code": parent.code,
+            "theoretical_basis": getattr(parent, "theoretical_basis", ""),
             "metrics": {
                 "hf_like_score": float(metrics.get("hf_like_score", float("inf")))
                 if metrics
@@ -128,6 +129,7 @@ def mutate_free_loss(
         "hyperparams": parent.hyperparams,
         "operators_used": parent.operators_used,
         "code": parent.code,
+        "theoretical_basis": getattr(parent, "theoretical_basis", ""),
         "metrics": {
             "hf_like_score": float(metrics.get("hf_like_score", float("inf"))) if metrics else None,
             "validation_objective": float(metrics.get("validation_objective", float("inf")))
@@ -162,6 +164,7 @@ def repair_free_loss(
             "hyperparams": failed_ir.hyperparams,
             "operators_used": failed_ir.operators_used,
             "code": failed_ir.code,
+            "theoretical_basis": getattr(failed_ir, "theoretical_basis", ""),
         },
         "failure_reason": failure_reason,
     }

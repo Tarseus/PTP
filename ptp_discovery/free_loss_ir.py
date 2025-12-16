@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Dict, List, Mapping, Sequence
+import logging
+
+
+LOGGER = logging.getLogger("ptp_discovery.free_loss_ir")
 
 
 @dataclass
@@ -26,6 +30,7 @@ class FreeLossIR:
     operators_used: List[str]
     implementation_hint: FreeLossImplementationHint
     code: str = ""
+    theoretical_basis: str = ""
 
 
 def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
@@ -35,15 +40,14 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
     intuition = str(obj.get("intuition", "")).strip()
     pseudocode = str(obj.get("pseudocode", "")).strip()
     code = str(obj.get("code", "")).strip()
+    theoretical_basis = str(obj.get("theoretical_basis", "")).strip()
     hyperparams_raw = obj.get("hyperparams", {}) or {}
     operators_raw = obj.get("operators_used", []) or {}
     impl_raw = obj.get("implementation_hint", {}) or {}
 
-    debug_prefix = "[FreeLossIR debug]"
-
     # hyperparams: prefer an object, but fall back to empty dict on mismatch.
     if not isinstance(hyperparams_raw, dict):
-        print(f"{debug_prefix} hyperparams not object; raw={hyperparams_raw!r}")
+        LOGGER.debug("hyperparams not object; raw=%r", hyperparams_raw)
         hyperparams_raw = {}
 
     # operators_used: prefer an array; if not, log and coerce.
@@ -54,12 +58,16 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
     elif isinstance(operators_raw, Mapping):
         operators_list = [str(k) for k in operators_raw.keys()]
     else:
-        print(f"{debug_prefix} operators_used not array or Mapping; type of raw: {type(operators_raw)}, raw={operators_raw!r}")
+        LOGGER.debug(
+            "operators_used not array or Mapping; type=%s, raw=%r",
+            type(operators_raw),
+            operators_raw,
+        )
         operators_list = [str(operators_raw)]
 
     # implementation_hint: prefer an object; if not, log and replace.
     if not isinstance(impl_raw, Mapping):
-        print(f"{debug_prefix} implementation_hint not object; raw={impl_raw!r}")
+        LOGGER.debug("implementation_hint not object; raw=%r", impl_raw)
         impl_raw = {}
 
     expects_raw = impl_raw.get("expects", []) or []
@@ -71,7 +79,11 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
         expects = [str(k) for k in expects_raw.keys()]
     else:
         # Be tolerant to models that emit a single string or other scalar.
-        print(f"{debug_prefix} implementation_hint.expects not array or Mapping; type of raw: {type(expects_raw)}, raw={expects_raw!r}")
+        LOGGER.debug(
+            "implementation_hint.expects not array or Mapping; type=%s, raw=%r",
+            type(expects_raw),
+            expects_raw,
+        )
         expects = [str(expects_raw)]
 
     returns = str(impl_raw.get("returns", "")).strip()
@@ -89,4 +101,5 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
         operators_used=operators_list,
         implementation_hint=impl,
         code=code,
+        theoretical_basis=theoretical_basis,
     )

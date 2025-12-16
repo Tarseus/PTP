@@ -150,6 +150,7 @@ def _build_global_feedback(
                 "generation": int(entry.get("generation", -1)),
                 "index": int(entry.get("index", -1)),
                 "name": ir.name,
+                "theoretical_basis": getattr(ir, "theoretical_basis", ""),
                 "operators_used": list(ir.operators_used),
                 "hyperparams": dict(ir.hyperparams),
                 "hf_like_score": float(fitness.get("hf_like_score", float("inf"))),
@@ -256,6 +257,7 @@ def _write_run_analysis(
             "generation": int(best.get("generation", -1)),
             "index": int(best.get("index", -1)),
             "name": ir.name,
+            "theoretical_basis": getattr(ir, "theoretical_basis", ""),
             "operators_used": list(ir.operators_used),
             "hyperparams": dict(ir.hyperparams),
             "hf_like_score": float(fitness.get("hf_like_score", float("inf"))),
@@ -309,6 +311,8 @@ def _worker_evaluate_candidate(args: Tuple[
     str,
     int,
     int,
+    float | None,
+    int,
 ]) -> Tuple[int, Dict[str, Any]]:
     """Worker process: compile and evaluate a single candidate loss.
 
@@ -326,6 +330,8 @@ def _worker_evaluate_candidate(args: Tuple[
         run_dir,
         gen,
         idx,
+        baseline_early_valid,
+        early_eval_steps,
     ) = args
 
     # Reduce noise on stdout/stderr from worker processes.
@@ -359,7 +365,12 @@ def _worker_evaluate_candidate(args: Tuple[
     ir = ir_from_json(ir_payload)
     compiled = compile_free_loss_candidate(ir, operator_whitelist=operator_whitelist)
 
-    fitness = evaluate_free_loss_candidate(compiled, free_cfg)
+    fitness = evaluate_free_loss_candidate(
+        compiled,
+        free_cfg,
+        baseline_early_valid=baseline_early_valid,
+        early_eval_steps=early_eval_steps,
+    )
     return idx, fitness
 
 
@@ -426,7 +437,13 @@ def _train_one_batch_with_po(
 
 
 def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
-    """Short-run HF-style evaluation using the original POMO po_loss."""
+    """Short-run HF-style evaluation using the original POMO po_loss.
+
+    In addition to the final evaluation, this function records an
+    intermediate validation objective after a small number of steps
+    (early_eval_steps) so that candidate losses can be compared against
+    the baseline at the same training horizon.
+    """
 
     if cfg.problem != "tsp":
         raise NotImplementedError(
@@ -470,10 +487,13 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
     score_meter = AverageMeter()
     loss_meter = AverageMeter()
     total_steps = get_total_hf_train_steps(cfg)
+    # For early comparison we fix an absolute step budget (e.g., 100).
+    early_eval_steps = min(100, total_steps)
+    early_validation_objective: float | None = None
 
     LOGGER.info(
-        "Baseline PO training: steps=%d, train_problem_size=%d, pomo_size=%d, "
-        "batch_size=%d, device=%s, init_time=%.3fs",
+          "Baseline PO training: steps=%d, train_problem_size=%d, pomo_size=%d, "
+          "batch_size=%d, device=%s, init_time=%.3fs",
         total_steps,
         cfg.train_problem_size,
         cfg.pomo_size,
@@ -494,11 +514,21 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
             LOGGER.info(
                 "Baseline PO step %d/%d: score=%.6f (avg=%.6f), loss=%.6f (avg=%.6f)",
                 step + 1,
-                cfg.hf_steps,
+                total_steps,
                 score,
                 float(score_meter.avg),
                 loss,
                 float(loss_meter.avg),
+            )
+        if (step + 1) == early_eval_steps:
+            # Early baseline performance for comparison with candidate losses.
+            early_validation_objective = _evaluate_tsp_model(
+                model=model,
+                problem_size=cfg.train_problem_size,
+                pomo_size=cfg.pomo_size,
+                device=device,
+                num_episodes=cfg.num_validation_episodes,
+                batch_size=cfg.validation_batch_size,
             )
     t_train_end = time.perf_counter()
 
@@ -545,6 +575,8 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
         "generalization_objectives": gen_objectives,
         "train_score_mean": float(score_meter.avg),
         "train_loss_mean": float(loss_meter.avg),
+        "early_validation_objective": early_validation_objective,
+        "early_eval_steps": early_eval_steps,
         "config": {
             "hf": cfg.__dict__,
             "baseline_type": "po_loss",
@@ -605,6 +637,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     }
 
     baseline_hf_score: float | None = None
+    baseline_early_valid: float | None = None
     burn_in_objectives: List[Dict[str, Any]] = []
 
     # Baseline: evaluate the original POMO po_loss once, using the same HF
@@ -613,6 +646,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     try:
         baseline = evaluate_po_baseline(hf_cfg)
         baseline_hf_score = float(baseline["hf_score"])
+        baseline_early_valid = float(
+            baseline.get("early_validation_objective", baseline_hf_score)
+        )
         burn_in_objectives.append(
             {
                 "name": "po_loss_baseline",
@@ -621,6 +657,8 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 "hf_like_score": float(baseline["hf_score"]),
                 "validation_objective": float(baseline["validation_objective"]),
                 "generalization_penalty": float(baseline["generalization_penalty"]),
+                "early_validation_objective": baseline.get("early_validation_objective"),
+                "early_eval_steps": baseline.get("early_eval_steps"),
             }
         )
         LOGGER.info(
@@ -725,7 +763,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
         # Collect candidates that pass all gates and evaluate them in
         # parallel across available devices.
-        eval_jobs: List[Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], str, List[str], str, int, int]] = []
+        eval_jobs: List[
+            Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], str, List[str], str, int, int, float | None, int]
+        ] = []
         eval_candidates: Dict[int, FreeLossIR] = {}
 
         for idx, original_ir in enumerate(population):
@@ -904,6 +944,8 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                         run_dir,
                         gen,
                         idx,
+                        baseline_early_valid,
+                        100,
                     )
                 )
                 break
@@ -916,16 +958,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 devices = [hf_cfg.device]
 
             # Assign one candidate per device in a round-robin fashion.
-            jobs_with_devices: List[Tuple[
-                Dict[str, Any],
-                Dict[str, Any],
-                Dict[str, Any],
-                str,
-                List[str],
-                str,
-                int,
-                int,
-            ]] = []
+            jobs_with_devices: List[
+                Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], str, List[str], str, int, int, float | None, int]
+            ] = []
             for j_idx, job in enumerate(eval_jobs):
                 device_str = devices[j_idx % len(devices)]
                 job_with_dev = list(job)

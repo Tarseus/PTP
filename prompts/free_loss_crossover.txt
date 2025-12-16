@@ -12,24 +12,26 @@ You are given `PARENTS_JSON`, where each element has:
 - `hyperparams`
 - `operators_used`
 - `code` (a Python implementation of the loss function)
+- `theoretical_basis` (a short English description of the underlying theoretical framework, e.g. "Bradley–Terry logistic preference model", "maximum-entropy RL", "margin-based classification on log-probabilities")
 - `metrics` (empirical metrics for that parent, including `hf_like_score`, `validation_objective`, `generalization_penalty`, `pair_count`).
 
 You may also be given a `GLOBAL_FEEDBACK_JSON` object, which summarizes the search history:
 - `burn_in_objectives`: baseline objectives (such as the original `po_loss`) and their metrics.
-- `recent_elites`: a small set of top-performing discovered losses, each with operators, hyperparameters, and metrics.
+- `recent_elites`: a small set of top-performing discovered losses, each with operators, hyperparameters, metrics, and potentially different theoretical bases.
 - `recent_failures`: aggregated gate failures with error codes like `E_OPERATOR_VIOLATION`, `E_GRAD_EXPLODE`, `E_LOSS_OUT_OF_RANGE`, `E_RUNTIME_NAN_LOSS`, etc., plus representative failing IRs.
 - `suggested_mode`: one of `"explore"`, `"refine"`, or `"combine"` indicating whether you should prioritize:
-  - **explore**: more radical new couplings and structures;
-  - **refine**: small numerical/stability improvements to patterns that already work well;
-  - **combine**: hybridize complementary ideas from multiple strong parents.
+  - **explore**: more radical new couplings and *possibly* a different theoretical basis than the parents;
+  - **refine**: small numerical/stability improvements to patterns that already work well under a similar theoretical basis;
+  - **combine**: hybridize complementary ideas—and possibly multiple theories—from several strong parents.
 
 Based on these parents and the global feedback, design a new loss and describe, in English, in `intuition` and `pseudocode`:
 - Which ideas are inherited from which parents.
 - What new couplings or modifications you introduce.
+- How the theoretical basis of the child relates to the parents (e.g., re-using the same Bradley–Terry-style theory, or switching to a different RL-inspired or margin-based theory).
 Explicitly indicate in the `intuition` string which conceptual mode you chose (explore / refine / combine), for example by including `Mode: combine`.
 
 Hard constraints:
-- Only use the following operators: `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
+- You may use any differentiable tensor operations available in PyTorch (`torch`, `torch.nn.functional`); the operators `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, and `rank_gap` are recommended but not mandatory.
 - The loss must be differentiable w.r.t. model parameters.
 - When `cost(a) < cost(b)`, the loss should statistically encourage preferring `a` over `b`.
 - It must be numerically stable (avoid NaN/Inf).
@@ -42,6 +44,7 @@ Hard constraints:
   - `pseudocode` (English only; high-level description, not executed)
   - `hyperparams`
   - `operators_used`
+  - `theoretical_basis` (English only; a short description of the main theoretical framework you are using for the child)
   - `implementation_hint` (with `expects` and `returns`)
   - `code` (Python implementation of the child loss function)
 - For `implementation_hint`:
@@ -59,7 +62,7 @@ Hard constraints:
       * `log_prob_w`, `log_prob_l` (shape [N])
       * optional `weight` (shape [N]) which may be None.
     - Optionally read hyperparameters from `hyperparams` and/or `extra`.
-    - Use only PyTorch (`torch`), `torch.nn.functional as F`, and the whitelisted operators listed above.
+    - Use only PyTorch (`torch`), `torch.nn.functional as F`, and standard differentiable tensor operations; do **not** use non-numerical APIs such as file I/O, subprocesses, networking, or reflection.
     - Return a scalar tensor representing the mean loss over the batch.
   - Do **not** wrap the code in Markdown fences. Encode it as a normal JSON string with escaped newlines (`\\n`).
 - All text fields must be in **English only**.

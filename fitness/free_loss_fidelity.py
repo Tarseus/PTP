@@ -123,6 +123,9 @@ def _train_one_batch_with_free_loss(
 def evaluate_free_loss_candidate(
     compiled_loss: CompiledFreeLoss,
     cfg: FreeLossFidelityConfig,
+    *,
+    baseline_early_valid: float | None = None,
+    early_eval_steps: int = 0,
 ) -> Dict[str, Any]:
     _set_seed(cfg.hf.seed)
 
@@ -192,6 +195,12 @@ def evaluate_free_loss_candidate(
 
     t_train_start = _time.perf_counter()
 
+    # Early-stop metadata relative to the baseline.
+    early_eval_steps = max(int(early_eval_steps or 0), 0)
+    early_eval_effective = min(early_eval_steps, steps) if early_eval_steps > 0 else 0
+    early_validation_objective: float | None = None
+    early_stopped = False
+
     for step in range(steps):
         score, loss, pair_count = _train_one_batch_with_free_loss(
             env=env,
@@ -221,17 +230,43 @@ def evaluate_free_loss_candidate(
                 int(pair_count),
                 total_pairs,
             )
+
+        # Early evaluation for comparison with the baseline after a small
+        # fixed number of steps (e.g., 100). If the candidate performs
+        # strictly worse than the baseline at this horizon, we stop training
+        # early to save compute.
+        if early_eval_effective > 0 and (step + 1) == early_eval_effective:
+            early_validation_objective = _evaluate_tsp_model(
+                model=model,
+                problem_size=cfg.hf.train_problem_size,
+                pomo_size=cfg.hf.pomo_size,
+                device=device,
+                num_episodes=cfg.hf.num_validation_episodes,
+                batch_size=cfg.hf.validation_batch_size,
+            )
+            if baseline_early_valid is not None and early_validation_objective > baseline_early_valid:
+                early_stopped = True
+                logger.info(
+                    "Early stop at step %d: candidate early_valid=%.6f baseline_early=%.6f",
+                    step + 1,
+                    early_validation_objective,
+                    baseline_early_valid,
+                )
+                break
     t_train_end = _time.perf_counter()
 
     t_eval_start = _time.perf_counter()
-    main_valid_obj = _evaluate_tsp_model(
-        model=model,
-        problem_size=cfg.hf.train_problem_size,
-        pomo_size=cfg.hf.pomo_size,
-        device=device,
-        num_episodes=cfg.hf.num_validation_episodes,
-        batch_size=cfg.hf.validation_batch_size,
-    )
+    if early_stopped and early_validation_objective is not None:
+        main_valid_obj = float(early_validation_objective)
+    else:
+        main_valid_obj = _evaluate_tsp_model(
+            model=model,
+            problem_size=cfg.hf.train_problem_size,
+            pomo_size=cfg.hf.pomo_size,
+            device=device,
+            num_episodes=cfg.hf.num_validation_episodes,
+            batch_size=cfg.hf.validation_batch_size,
+        )
 
     gen_objectives: Dict[int, float] = {}
     for size in cfg.hf.valid_problem_sizes:
@@ -267,6 +302,13 @@ def evaluate_free_loss_candidate(
         "train_score_mean": float(score_meter.avg),
         "train_loss_mean": float(loss_meter.avg),
         "pair_count": int(total_pairs),
+        "early_eval": {
+            "enabled": bool(early_eval_effective),
+            "steps": int(early_eval_effective),
+            "baseline_validation_objective": baseline_early_valid,
+            "candidate_validation_objective": early_validation_objective,
+            "early_stopped": early_stopped,
+        },
         "phases": {
             "f1": {
                 "steps": int(steps_f1),

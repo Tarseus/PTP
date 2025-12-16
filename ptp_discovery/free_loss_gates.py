@@ -32,16 +32,11 @@ def run_static_gates(
         return StaticGateResult(ok=False, reason="Missing name.")
     if not ir.pseudocode:
         return StaticGateResult(ok=False, reason="Missing pseudocode.")
+    # We keep operators_used as a descriptive field but no longer enforce
+    # a hard whitelist. This allows the discovery process to explore more
+    # freely; safety is enforced at the code level and via dynamic gates.
     if not ir.operators_used:
         return StaticGateResult(ok=False, reason="operators_used must be non-empty.")
-
-    ops = set(ir.operators_used)
-    allowed = set(operator_whitelist)
-    if not ops.issubset(allowed):
-        return StaticGateResult(
-            ok=False,
-            reason=f"operators_used contains non-whitelisted operators: {sorted(ops - allowed)}",
-        )
 
     returns_str = (ir.implementation_hint.returns or "").strip().lower()
     # Be tolerant to descriptive strings like "a scalar loss value ...".
