@@ -1,0 +1,41 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 8.115307331085205,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_FORWARD_ERROR",
+        "count": 47
+      },
+      {
+        "code": "E_EXPECTS_RETURNS_MISMATCH",
+        "count": 10
+      },
+      {
+        "code": "E_COMPILE_ERROR",
+        "count": 3
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 5,
+    "index": 6,
+    "name": "SoftmaxWeightedAdaptiveMarginLogisticLoss",
+    "operators_used": [
+      "logsigmoid",
+      "sigmoid",
+      "tanh",
+      "zscore"
+    ],
+    "hyperparams": {
+      "epsilon": 1e-08,
+      "margin_scale": 1.0,
+      "temp": 1.0
+    },
+    "hf_like_score": 8.235873699188232,
+    "validation_objective": 8.235873699188232,
+    "generalization_penalty": 0.0,
+    "pair_count": 96246359
+  }
+}

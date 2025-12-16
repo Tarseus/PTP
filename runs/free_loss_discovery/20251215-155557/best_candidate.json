@@ -1,0 +1,99 @@
+{
+  "generation": 5,
+  "index": 6,
+  "ir": {
+    "name": "SoftmaxWeightedAdaptiveMarginLogisticLoss",
+    "intuition": "Mode: explore. This loss function hybridizes the adaptive margin concept from `AdaptiveNormalizedLogisticLossWithSigmoidCost` with the dynamic weighting scheme from `SoftmaxWeightedNormalizedLogisticLoss`. The goal is to create a loss that both sets a clear target for the log-probability difference (via the margin) and simultaneously up-weights the importance of pairs with more significant cost differences. It inherits z-score normalization for both logp_diff and cost_gap, and the core `-logsigmoid` structure from both parents. The first new coupling is that the adaptive margin, `sigmoid(normalized_cost_gap)`, is now pre-multiplied by a `tanh` of the normalized logp difference. This `logp_gate` scales the margin based on how well the model already separates the pair; a large positive `logp_diff` reduces the margin's impact. The second new coupling is the use of softmax-based weights derived from the cost gap to modulate the final loss, focusing learning on high-stakes decisions. This creates a dual mechanism for focusing gradients: a margin for the target and a weight for the importance.",
+    "pseudocode": "1. For each pair (a, b) where cost(a) < cost(b), calculate the cost difference `cost_gap = cost(b) - cost(a)` and log-probability difference `logp_diff = logp(a) - logp(b)`.\n2. Normalize both across the batch using a z-score function: `normalized_cost_gap = zscore(cost_gap)` and `normalized_logp_diff = zscore(logp_diff)`.\n3. (Inherited Idea 1) Calculate a base adaptive margin using a sigmoid on the normalized cost gap: `base_margin = sigmoid(normalized_cost_gap * margin_scale)`.\n4. (New Coupling 1) Create a 'logp gate' by applying `tanh` to the normalized logp difference. This gate will be close to 1 for well-separated pairs and smaller otherwise: `logp_gate = tanh(normalized_logp_diff)`.\n5. Modulate the base margin with the gate: `gated_margin = base_margin * logp_gate`.\n6. (Inherited Idea 2) Compute dynamic weights for each pair using softmax on the normalized cost gaps: `cost_softmax_weight = softmax(normalized_cost_gap * temp)`.\n7. (Inherited Idea 3) Calculate the core logistic loss using the gated margin: `pair_loss = -logsigmoid(normalized_logp_diff - gated_margin)`.\n8. (New Coupling 2) Apply the softmax weights to the pair loss, re-scaling by batch size N for stability: `weighted_loss = pair_loss * cost_softmax_weight * N`.\n9. Return the mean of the weighted losses.",
+    "hyperparams": {
+      "epsilon": 1e-08,
+      "margin_scale": 1.0,
+      "temp": 1.0
+    },
+    "operators_used": [
+      "logsigmoid",
+      "sigmoid",
+      "tanh",
+      "zscore"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "logp_a",
+        "logp_b"
+      ],
+      "returns": "scalar"
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    \"\"\"\n    Hybridizes an adaptive margin with softmax weighting. Inherits z-score normalization\n    and the logistic loss structure from both parents. Introduces two new couplings:\n    1. A 'logp_gate' using tanh(normalized_logp_diff) to modulate the margin.\n    2. The combination of a margin-based loss with a softmax-based importance weighting.\n    \"\"\"\n    # Read tensors from the batch\n    cost_w = batch['cost_a']\n    cost_l = batch['cost_b']\n    logp_w = batch['log_prob_w']\n    logp_l = batch['log_prob_l']\n\n    # Retrieve hyperparameters\n    epsilon = extra.get('epsilon', 1e-8)\n    margin_scale = extra.get('margin_scale', 1.0)\n    temp = extra.get('temp', 1.0)\n\n    def zscore(t):\n        mean = t.mean()\n        std = t.std()\n        return (t - mean) / (std + epsilon)\n\n    # Calculate cost gap and logp difference\n    cost_gap = cost_l - cost_w\n    logp_diff = logp_w - logp_l\n\n    # Inherited Idea: Normalize both using z-score\n    normalized_cost_gap = zscore(cost_gap)\n    normalized_logp_diff = zscore(logp_diff)\n\n    # Inherited Idea 1 (from Parent 0): Adaptive margin based on sigmoid of cost gap\n    base_margin = torch.sigmoid(normalized_cost_gap * margin_scale)\n    \n    # New Coupling 1: Create a 'logp_gate' to modulate the margin based on current separation\n    logp_gate = torch.tanh(normalized_logp_diff)\n    gated_margin = base_margin * logp_gate\n\n    # Inherited Idea 2 (from Parent 1): Softmax-based importance weighting\n    cost_softmax_weight = torch.softmax(normalized_cost_gap * temp, dim=0)\n\n    # Inherited Idea 3: Core logistic loss, now with the gated margin\n    pair_loss = -torch.nn.functional.logsigmoid(normalized_logp_diff - gated_margin)\n\n    # New Coupling 2: Apply the softmax weights to the margin-based loss\n    N = cost_w.size(0)\n    weighted_loss = pair_loss * cost_softmax_weight * N\n\n    # Optional batch-level weighting\n    if 'weight' in batch and batch['weight'] is not None:\n        weighted_loss = weighted_loss * batch['weight']\n\n    # Return the mean loss\n    return weighted_loss.mean()"
+  },
+  "fitness": {
+    "hf_like_score": 8.235873699188232,
+    "validation_objective": 8.235873699188232,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "100": 8.20966100692749
+    },
+    "train_score_mean": 13.379886666838308,
+    "train_loss_mean": 0.45455709622016227,
+    "pair_count": 96246359,
+    "phases": {
+      "f1": {
+        "steps": 7815,
+        "train_score_mean": 13.366177154487321,
+        "train_loss_mean": 0.45479514254108117,
+        "pair_count": 95030359
+      },
+      "f2": {
+        "steps": 100,
+        "train_score_mean": 13.379886666838308,
+        "train_loss_mean": 0.45455709622016227,
+        "pair_count": 1216000
+      }
+    },
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 5,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          100
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 20,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:2",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 7915,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "SoftmaxWeightedAdaptiveMarginLogisticLoss",
+      "intuition": "Mode: explore. This loss function hybridizes the adaptive margin concept from `AdaptiveNormalizedLogisticLossWithSigmoidCost` with the dynamic weighting scheme from `SoftmaxWeightedNormalizedLogisticLoss`. The goal is to create a loss that both sets a clear target for the log-probability difference (via the margin) and simultaneously up-weights the importance of pairs with more significant cost differences. It inherits z-score normalization for both logp_diff and cost_gap, and the core `-logsigmoid` structure from both parents. The first new coupling is that the adaptive margin, `sigmoid(normalized_cost_gap)`, is now pre-multiplied by a `tanh` of the normalized logp difference. This `logp_gate` scales the margin based on how well the model already separates the pair; a large positive `logp_diff` reduces the margin's impact. The second new coupling is the use of softmax-based weights derived from the cost gap to modulate the final loss, focusing learning on high-stakes decisions. This creates a dual mechanism for focusing gradients: a margin for the target and a weight for the importance.",
+      "hyperparams": {
+        "epsilon": 1e-08,
+        "margin_scale": 1.0,
+        "temp": 1.0
+      },
+      "operators_used": [
+        "logsigmoid",
+        "sigmoid",
+        "tanh",
+        "zscore"
+      ]
+    }
+  }
+}
