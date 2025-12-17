@@ -1,0 +1,107 @@
+{
+  "generation": 9,
+  "index": 2,
+  "ir": {
+    "name": "ClippedMarginBradleyTerryLoss",
+    "intuition": "Mode: combine. This loss hybridizes two successful patterns from the parents and recent elites. It inherits the core Bradley-Terry logistic loss (`-logsigmoid(logit)`) and the normalization of the log-probability difference by its batch-wise standard deviation, which makes the loss invariant to the scale of log-probabilities. This idea is present in both `AdaptiveSigmoidAdvantageLoss` and `NormalizedMarginBradleyTerryLoss`. It also inherits the concept of an adaptive, cost-based margin from both parents. For the new coupling, instead of clipping the final margin value (as in `AdaptiveSigmoidAdvantageLoss`), I introduce a clipping of the input to the margin calculation—the z-scored cost gap. This prevents extreme cost gaps within a batch from creating excessively large or small margins, which can lead to instability, while still allowing the margin to adapt to the batch's cost distribution. This creates a more robust version of the adaptive margin.",
+    "pseudocode": "1. Identify the better (w) and worse (l) candidates based on cost.\n2. Calculate the log-probability difference: `logp_diff = logp_w - logp_l`.\n3. Calculate the positive cost gap for each pair: `cost_gap = cost_l - cost_w`.\n4. Compute the z-score of the `cost_gap`.\n5. Introduce a new coupling: Clip the `cost_gap_zscore` to a stable range `[-z_clip, z_clip]` to prevent outlier costs from dominating the margin calculation.\n6. Compute an adaptive margin from the clipped z-score using a `softplus` function: `target_margin = margin_scale * softplus(clipped_zscore)`.\n7. Normalize the `logp_diff` by its batch-wise standard deviation for scale invariance: `scaled_logp_diff = logp_diff / std(logp_diff)`.\n8. Calculate the final logit for the preference model: `logit = beta * (scaled_logp_diff - target_margin)`.\n9. Compute the loss per pair using the standard logistic loss: `loss_per_pair = -logsigmoid(logit)`.\n10. Return the (optionally weighted) mean loss over the batch.",
+    "hyperparams": {
+      "beta": 1.0,
+      "margin_scale": 1.0,
+      "z_clip": 3.0
+    },
+    "operators_used": [
+      "logsigmoid",
+      "softplus",
+      "clamp",
+      "zscore"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "logp_w",
+        "logp_l"
+      ],
+      "returns": "scalar"
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    \"\"\"\n    Computes a Bradley-Terry style loss where the logit is a scale-invariant\n    log-probability difference, adjusted by a robust, adaptive margin.\n\n    Inherits:\n    - Normalization of logp_diff by its standard deviation from both parents.\n    - An adaptive margin based on the z-scored cost gap from both parents.\n    - The use of a smooth `logsigmoid` loss from both parents.\n\n    New Couplings:\n    1. Clips the z-scored cost gap *before* it is used to compute the margin.\n       This prevents cost outliers from creating extreme margins and improves stability.\n    \"\"\"\n    # Unpack hyperparameters\n    hyperparams = extra.get('hyperparams', {})\n    beta = hyperparams.get('beta', 1.0)\n    margin_scale = hyperparams.get('margin_scale', 1.0)\n    z_clip = hyperparams.get('z_clip', 3.0)\n\n    # Unpack batch data\n    cost_w = batch['cost_a']\n    cost_l = batch['cost_b']\n    logp_w = batch['log_prob_w']\n    logp_l = batch['log_prob_l']\n\n    # 1. Calculate log-probability difference and cost gap\n    logp_diff = logp_w - logp_l\n    cost_gap = cost_l - cost_w\n\n    with torch.no_grad():\n        # 2. Compute adaptive margin from z-scored cost gap\n        if cost_gap.numel() > 1:\n            cost_gap_mean = cost_gap.mean()\n            cost_gap_std = cost_gap.std().clamp(min=1e-8)\n            cost_gap_zscore = (cost_gap - cost_gap_mean) / cost_gap_std\n        else:\n            cost_gap_zscore = torch.zeros_like(cost_gap)\n\n        # 3. New Coupling: Clip z-score for stability before margin calculation\n        clipped_zscore = torch.clamp(cost_gap_zscore, -z_clip, z_clip)\n        target_margin = margin_scale * F.softplus(clipped_zscore)\n\n        # 4. Compute standard deviation of logp_diff for normalization\n        if logp_diff.numel() > 1:\n            logp_diff_std = logp_diff.std().clamp(min=1e-8)\n        else:\n            logp_diff_std = torch.ones_like(logp_diff)\n\n    # 5. Normalize logp_diff for scale invariance\n    scaled_logp_diff = logp_diff / logp_diff_std\n\n    # 6. Calculate the margin-adjusted logit for the logistic loss\n    logit = beta * (scaled_logp_diff - target_margin)\n\n    # 7. Compute the loss using negative log-sigmoid\n    loss_per_pair = -F.logsigmoid(logit)\n\n    # Apply optional weights if they exist\n    weights = batch.get('weight')\n    if weights is not None:\n        loss = (loss_per_pair * weights).sum() / weights.sum().clamp(min=1e-8)\n    else:\n        loss = loss_per_pair.mean()\n\n    return loss",
+    "theoretical_basis": "A Bradley-Terry logistic preference model where the log-odds of preferring the winner are a function of a scaled log-probability difference minus an adaptive, cost-dependent margin. The log-probability difference is normalized by its batch standard deviation for scale invariance, and the margin is derived from the clipped z-score of the cost gap to ensure stability against outliers."
+  },
+  "fitness": {
+    "hf_like_score": 8.092604637145996,
+    "validation_objective": 8.087462902069092,
+    "generalization_penalty": 0.005141735076904297,
+    "generalization_objectives": {
+      "100": 8.092604637145996
+    },
+    "train_score_mean": 8.429888886134231,
+    "train_loss_mean": 0.9430558672150101,
+    "pair_count": 96246295,
+    "early_eval": {
+      "enabled": true,
+      "steps": 100,
+      "baseline_validation_objective": 8.926844120025635,
+      "candidate_validation_objective": 8.866127014160156,
+      "early_stopped": false
+    },
+    "phases": {
+      "f1": {
+        "steps": 7815,
+        "train_score_mean": 8.432167090076097,
+        "train_loss_mean": 0.9430843709373963,
+        "pair_count": 95030295
+      },
+      "f2": {
+        "steps": 100,
+        "train_score_mean": 8.429888886134231,
+        "train_loss_mean": 0.9430558672150101,
+        "pair_count": 1216000
+      }
+    },
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 5,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          100
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 20,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:2",
+        "seed": 1234,
+        "num_validation_episodes": 128,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 7915,
+        "f2_steps": 100,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "ClippedMarginBradleyTerryLoss",
+      "intuition": "Mode: combine. This loss hybridizes two successful patterns from the parents and recent elites. It inherits the core Bradley-Terry logistic loss (`-logsigmoid(logit)`) and the normalization of the log-probability difference by its batch-wise standard deviation, which makes the loss invariant to the scale of log-probabilities. This idea is present in both `AdaptiveSigmoidAdvantageLoss` and `NormalizedMarginBradleyTerryLoss`. It also inherits the concept of an adaptive, cost-based margin from both parents. For the new coupling, instead of clipping the final margin value (as in `AdaptiveSigmoidAdvantageLoss`), I introduce a clipping of the input to the margin calculation—the z-scored cost gap. This prevents extreme cost gaps within a batch from creating excessively large or small margins, which can lead to instability, while still allowing the margin to adapt to the batch's cost distribution. This creates a more robust version of the adaptive margin.",
+      "hyperparams": {
+        "beta": 1.0,
+        "margin_scale": 1.0,
+        "z_clip": 3.0
+      },
+      "operators_used": [
+        "logsigmoid",
+        "softplus",
+        "clamp",
+        "zscore"
+      ]
+    }
+  }
+}

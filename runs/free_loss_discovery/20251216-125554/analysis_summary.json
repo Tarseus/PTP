@@ -1,0 +1,46 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 8.15504264831543,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_FORWARD_ERROR",
+        "count": 20
+      },
+      {
+        "code": "E_COMPILE_ERROR",
+        "count": 2
+      },
+      {
+        "code": "E_LOSS_OUT_OF_RANGE",
+        "count": 2
+      },
+      {
+        "code": "E_EXPECTS_RETURNS_MISMATCH",
+        "count": 1
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 9,
+    "index": 2,
+    "name": "ClippedMarginBradleyTerryLoss",
+    "theoretical_basis": "A Bradley-Terry logistic preference model where the log-odds of preferring the winner are a function of a scaled log-probability difference minus an adaptive, cost-dependent margin. The log-probability difference is normalized by its batch standard deviation for scale invariance, and the margin is derived from the clipped z-score of the cost gap to ensure stability against outliers.",
+    "operators_used": [
+      "logsigmoid",
+      "softplus",
+      "clamp",
+      "zscore"
+    ],
+    "hyperparams": {
+      "beta": 1.0,
+      "margin_scale": 1.0,
+      "z_clip": 3.0
+    },
+    "hf_like_score": 8.092604637145996,
+    "validation_objective": 8.087462902069092,
+    "generalization_penalty": 0.005141735076904297,
+    "pair_count": 96246295
+  }
+}
