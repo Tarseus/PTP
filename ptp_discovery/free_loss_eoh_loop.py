@@ -951,26 +951,42 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 break
 
         # Evaluate all surviving candidates in parallel across GPUs / devices.
+        # We ensure that at any moment, at most one candidate runs on each device.
         results: List[Tuple[int, Dict[str, Any]]] = []
         if eval_jobs:
             devices = _get_available_devices(hf_cfg.device)
             if not devices:
                 devices = [hf_cfg.device]
 
-            # Assign one candidate per device in a round-robin fashion.
-            jobs_with_devices: List[
-                Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], str, List[str], str, int, int, float | None, int]
-            ] = []
-            for j_idx, job in enumerate(eval_jobs):
-                device_str = devices[j_idx % len(devices)]
-                job_with_dev = list(job)
-                job_with_dev[3] = device_str
-                jobs_with_devices.append(tuple(job_with_dev))  # type: ignore[arg-type]
-
             ctx = mp.get_context("spawn")
-            num_workers = min(len(devices), len(jobs_with_devices))
+            num_workers = min(len(devices), len(eval_jobs))
             with ctx.Pool(processes=num_workers) as pool:
-                results = pool.map(_worker_evaluate_candidate, jobs_with_devices)
+                # Process candidates in batches so that each device is used
+                # by at most one candidate concurrently.
+                for start in range(0, len(eval_jobs), num_workers):
+                    batch_jobs = eval_jobs[start : start + num_workers]
+                    jobs_with_devices: List[
+                        Tuple[
+                            Dict[str, Any],
+                            Dict[str, Any],
+                            Dict[str, Any],
+                            str,
+                            List[str],
+                            str,
+                            int,
+                            int,
+                            float | None,
+                            int,
+                        ]
+                    ] = []
+                    for dev_idx, job in enumerate(batch_jobs):
+                        device_str = devices[dev_idx % len(devices)]
+                        job_with_dev = list(job)
+                        job_with_dev[3] = device_str
+                        jobs_with_devices.append(tuple(job_with_dev))  # type: ignore[arg-type]
+
+                    batch_results = pool.map(_worker_evaluate_candidate, jobs_with_devices)
+                    results.extend(batch_results)
 
         # Integrate evaluation results back into the evolutionary loop.
         for idx, fitness in sorted(results, key=lambda x: x[0]):
