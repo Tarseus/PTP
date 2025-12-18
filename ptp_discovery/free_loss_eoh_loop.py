@@ -371,6 +371,20 @@ def _worker_evaluate_candidate(args: Tuple[
         baseline_early_valid=baseline_early_valid,
         early_eval_steps=early_eval_steps,
     )
+
+    # Proactively release unused CUDA cache in this worker process to
+    # reduce fragmentation and long-lived reservations across jobs.
+    if torch.cuda.is_available():
+        try:
+            device_str = str(hf_cfg.device)
+            if device_str.startswith("cuda"):
+                torch.cuda.set_device(torch.device(device_str))
+            torch.cuda.empty_cache()
+        except Exception:  # noqa: BLE001
+            # Cache cleanup is best-effort; ignore failures to avoid masking
+            # the actual training result.
+            pass
+
     return idx, fitness
 
 
@@ -390,6 +404,25 @@ def _device_worker(
     result_queue: "mp.Queue[Tuple[int, Dict[str, Any]]]",
 ) -> None:
     """Worker bound to a single device that evaluates its assigned jobs sequentially."""
+
+    if not jobs:
+        return
+
+    # Best-effort debug logging: print which device this worker is bound to
+    # and which candidates it will evaluate.
+    try:
+        import os  # local import to keep worker self-contained
+
+        first_job = jobs[0]
+        device_str = str(first_job[3])
+        job_tags = [(int(j[6]), int(j[7])) for j in jobs]  # (generation, index)
+        print(
+            f"[free_loss_eoh][device_worker] pid={os.getpid()} device={device_str} "
+            f"jobs={job_tags}",
+            flush=True,
+        )
+    except Exception:  # noqa: BLE001
+        pass
 
     for job in jobs:
         idx, fitness = _worker_evaluate_candidate(job)
