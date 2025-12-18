@@ -20,8 +20,8 @@ f1_steps: 0
 # Option 2: specify epochs and instances per epoch. When both are > 0,
 # they are used to derive the total number of training steps as:
 #   total_steps = hf_epochs * ceil(hf_instances_per_epoch / train_batch_size)
-hf_epochs: 10
-hf_instances_per_epoch: 100000
+hf_epochs: 1
+hf_instances_per_epoch: 1000
 f2_steps: 0    # set >0 to enable F2
 f3_enabled: false
 max_repair_rounds: 2

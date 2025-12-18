@@ -1,0 +1,177 @@
+[2025-12-18 11:22:11,577] INFO:ptp_discovery.sanity_free_loss_eval: Sanity check devices: cuda:0, cuda:1, cuda:2, cuda:3
+[2025-12-18 11:22:11,578] INFO:ptp_discovery.sanity_free_loss_eval: Running candidate 1/8 on device=cuda:0 (train_problem_size=100, batch_size=64, pomo_size=100)
+[2025-12-18 11:22:13,341] INFO:fitness.free_loss_fidelity: Free-loss training: f1_steps=16, f2_steps=0, total_steps=16, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda:0
+[2025-12-18 11:22:14,999] INFO:fitness.free_loss_fidelity: Free-loss step 1/16: score=48.226318 (avg=48.226318), loss=0.719226 (avg=0.719226), pairs_step=316799, pairs_total=316799
+[2025-12-18 11:22:15,344] INFO:fitness.free_loss_fidelity: Free-loss step 2/16: score=37.130783 (avg=42.678551), loss=0.789514 (avg=0.754370), pairs_step=316800, pairs_total=633599
+[2025-12-18 11:22:15,687] INFO:fitness.free_loss_fidelity: Free-loss step 3/16: score=17.120346 (avg=34.159149), loss=0.698660 (avg=0.735800), pairs_step=316800, pairs_total=950399
+[2025-12-18 11:22:16,030] INFO:fitness.free_loss_fidelity: Free-loss step 4/16: score=13.022732 (avg=28.875045), loss=0.617219 (avg=0.706154), pairs_step=316800, pairs_total=1267199
+[2025-12-18 11:22:16,373] INFO:fitness.free_loss_fidelity: Free-loss step 5/16: score=13.361255 (avg=25.772287), loss=0.601700 (avg=0.685264), pairs_step=316800, pairs_total=1583999
+[2025-12-18 11:22:16,720] INFO:fitness.free_loss_fidelity: Free-loss step 6/16: score=13.482893 (avg=23.724054), loss=0.600614 (avg=0.671155), pairs_step=316800, pairs_total=1900799
+[2025-12-18 11:22:17,064] INFO:fitness.free_loss_fidelity: Free-loss step 7/16: score=13.294655 (avg=22.234140), loss=0.610726 (avg=0.662523), pairs_step=316800, pairs_total=2217599
+[2025-12-18 11:22:17,405] INFO:fitness.free_loss_fidelity: Free-loss step 8/16: score=12.969980 (avg=21.076120), loss=0.607188 (avg=0.655606), pairs_step=316800, pairs_total=2534399
+[2025-12-18 11:22:17,747] INFO:fitness.free_loss_fidelity: Free-loss step 9/16: score=12.472576 (avg=20.120171), loss=0.601015 (avg=0.649540), pairs_step=316800, pairs_total=2851199
+[2025-12-18 11:22:18,097] INFO:fitness.free_loss_fidelity: Free-loss step 10/16: score=11.962673 (avg=19.304421), loss=0.608697 (avg=0.645456), pairs_step=316800, pairs_total=3167999
+[2025-12-18 11:22:18,440] INFO:fitness.free_loss_fidelity: Free-loss step 11/16: score=11.425488 (avg=18.588155), loss=0.612670 (avg=0.642475), pairs_step=316800, pairs_total=3484799
+[2025-12-18 11:22:18,788] INFO:fitness.free_loss_fidelity: Free-loss step 12/16: score=10.926364 (avg=17.949672), loss=0.610748 (avg=0.639831), pairs_step=316799, pairs_total=3801598
+[2025-12-18 11:22:19,130] INFO:fitness.free_loss_fidelity: Free-loss step 13/16: score=10.803663 (avg=17.399979), loss=0.621918 (avg=0.638453), pairs_step=316800, pairs_total=4118398
+[2025-12-18 11:22:19,473] INFO:fitness.free_loss_fidelity: Free-loss step 14/16: score=10.727999 (avg=16.923409), loss=0.624763 (avg=0.637475), pairs_step=316800, pairs_total=4435198
+[2025-12-18 11:22:19,820] INFO:fitness.free_loss_fidelity: Free-loss step 15/16: score=10.632431 (avg=16.504010), loss=0.624195 (avg=0.636590), pairs_step=316800, pairs_total=4751998
+[2025-12-18 11:22:20,157] INFO:fitness.free_loss_fidelity: Free-loss step 16/16: score=10.328655 (avg=16.118051), loss=0.618224 (avg=0.635442), pairs_step=316800, pairs_total=5068798
+[2025-12-18 11:22:20,158] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:22:38,790] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:22:57,518] INFO:fitness.free_loss_fidelity: Free-loss timing: init=1.755s, train=6.817s, eval=37.360s
+[2025-12-18 11:22:57,521] INFO:ptp_discovery.sanity_free_loss_eval: After candidate 1 on cuda:0: allocated=0.016 GiB, reserved=8.312 GiB
+[2025-12-18 11:22:57,764] INFO:ptp_discovery.sanity_free_loss_eval: Running candidate 2/8 on device=cuda:1 (train_problem_size=100, batch_size=64, pomo_size=100)
+[2025-12-18 11:22:59,774] INFO:fitness.free_loss_fidelity: Free-loss training: f1_steps=16, f2_steps=0, total_steps=16, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda:1
+[2025-12-18 11:23:00,248] INFO:fitness.free_loss_fidelity: Free-loss step 1/16: score=48.226318 (avg=48.226318), loss=0.719226 (avg=0.719226), pairs_step=316799, pairs_total=316799
+[2025-12-18 11:23:00,598] INFO:fitness.free_loss_fidelity: Free-loss step 2/16: score=37.130783 (avg=42.678551), loss=0.789539 (avg=0.754382), pairs_step=316800, pairs_total=633599
+[2025-12-18 11:23:00,948] INFO:fitness.free_loss_fidelity: Free-loss step 3/16: score=17.158268 (avg=34.171790), loss=0.698007 (avg=0.735590), pairs_step=316800, pairs_total=950399
+[2025-12-18 11:23:01,297] INFO:fitness.free_loss_fidelity: Free-loss step 4/16: score=13.028883 (avg=28.886063), loss=0.611044 (avg=0.704454), pairs_step=316800, pairs_total=1267199
+[2025-12-18 11:23:01,643] INFO:fitness.free_loss_fidelity: Free-loss step 5/16: score=13.307107 (avg=25.770272), loss=0.605442 (avg=0.684651), pairs_step=316799, pairs_total=1583998
+[2025-12-18 11:23:01,990] INFO:fitness.free_loss_fidelity: Free-loss step 6/16: score=13.507191 (avg=23.726425), loss=0.601341 (avg=0.670766), pairs_step=316800, pairs_total=1900798
+[2025-12-18 11:23:02,336] INFO:fitness.free_loss_fidelity: Free-loss step 7/16: score=13.291733 (avg=22.235755), loss=0.606306 (avg=0.661558), pairs_step=316800, pairs_total=2217598
+[2025-12-18 11:23:02,685] INFO:fitness.free_loss_fidelity: Free-loss step 8/16: score=12.948398 (avg=21.074835), loss=0.602582 (avg=0.654186), pairs_step=316800, pairs_total=2534398
+[2025-12-18 11:23:03,030] INFO:fitness.free_loss_fidelity: Free-loss step 9/16: score=12.496747 (avg=20.121714), loss=0.604855 (avg=0.648704), pairs_step=316800, pairs_total=2851198
+[2025-12-18 11:23:03,374] INFO:fitness.free_loss_fidelity: Free-loss step 10/16: score=11.910199 (avg=19.300563), loss=0.605387 (avg=0.644373), pairs_step=316800, pairs_total=3167998
+[2025-12-18 11:23:03,719] INFO:fitness.free_loss_fidelity: Free-loss step 11/16: score=11.386871 (avg=18.581136), loss=0.611982 (avg=0.641428), pairs_step=316798, pairs_total=3484796
+[2025-12-18 11:23:04,068] INFO:fitness.free_loss_fidelity: Free-loss step 12/16: score=10.902866 (avg=17.941280), loss=0.615075 (avg=0.639232), pairs_step=316800, pairs_total=3801596
+[2025-12-18 11:23:04,416] INFO:fitness.free_loss_fidelity: Free-loss step 13/16: score=10.777586 (avg=17.390227), loss=0.618939 (avg=0.637671), pairs_step=316800, pairs_total=4118396
+[2025-12-18 11:23:04,762] INFO:fitness.free_loss_fidelity: Free-loss step 14/16: score=10.778205 (avg=16.917940), loss=0.620172 (avg=0.636421), pairs_step=316800, pairs_total=4435196
+[2025-12-18 11:23:05,105] INFO:fitness.free_loss_fidelity: Free-loss step 15/16: score=10.488012 (avg=16.489278), loss=0.622399 (avg=0.635486), pairs_step=316799, pairs_total=4751995
+[2025-12-18 11:23:05,452] INFO:fitness.free_loss_fidelity: Free-loss step 16/16: score=10.297374 (avg=16.102284), loss=0.610270 (avg=0.633910), pairs_step=316799, pairs_total=5068794
+[2025-12-18 11:23:05,452] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:23:24,684] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:23:43,980] INFO:fitness.free_loss_fidelity: Free-loss timing: init=2.009s, train=5.678s, eval=38.527s
+[2025-12-18 11:23:43,982] INFO:ptp_discovery.sanity_free_loss_eval: After candidate 2 on cuda:1: allocated=0.016 GiB, reserved=8.312 GiB
+[2025-12-18 11:23:44,234] INFO:ptp_discovery.sanity_free_loss_eval: Running candidate 3/8 on device=cuda:2 (train_problem_size=100, batch_size=64, pomo_size=100)
+[2025-12-18 11:23:46,250] INFO:fitness.free_loss_fidelity: Free-loss training: f1_steps=16, f2_steps=0, total_steps=16, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda:2
+[2025-12-18 11:23:46,725] INFO:fitness.free_loss_fidelity: Free-loss step 1/16: score=48.226318 (avg=48.226318), loss=0.719226 (avg=0.719226), pairs_step=316799, pairs_total=316799
+[2025-12-18 11:23:47,070] INFO:fitness.free_loss_fidelity: Free-loss step 2/16: score=37.130783 (avg=42.678551), loss=0.789539 (avg=0.754382), pairs_step=316800, pairs_total=633599
+[2025-12-18 11:23:47,420] INFO:fitness.free_loss_fidelity: Free-loss step 3/16: score=17.154202 (avg=34.170434), loss=0.698264 (avg=0.735676), pairs_step=316800, pairs_total=950399
+[2025-12-18 11:23:47,764] INFO:fitness.free_loss_fidelity: Free-loss step 4/16: score=13.026575 (avg=28.884470), loss=0.611141 (avg=0.704542), pairs_step=316800, pairs_total=1267199
+[2025-12-18 11:23:48,107] INFO:fitness.free_loss_fidelity: Free-loss step 5/16: score=13.350729 (avg=25.777721), loss=0.606054 (avg=0.684845), pairs_step=316800, pairs_total=1583999
+[2025-12-18 11:23:48,452] INFO:fitness.free_loss_fidelity: Free-loss step 6/16: score=13.504627 (avg=23.732206), loss=0.602309 (avg=0.671089), pairs_step=316800, pairs_total=1900799
+[2025-12-18 11:23:48,798] INFO:fitness.free_loss_fidelity: Free-loss step 7/16: score=13.338518 (avg=22.247393), loss=0.611992 (avg=0.662646), pairs_step=316800, pairs_total=2217599
+[2025-12-18 11:23:49,150] INFO:fitness.free_loss_fidelity: Free-loss step 8/16: score=12.996439 (avg=21.091024), loss=0.605296 (avg=0.655478), pairs_step=316800, pairs_total=2534399
+[2025-12-18 11:23:49,497] INFO:fitness.free_loss_fidelity: Free-loss step 9/16: score=12.484153 (avg=20.134705), loss=0.599747 (avg=0.649285), pairs_step=316800, pairs_total=2851199
+[2025-12-18 11:23:49,842] INFO:fitness.free_loss_fidelity: Free-loss step 10/16: score=12.001431 (avg=19.321377), loss=0.612447 (avg=0.645601), pairs_step=316800, pairs_total=3167999
+[2025-12-18 11:23:50,192] INFO:fitness.free_loss_fidelity: Free-loss step 11/16: score=11.450674 (avg=18.605859), loss=0.613901 (avg=0.642720), pairs_step=316800, pairs_total=3484799
+[2025-12-18 11:23:50,544] INFO:fitness.free_loss_fidelity: Free-loss step 12/16: score=10.911788 (avg=17.964686), loss=0.610923 (avg=0.640070), pairs_step=316800, pairs_total=3801599
+[2025-12-18 11:23:50,892] INFO:fitness.free_loss_fidelity: Free-loss step 13/16: score=10.758602 (avg=17.410372), loss=0.616852 (avg=0.638284), pairs_step=316800, pairs_total=4118399
+[2025-12-18 11:23:51,241] INFO:fitness.free_loss_fidelity: Free-loss step 14/16: score=10.736940 (avg=16.933699), loss=0.625382 (avg=0.637362), pairs_step=316800, pairs_total=4435199
+[2025-12-18 11:23:51,587] INFO:fitness.free_loss_fidelity: Free-loss step 15/16: score=10.578350 (avg=16.510009), loss=0.634397 (avg=0.637165), pairs_step=316800, pairs_total=4751999
+[2025-12-18 11:23:51,937] INFO:fitness.free_loss_fidelity: Free-loss step 16/16: score=10.281796 (avg=16.120745), loss=0.612913 (avg=0.635649), pairs_step=316799, pairs_total=5068798
+[2025-12-18 11:23:51,938] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:24:11,165] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:24:30,187] INFO:fitness.free_loss_fidelity: Free-loss timing: init=2.015s, train=5.688s, eval=38.249s
+[2025-12-18 11:24:30,189] INFO:ptp_discovery.sanity_free_loss_eval: After candidate 3 on cuda:2: allocated=0.016 GiB, reserved=8.312 GiB
+[2025-12-18 11:24:30,432] INFO:ptp_discovery.sanity_free_loss_eval: Running candidate 4/8 on device=cuda:3 (train_problem_size=100, batch_size=64, pomo_size=100)
+[2025-12-18 11:24:32,470] INFO:fitness.free_loss_fidelity: Free-loss training: f1_steps=16, f2_steps=0, total_steps=16, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda:3
+[2025-12-18 11:24:32,956] INFO:fitness.free_loss_fidelity: Free-loss step 1/16: score=48.226318 (avg=48.226318), loss=0.719226 (avg=0.719226), pairs_step=316799, pairs_total=316799
+[2025-12-18 11:24:33,309] INFO:fitness.free_loss_fidelity: Free-loss step 2/16: score=37.118301 (avg=42.672310), loss=0.789425 (avg=0.754325), pairs_step=316800, pairs_total=633599
+[2025-12-18 11:24:33,653] INFO:fitness.free_loss_fidelity: Free-loss step 3/16: score=17.166821 (avg=34.170480), loss=0.701382 (avg=0.736677), pairs_step=316800, pairs_total=950399
+[2025-12-18 11:24:34,007] INFO:fitness.free_loss_fidelity: Free-loss step 4/16: score=13.046741 (avg=28.889545), loss=0.615434 (avg=0.706367), pairs_step=316800, pairs_total=1267199
+[2025-12-18 11:24:34,354] INFO:fitness.free_loss_fidelity: Free-loss step 5/16: score=13.382462 (avg=25.788129), loss=0.602602 (avg=0.685614), pairs_step=316798, pairs_total=1583997
+[2025-12-18 11:24:34,707] INFO:fitness.free_loss_fidelity: Free-loss step 6/16: score=13.405668 (avg=23.724385), loss=0.601698 (avg=0.671628), pairs_step=316800, pairs_total=1900797
+[2025-12-18 11:24:35,053] INFO:fitness.free_loss_fidelity: Free-loss step 7/16: score=13.338680 (avg=22.240713), loss=0.607408 (avg=0.662453), pairs_step=316800, pairs_total=2217597
+[2025-12-18 11:24:35,406] INFO:fitness.free_loss_fidelity: Free-loss step 8/16: score=13.029097 (avg=21.089261), loss=0.606487 (avg=0.655458), pairs_step=316799, pairs_total=2534396
+[2025-12-18 11:24:35,762] INFO:fitness.free_loss_fidelity: Free-loss step 9/16: score=12.477224 (avg=20.132368), loss=0.601898 (avg=0.649507), pairs_step=316799, pairs_total=2851195
+[2025-12-18 11:24:36,115] INFO:fitness.free_loss_fidelity: Free-loss step 10/16: score=11.998857 (avg=19.319017), loss=0.606157 (avg=0.645172), pairs_step=316800, pairs_total=3167995
+[2025-12-18 11:24:36,459] INFO:fitness.free_loss_fidelity: Free-loss step 11/16: score=11.450439 (avg=18.603692), loss=0.619122 (avg=0.642804), pairs_step=316800, pairs_total=3484795
+[2025-12-18 11:24:36,816] INFO:fitness.free_loss_fidelity: Free-loss step 12/16: score=10.976280 (avg=17.968074), loss=0.613863 (avg=0.640392), pairs_step=316800, pairs_total=3801595
+[2025-12-18 11:24:37,168] INFO:fitness.free_loss_fidelity: Free-loss step 13/16: score=10.676010 (avg=17.407146), loss=0.616135 (avg=0.638526), pairs_step=316800, pairs_total=4118395
+[2025-12-18 11:24:37,524] INFO:fitness.free_loss_fidelity: Free-loss step 14/16: score=10.680992 (avg=16.926707), loss=0.625804 (avg=0.637617), pairs_step=316800, pairs_total=4435195
+[2025-12-18 11:24:37,869] INFO:fitness.free_loss_fidelity: Free-loss step 15/16: score=10.635626 (avg=16.507301), loss=0.637622 (avg=0.637618), pairs_step=316800, pairs_total=4751995
+[2025-12-18 11:24:38,222] INFO:fitness.free_loss_fidelity: Free-loss step 16/16: score=10.340564 (avg=16.121880), loss=0.617690 (avg=0.636372), pairs_step=316800, pairs_total=5068795
+[2025-12-18 11:24:38,224] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:24:57,486] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:25:16,864] INFO:fitness.free_loss_fidelity: Free-loss timing: init=2.037s, train=5.753s, eval=38.640s
+[2025-12-18 11:25:16,867] INFO:ptp_discovery.sanity_free_loss_eval: After candidate 4 on cuda:3: allocated=0.016 GiB, reserved=8.312 GiB
+[2025-12-18 11:25:17,111] INFO:ptp_discovery.sanity_free_loss_eval: Running candidate 5/8 on device=cuda:0 (train_problem_size=100, batch_size=64, pomo_size=100)
+[2025-12-18 11:25:17,156] INFO:fitness.free_loss_fidelity: Free-loss training: f1_steps=16, f2_steps=0, total_steps=16, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda:0
+[2025-12-18 11:25:17,588] INFO:fitness.free_loss_fidelity: Free-loss step 1/16: score=48.226318 (avg=48.226318), loss=0.719226 (avg=0.719226), pairs_step=316799, pairs_total=316799
+[2025-12-18 11:25:17,930] INFO:fitness.free_loss_fidelity: Free-loss step 2/16: score=37.130783 (avg=42.678551), loss=0.789539 (avg=0.754382), pairs_step=316800, pairs_total=633599
+[2025-12-18 11:25:18,274] INFO:fitness.free_loss_fidelity: Free-loss step 3/16: score=17.155174 (avg=34.170759), loss=0.698075 (avg=0.735613), pairs_step=316800, pairs_total=950399
+[2025-12-18 11:25:18,616] INFO:fitness.free_loss_fidelity: Free-loss step 4/16: score=13.000789 (avg=28.878266), loss=0.611608 (avg=0.704612), pairs_step=316800, pairs_total=1267199
+[2025-12-18 11:25:18,970] INFO:fitness.free_loss_fidelity: Free-loss step 5/16: score=13.319956 (avg=25.766604), loss=0.602738 (avg=0.684237), pairs_step=316799, pairs_total=1583998
+[2025-12-18 11:25:19,314] INFO:fitness.free_loss_fidelity: Free-loss step 6/16: score=13.489468 (avg=23.720415), loss=0.604056 (avg=0.670874), pairs_step=316800, pairs_total=1900798
+[2025-12-18 11:25:19,664] INFO:fitness.free_loss_fidelity: Free-loss step 7/16: score=13.308751 (avg=22.233034), loss=0.606835 (avg=0.661725), pairs_step=316800, pairs_total=2217598
+[2025-12-18 11:25:20,008] INFO:fitness.free_loss_fidelity: Free-loss step 8/16: score=12.998299 (avg=21.078692), loss=0.606297 (avg=0.654797), pairs_step=316800, pairs_total=2534398
+[2025-12-18 11:25:20,350] INFO:fitness.free_loss_fidelity: Free-loss step 9/16: score=12.451255 (avg=20.120088), loss=0.604269 (avg=0.649182), pairs_step=316800, pairs_total=2851198
+[2025-12-18 11:25:20,697] INFO:fitness.free_loss_fidelity: Free-loss step 10/16: score=11.997207 (avg=19.307800), loss=0.609398 (avg=0.645204), pairs_step=316800, pairs_total=3167998
+[2025-12-18 11:25:21,032] INFO:fitness.free_loss_fidelity: Free-loss step 11/16: score=11.429200 (avg=18.591564), loss=0.612660 (avg=0.642245), pairs_step=316800, pairs_total=3484798
+[2025-12-18 11:25:21,377] INFO:fitness.free_loss_fidelity: Free-loss step 12/16: score=10.938343 (avg=17.953795), loss=0.613750 (avg=0.639871), pairs_step=316800, pairs_total=3801598
+[2025-12-18 11:25:21,725] INFO:fitness.free_loss_fidelity: Free-loss step 13/16: score=10.647766 (avg=17.391793), loss=0.614974 (avg=0.637956), pairs_step=316800, pairs_total=4118398
+[2025-12-18 11:25:22,069] INFO:fitness.free_loss_fidelity: Free-loss step 14/16: score=10.739156 (avg=16.916605), loss=0.622410 (avg=0.636845), pairs_step=316800, pairs_total=4435198
+[2025-12-18 11:25:22,416] INFO:fitness.free_loss_fidelity: Free-loss step 15/16: score=10.458538 (avg=16.486067), loss=0.625199 (avg=0.636069), pairs_step=316800, pairs_total=4751998
+[2025-12-18 11:25:22,761] INFO:fitness.free_loss_fidelity: Free-loss step 16/16: score=10.332510 (avg=16.101470), loss=0.619080 (avg=0.635007), pairs_step=316799, pairs_total=5068797
+[2025-12-18 11:25:22,761] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:25:41,597] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:26:00,312] INFO:fitness.free_loss_fidelity: Free-loss timing: init=0.044s, train=5.606s, eval=37.551s
+[2025-12-18 11:26:00,315] INFO:ptp_discovery.sanity_free_loss_eval: After candidate 5 on cuda:0: allocated=0.016 GiB, reserved=8.340 GiB
+[2025-12-18 11:26:00,577] INFO:ptp_discovery.sanity_free_loss_eval: Running candidate 6/8 on device=cuda:1 (train_problem_size=100, batch_size=64, pomo_size=100)
+[2025-12-18 11:26:00,634] INFO:fitness.free_loss_fidelity: Free-loss training: f1_steps=16, f2_steps=0, total_steps=16, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda:1
+[2025-12-18 11:26:01,080] INFO:fitness.free_loss_fidelity: Free-loss step 1/16: score=48.226318 (avg=48.226318), loss=0.719226 (avg=0.719226), pairs_step=316799, pairs_total=316799
+[2025-12-18 11:26:01,427] INFO:fitness.free_loss_fidelity: Free-loss step 2/16: score=37.130783 (avg=42.678551), loss=0.789522 (avg=0.754374), pairs_step=316800, pairs_total=633599
+[2025-12-18 11:26:01,771] INFO:fitness.free_loss_fidelity: Free-loss step 3/16: score=17.178247 (avg=34.178450), loss=0.697668 (avg=0.735472), pairs_step=316800, pairs_total=950399
+[2025-12-18 11:26:02,116] INFO:fitness.free_loss_fidelity: Free-loss step 4/16: score=13.064054 (avg=28.899851), loss=0.611153 (avg=0.704392), pairs_step=316800, pairs_total=1267199
+[2025-12-18 11:26:02,461] INFO:fitness.free_loss_fidelity: Free-loss step 5/16: score=13.293262 (avg=25.778533), loss=0.601300 (avg=0.683774), pairs_step=316800, pairs_total=1583999
+[2025-12-18 11:26:02,805] INFO:fitness.free_loss_fidelity: Free-loss step 6/16: score=13.465965 (avg=23.726438), loss=0.603654 (avg=0.670421), pairs_step=316800, pairs_total=1900799
+[2025-12-18 11:26:03,154] INFO:fitness.free_loss_fidelity: Free-loss step 7/16: score=13.340630 (avg=22.242751), loss=0.609601 (avg=0.661732), pairs_step=316800, pairs_total=2217599
+[2025-12-18 11:26:03,504] INFO:fitness.free_loss_fidelity: Free-loss step 8/16: score=12.890083 (avg=21.073668), loss=0.602393 (avg=0.654315), pairs_step=316800, pairs_total=2534399
+[2025-12-18 11:26:03,853] INFO:fitness.free_loss_fidelity: Free-loss step 9/16: score=12.440257 (avg=20.114400), loss=0.601947 (avg=0.648496), pairs_step=316800, pairs_total=2851199
+[2025-12-18 11:26:04,199] INFO:fitness.free_loss_fidelity: Free-loss step 10/16: score=11.897648 (avg=19.292725), loss=0.608375 (avg=0.644484), pairs_step=316800, pairs_total=3167999
+[2025-12-18 11:26:04,542] INFO:fitness.free_loss_fidelity: Free-loss step 11/16: score=11.411226 (avg=18.576225), loss=0.616111 (avg=0.641905), pairs_step=316799, pairs_total=3484798
+[2025-12-18 11:26:04,889] INFO:fitness.free_loss_fidelity: Free-loss step 12/16: score=10.847166 (avg=17.932137), loss=0.609966 (avg=0.639243), pairs_step=316799, pairs_total=3801597
+[2025-12-18 11:26:05,233] INFO:fitness.free_loss_fidelity: Free-loss step 13/16: score=10.649454 (avg=17.371930), loss=0.615155 (avg=0.637390), pairs_step=316799, pairs_total=4118396
+[2025-12-18 11:26:05,577] INFO:fitness.free_loss_fidelity: Free-loss step 14/16: score=10.673706 (avg=16.893486), loss=0.627281 (avg=0.636668), pairs_step=316800, pairs_total=4435196
+[2025-12-18 11:26:05,926] INFO:fitness.free_loss_fidelity: Free-loss step 15/16: score=10.750504 (avg=16.483954), loss=0.633930 (avg=0.636485), pairs_step=316800, pairs_total=4751996
+[2025-12-18 11:26:06,272] INFO:fitness.free_loss_fidelity: Free-loss step 16/16: score=10.467232 (avg=16.107908), loss=0.597390 (avg=0.634042), pairs_step=316800, pairs_total=5068796
+[2025-12-18 11:26:06,273] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:26:25,598] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:26:44,874] INFO:fitness.free_loss_fidelity: Free-loss timing: init=0.057s, train=5.638s, eval=38.602s
+[2025-12-18 11:26:44,877] INFO:ptp_discovery.sanity_free_loss_eval: After candidate 6 on cuda:1: allocated=0.016 GiB, reserved=8.340 GiB
+[2025-12-18 11:26:45,134] INFO:ptp_discovery.sanity_free_loss_eval: Running candidate 7/8 on device=cuda:2 (train_problem_size=100, batch_size=64, pomo_size=100)
+[2025-12-18 11:26:45,182] INFO:fitness.free_loss_fidelity: Free-loss training: f1_steps=16, f2_steps=0, total_steps=16, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda:2
+[2025-12-18 11:26:45,619] INFO:fitness.free_loss_fidelity: Free-loss step 1/16: score=48.226318 (avg=48.226318), loss=0.719226 (avg=0.719226), pairs_step=316799, pairs_total=316799
+[2025-12-18 11:26:45,963] INFO:fitness.free_loss_fidelity: Free-loss step 2/16: score=37.130783 (avg=42.678551), loss=0.789539 (avg=0.754382), pairs_step=316800, pairs_total=633599
+[2025-12-18 11:26:46,305] INFO:fitness.free_loss_fidelity: Free-loss step 3/16: score=17.158268 (avg=34.171790), loss=0.698038 (avg=0.735601), pairs_step=316800, pairs_total=950399
+[2025-12-18 11:26:46,645] INFO:fitness.free_loss_fidelity: Free-loss step 4/16: score=12.982143 (avg=28.874378), loss=0.610947 (avg=0.704437), pairs_step=316800, pairs_total=1267199
+[2025-12-18 11:26:46,988] INFO:fitness.free_loss_fidelity: Free-loss step 5/16: score=13.363993 (avg=25.772301), loss=0.602534 (avg=0.684056), pairs_step=316799, pairs_total=1583998
+[2025-12-18 11:26:47,331] INFO:fitness.free_loss_fidelity: Free-loss step 6/16: score=13.466848 (avg=23.721392), loss=0.600752 (avg=0.670172), pairs_step=316800, pairs_total=1900798
+[2025-12-18 11:26:47,670] INFO:fitness.free_loss_fidelity: Free-loss step 7/16: score=13.318125 (avg=22.235211), loss=0.606671 (avg=0.661101), pairs_step=316799, pairs_total=2217597
+[2025-12-18 11:26:48,007] INFO:fitness.free_loss_fidelity: Free-loss step 8/16: score=12.952745 (avg=21.074903), loss=0.603270 (avg=0.653872), pairs_step=316799, pairs_total=2534396
+[2025-12-18 11:26:48,347] INFO:fitness.free_loss_fidelity: Free-loss step 9/16: score=12.491518 (avg=20.121194), loss=0.605180 (avg=0.648462), pairs_step=316800, pairs_total=2851196
+[2025-12-18 11:26:48,696] INFO:fitness.free_loss_fidelity: Free-loss step 10/16: score=11.898059 (avg=19.298880), loss=0.606891 (avg=0.644305), pairs_step=316800, pairs_total=3167996
+[2025-12-18 11:26:49,040] INFO:fitness.free_loss_fidelity: Free-loss step 11/16: score=11.447202 (avg=18.585091), loss=0.618990 (avg=0.642003), pairs_step=316800, pairs_total=3484796
+[2025-12-18 11:26:49,378] INFO:fitness.free_loss_fidelity: Free-loss step 12/16: score=10.870518 (avg=17.942210), loss=0.614268 (avg=0.639692), pairs_step=316800, pairs_total=3801596
+[2025-12-18 11:26:49,723] INFO:fitness.free_loss_fidelity: Free-loss step 13/16: score=10.652122 (avg=17.381434), loss=0.622088 (avg=0.638338), pairs_step=316800, pairs_total=4118396
+[2025-12-18 11:26:50,068] INFO:fitness.free_loss_fidelity: Free-loss step 14/16: score=10.639767 (avg=16.899886), loss=0.621256 (avg=0.637118), pairs_step=316800, pairs_total=4435196
+[2025-12-18 11:26:50,406] INFO:fitness.free_loss_fidelity: Free-loss step 15/16: score=10.651497 (avg=16.483327), loss=0.631128 (avg=0.636718), pairs_step=316800, pairs_total=4751996
+[2025-12-18 11:26:50,752] INFO:fitness.free_loss_fidelity: Free-loss step 16/16: score=10.316391 (avg=16.097894), loss=0.632455 (avg=0.636452), pairs_step=316800, pairs_total=5068796
+[2025-12-18 11:26:50,754] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:27:10,339] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:27:29,871] INFO:fitness.free_loss_fidelity: Free-loss timing: init=0.046s, train=5.572s, eval=39.118s
+[2025-12-18 11:27:29,874] INFO:ptp_discovery.sanity_free_loss_eval: After candidate 7 on cuda:2: allocated=0.016 GiB, reserved=8.340 GiB
+[2025-12-18 11:27:30,118] INFO:ptp_discovery.sanity_free_loss_eval: Running candidate 8/8 on device=cuda:3 (train_problem_size=100, batch_size=64, pomo_size=100)
+[2025-12-18 11:27:30,163] INFO:fitness.free_loss_fidelity: Free-loss training: f1_steps=16, f2_steps=0, total_steps=16, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda:3
+[2025-12-18 11:27:30,620] INFO:fitness.free_loss_fidelity: Free-loss step 1/16: score=48.226318 (avg=48.226318), loss=0.719226 (avg=0.719226), pairs_step=316799, pairs_total=316799
+[2025-12-18 11:27:30,967] INFO:fitness.free_loss_fidelity: Free-loss step 2/16: score=37.130783 (avg=42.678551), loss=0.789539 (avg=0.754382), pairs_step=316800, pairs_total=633599
+[2025-12-18 11:27:31,317] INFO:fitness.free_loss_fidelity: Free-loss step 3/16: score=17.158268 (avg=34.171790), loss=0.698038 (avg=0.735601), pairs_step=316800, pairs_total=950399
+[2025-12-18 11:27:31,660] INFO:fitness.free_loss_fidelity: Free-loss step 4/16: score=12.983318 (avg=28.874672), loss=0.611188 (avg=0.704498), pairs_step=316800, pairs_total=1267199
+[2025-12-18 11:27:32,010] INFO:fitness.free_loss_fidelity: Free-loss step 5/16: score=13.348946 (avg=25.769527), loss=0.603187 (avg=0.684236), pairs_step=316800, pairs_total=1583999
+[2025-12-18 11:27:32,365] INFO:fitness.free_loss_fidelity: Free-loss step 6/16: score=13.473093 (avg=23.720121), loss=0.602109 (avg=0.670548), pairs_step=316800, pairs_total=1900799
+[2025-12-18 11:27:32,720] INFO:fitness.free_loss_fidelity: Free-loss step 7/16: score=13.264082 (avg=22.226401), loss=0.609745 (avg=0.661862), pairs_step=316800, pairs_total=2217599
+[2025-12-18 11:27:33,073] INFO:fitness.free_loss_fidelity: Free-loss step 8/16: score=12.979582 (avg=21.070549), loss=0.599083 (avg=0.654014), pairs_step=316800, pairs_total=2534399
+[2025-12-18 11:27:33,424] INFO:fitness.free_loss_fidelity: Free-loss step 9/16: score=12.489783 (avg=20.117130), loss=0.600752 (avg=0.648096), pairs_step=316800, pairs_total=2851199
+[2025-12-18 11:27:33,770] INFO:fitness.free_loss_fidelity: Free-loss step 10/16: score=11.909462 (avg=19.296364), loss=0.602714 (avg=0.643558), pairs_step=316800, pairs_total=3167999
+[2025-12-18 11:27:34,124] INFO:fitness.free_loss_fidelity: Free-loss step 11/16: score=11.346199 (avg=18.573621), loss=0.616415 (avg=0.641091), pairs_step=316800, pairs_total=3484799
+[2025-12-18 11:27:34,473] INFO:fitness.free_loss_fidelity: Free-loss step 12/16: score=10.884443 (avg=17.932856), loss=0.615967 (avg=0.638997), pairs_step=316800, pairs_total=3801599
+[2025-12-18 11:27:34,811] INFO:fitness.free_loss_fidelity: Free-loss step 13/16: score=10.792263 (avg=17.383580), loss=0.615795 (avg=0.637212), pairs_step=316800, pairs_total=4118399
+[2025-12-18 11:27:35,169] INFO:fitness.free_loss_fidelity: Free-loss step 14/16: score=10.881984 (avg=16.919180), loss=0.623494 (avg=0.636232), pairs_step=316800, pairs_total=4435199
+[2025-12-18 11:27:35,525] INFO:fitness.free_loss_fidelity: Free-loss step 15/16: score=10.464208 (avg=16.488849), loss=0.616530 (avg=0.634919), pairs_step=316800, pairs_total=4751999
+[2025-12-18 11:27:35,873] INFO:fitness.free_loss_fidelity: Free-loss step 16/16: score=10.275339 (avg=16.100504), loss=0.628705 (avg=0.634531), pairs_step=316800, pairs_total=5068799
+[2025-12-18 11:27:35,874] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:27:55,197] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-18 11:28:14,636] INFO:fitness.free_loss_fidelity: Free-loss timing: init=0.044s, train=5.711s, eval=38.762s
+[2025-12-18 11:28:14,639] INFO:ptp_discovery.sanity_free_loss_eval: After candidate 8 on cuda:3: allocated=0.016 GiB, reserved=8.340 GiB
