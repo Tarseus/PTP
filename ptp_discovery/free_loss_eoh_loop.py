@@ -374,6 +374,28 @@ def _worker_evaluate_candidate(args: Tuple[
     return idx, fitness
 
 
+def _device_worker(
+    jobs: List[Tuple[
+        Dict[str, Any],
+        Dict[str, Any],
+        Dict[str, Any],
+        str,
+        List[str],
+        str,
+        int,
+        int,
+        float | None,
+        int,
+    ]],
+    result_queue: "mp.Queue[Tuple[int, Dict[str, Any]]]",
+) -> None:
+    """Worker bound to a single device that evaluates its assigned jobs sequentially."""
+
+    for job in jobs:
+        idx, fitness = _worker_evaluate_candidate(job)
+        result_queue.put((idx, fitness))
+
+
 def _timestamp_dir(root: str) -> str:
     ts = time.strftime("%Y%m%d-%H%M%S")
     path = os.path.join(root, ts)
@@ -951,7 +973,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 break
 
         # Evaluate all surviving candidates in parallel across GPUs / devices.
-        # We ensure that at any moment, at most one candidate runs on each device.
+        # We ensure that at any moment, at most one long-lived worker process
+        # is active per device, so each GPU holds at most one candidate's
+        # training state/cache.
         results: List[Tuple[int, Dict[str, Any]]] = []
         if eval_jobs:
             devices = _get_available_devices(hf_cfg.device)
@@ -959,34 +983,48 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 devices = [hf_cfg.device]
 
             ctx = mp.get_context("spawn")
-            num_workers = min(len(devices), len(eval_jobs))
-            with ctx.Pool(processes=num_workers) as pool:
-                # Process candidates in batches so that each device is used
-                # by at most one candidate concurrently.
-                for start in range(0, len(eval_jobs), num_workers):
-                    batch_jobs = eval_jobs[start : start + num_workers]
-                    jobs_with_devices: List[
-                        Tuple[
-                            Dict[str, Any],
-                            Dict[str, Any],
-                            Dict[str, Any],
-                            str,
-                            List[str],
-                            str,
-                            int,
-                            int,
-                            float | None,
-                            int,
-                        ]
-                    ] = []
-                    for dev_idx, job in enumerate(batch_jobs):
-                        device_str = devices[dev_idx % len(devices)]
-                        job_with_dev = list(job)
-                        job_with_dev[3] = device_str
-                        jobs_with_devices.append(tuple(job_with_dev))  # type: ignore[arg-type]
 
-                    batch_results = pool.map(_worker_evaluate_candidate, jobs_with_devices)
-                    results.extend(batch_results)
+            # Partition jobs by device in a round-robin fashion.
+            jobs_by_device: Dict[str, List[
+                Tuple[
+                    Dict[str, Any],
+                    Dict[str, Any],
+                    Dict[str, Any],
+                    str,
+                    List[str],
+                    str,
+                    int,
+                    int,
+                    float | None,
+                    int,
+                ]
+            ]] = {dev: [] for dev in devices}
+
+            for j_idx, job in enumerate(eval_jobs):
+                dev = devices[j_idx % len(devices)]
+                job_with_dev = list(job)
+                job_with_dev[3] = dev
+                jobs_by_device[dev].append(tuple(job_with_dev))  # type: ignore[arg-type]
+
+            result_queue: "mp.Queue[Tuple[int, Dict[str, Any]]]" = ctx.Queue()
+            processes: List[mp.Process] = []
+
+            total_jobs = 0
+            for dev, dev_jobs in jobs_by_device.items():
+                if not dev_jobs:
+                    continue
+                total_jobs += len(dev_jobs)
+                p = ctx.Process(target=_device_worker, args=(dev_jobs, result_queue))
+                p.start()
+                processes.append(p)
+
+            # Collect all results.
+            for _ in range(total_jobs):
+                idx, fitness = result_queue.get()
+                results.append((idx, fitness))
+
+            for p in processes:
+                p.join()
 
         # Integrate evaluation results back into the evolutionary loop.
         for idx, fitness in sorted(results, key=lambda x: x[0]):
