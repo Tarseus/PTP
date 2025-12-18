@@ -363,27 +363,61 @@ def _worker_evaluate_candidate(args: Tuple[
 
     # Reconstruct IR and compiled loss in the worker.
     ir = ir_from_json(ir_payload)
-    compiled = compile_free_loss_candidate(ir, operator_whitelist=operator_whitelist)
+    fitness: Dict[str, Any]
+    worst_score = float(1e9)
 
-    fitness = evaluate_free_loss_candidate(
-        compiled,
-        free_cfg,
-        baseline_early_valid=baseline_early_valid,
-        early_eval_steps=early_eval_steps,
-    )
-
-    # Proactively release unused CUDA cache in this worker process to
-    # reduce fragmentation and long-lived reservations across jobs.
-    if torch.cuda.is_available():
+    try:
+        compiled = compile_free_loss_candidate(ir, operator_whitelist=operator_whitelist)
+        fitness = evaluate_free_loss_candidate(
+            compiled,
+            free_cfg,
+            baseline_early_valid=baseline_early_valid,
+            early_eval_steps=early_eval_steps,
+        )
+    except Exception as exc:  # noqa: BLE001
+        # If candidate evaluation fails (e.g., NaNs in probabilities or loss),
+        # treat this candidate as having the worst possible fitness instead of
+        # crashing the worker process.
         try:
-            device_str = str(hf_cfg.device)
-            if device_str.startswith("cuda"):
-                torch.cuda.set_device(torch.device(device_str))
-            torch.cuda.empty_cache()
+            fl_logger = logging.getLogger("fitness.free_loss_fidelity")
+            fl_logger.exception(
+                "Candidate evaluation failed for gen=%d, idx=%d; assigning worst fitness.",
+                gen,
+                idx,
+            )
         except Exception:  # noqa: BLE001
-            # Cache cleanup is best-effort; ignore failures to avoid masking
-            # the actual training result.
             pass
+
+        fitness = {
+            "hf_like_score": worst_score,
+            "validation_objective": worst_score,
+            "generalization_penalty": 0.0,
+            "generalization_objectives": {},
+            "train_score_mean": float("nan"),
+            "train_loss_mean": float("nan"),
+            "pair_count": 0,
+            "early_eval": {
+                "enabled": False,
+                "steps": int(early_eval_steps or 0),
+                "baseline_validation_objective": baseline_early_valid,
+                "candidate_validation_objective": None,
+                "early_stopped": False,
+            },
+        }
+        fitness["eval_error"] = str(exc)
+    finally:
+        # Proactively release unused CUDA cache in this worker process to
+        # reduce fragmentation and long-lived reservations across jobs.
+        if torch.cuda.is_available():
+            try:
+                device_str = str(hf_cfg.device)
+                if device_str.startswith("cuda"):
+                    torch.cuda.set_device(torch.device(device_str))
+                torch.cuda.empty_cache()
+            except Exception:  # noqa: BLE001
+                # Cache cleanup is best-effort; ignore failures to avoid masking
+                # the actual training result.
+                pass
 
     return idx, fitness
 
