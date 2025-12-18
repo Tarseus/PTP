@@ -22,7 +22,7 @@ f1_steps: 0
 #   total_steps = hf_epochs * ceil(hf_instances_per_epoch / train_batch_size)
 hf_epochs: 10
 hf_instances_per_epoch: 100000
-f2_steps: 100    # set >0 to enable F2
+f2_steps: 0    # set >0 to enable F2
 f3_enabled: false
 max_repair_rounds: 2
 
@@ -34,12 +34,12 @@ problem: tsp
 train_problem_size: 100
 valid_problem_sizes: [100]
 train_batch_size: 64
-pomo_size: 20
+pomo_size: 100
 learning_rate: 0.0003
 weight_decay: 0.000001
 alpha: 0.05
 device: cuda
-num_validation_episodes: 128
+num_validation_episodes: 10000
 validation_batch_size: 64
 generalization_penalty_weight: 1.0
 
