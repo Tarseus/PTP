@@ -1,0 +1,109 @@
+{
+  "generation": 3,
+  "index": 3,
+  "ir": {
+    "name": "Adaptive_LogSigmoid_with_Dual_Adaptive_Margin",
+    "intuition": "Mode: combine. This loss function hybridizes the adaptive mechanisms of both parents to create a more nuanced and stable preference learning objective. It inherits the core `logsigmoid` loss structure, which is common to both parents and provides a solid probabilistic foundation. From Parent 1, it inherits the idea of an adaptive beta (temperature) for the `logsigmoid` function, which is inversely proportional to the standard deviation of `delta_logp`. This helps to soften the loss and prevent aggressive updates when the model's outputs are highly variable (i.e., it is uncertain). From Parent 2, it inherits the idea of making the cost temperature adaptive, based on the standard deviation of `delta_cost`. This makes the margin's sensitivity to cost differences dependent on the diversity of costs in the current batch. \n\nThe first new coupling idea is a **dual-component margin**. Instead of choosing one parent's margin, we combine them additively. The margin is now `margin = margin_A + margin_B`, where `margin_A` is the scaled cost-sigmoid from Parent 1 (`adaptive_scale * sigmoid(delta_cost / temp)`) and `margin_B` is a similar term using the adaptive temperature from Parent 2 (`adaptive_cost_temp`). This allows the margin to be influenced by both a fixed temperature and a batch-adaptive one, providing both stability and responsiveness. The second new coupling is a **dynamic re-weighting of the margin components**. I introduce a hyperparameter `alpha` (e.g., 0.5) to blend the two margin terms: `margin = alpha * margin_A + (1 - alpha) * margin_B`. This allows for explicit control over the influence of the fixed-temperature margin versus the adaptive-temperature margin, making the design more flexible and tunable. The overall structure remains a Bradley-Terry model with a sophisticated, dynamically constructed margin.",
+    "pseudocode": "1. Calculate the difference in log-probabilities: delta_logp = logp(a) - logp(b).\n2. Calculate the difference in costs: delta_cost = cost(b) - cost(a).\n3. Compute an adaptive scale based on the standard deviation of delta_logp, clipped for stability. This is used for both the margin and the loss temperature.\n4. Inherit from Parent 1: Calculate the first margin component (margin_A) using a fixed temperature for the cost sigmoid: `margin_A = adaptive_scale * sigmoid(delta_cost / fixed_temp)`.\n5. Inherit from Parent 2: Compute an adaptive cost temperature based on the standard deviation of delta_cost: `adaptive_cost_temp = std(delta_cost) + epsilon`.\n6. New Coupling 1: Calculate the second margin component (margin_B) using the adaptive cost temperature: `margin_B = adaptive_scale * sigmoid(delta_cost / adaptive_cost_temp)`.\n7. New Coupling 2: Combine the two margin components using a blending factor `alpha`: `margin = alpha * margin_A + (1 - alpha) * margin_B`.\n8. Inherit from Parent 1/2: Define an adaptive beta for the logsigmoid loss as the inverse of the adaptive scale: `beta = 1.0 / (adaptive_scale + epsilon)`.\n9. Compute the final loss argument: `loss_arg = delta_logp - margin`.\n10. Calculate the final loss using the scaled negative log-sigmoid function: `loss = -logsigmoid(beta * loss_arg)`.\n11. Return the mean of the loss across the batch.",
+    "hyperparams": {
+      "fixed_temp": 1.0,
+      "alpha": 0.5,
+      "min_scale": 0.1,
+      "max_scale": 5.0,
+      "epsilon": 1e-08
+    },
+    "operators_used": [
+      "logsigmoid",
+      "sigmoid",
+      "clamp"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "logp_a",
+        "logp_b"
+      ],
+      "returns": "scalar"
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    \"\"\"\n    A logistic preference loss with a blended margin from two adaptive schemes.\n    \"\"\"\n    # Read tensors from the batch\n    cost_a = batch['cost_a']\n    cost_b = batch['cost_b']\n    logp_a = batch['log_prob_w']\n    logp_b = batch['log_prob_l']\n    weights = batch.get('weight')\n\n    # Read hyperparameters\n    hyperparams = extra['hyperparams']\n    fixed_temp = hyperparams.get('fixed_temp', 1.0)\n    alpha = hyperparams.get('alpha', 0.5)\n    min_scale = hyperparams.get('min_scale', 0.1)\n    max_scale = hyperparams.get('max_scale', 5.0)\n    epsilon = hyperparams.get('epsilon', 1e-8)\n\n    # 1. Calculate log-probability and cost differences\n    delta_logp = logp_a - logp_b\n    delta_cost = cost_b - cost_a\n\n    # 2. Compute adaptive scale from logp stats (common element)\n    if delta_logp.numel() > 1:\n        logp_std = delta_logp.detach().std()\n    else:\n        logp_std = torch.tensor(1.0, device=delta_logp.device)\n    adaptive_scale = torch.clamp(logp_std, min_scale, max_scale)\n\n    # 3. Inherit from Parent 1: Calculate margin_A with fixed temperature\n    cost_weight_A = torch.sigmoid(delta_cost / fixed_temp)\n    margin_A = adaptive_scale * cost_weight_A\n\n    # 4. Inherit from Parent 2: Calculate adaptive cost temperature\n    if delta_cost.numel() > 1:\n        adaptive_cost_temp = delta_cost.detach().std() + epsilon\n    else:\n        adaptive_cost_temp = torch.tensor(1.0, device=delta_cost.device)\n\n    # 5. New Coupling 1: Calculate margin_B with adaptive temperature\n    cost_weight_B = torch.sigmoid(delta_cost / adaptive_cost_temp)\n    margin_B = adaptive_scale * cost_weight_B\n\n    # 6. New Coupling 2: Blend the two margins\n    margin = alpha * margin_A + (1.0 - alpha) * margin_B\n    \n    # 7. Inherit from both: Adaptive beta for logsigmoid\n    beta = 1.0 / (adaptive_scale.detach() + epsilon)\n\n    # 8. Compute the loss argument\n    loss_arg = delta_logp - margin\n\n    # 9. Apply negative log-sigmoid loss\n    loss_per_pair = -torch.nn.functional.logsigmoid(beta * loss_arg)\n\n    # 10. Apply optional weights and compute the mean loss\n    if weights is not None:\n        loss = (loss_per_pair * weights).sum() / weights.sum().clamp(min=epsilon)\n    else:\n        loss = loss_per_pair.mean()\n\n    return loss",
+    "theoretical_basis": "A Bradley-Terry logistic preference model where the target log-odds is a dynamically constructed margin. This margin is a blended sum of two components: one sensitive to cost differences via a fixed temperature, and another sensitive via a batch-adaptive temperature. The loss function's steepness (beta) is inversely coupled to the model's output variance, ensuring stability by softening the loss during periods of high uncertainty."
+  },
+  "fitness": {
+    "hf_like_score": 7.870896125793457,
+    "validation_objective": 7.8704054779052735,
+    "generalization_penalty": 0.0004906478881832044,
+    "generalization_objectives": {
+      "100": 7.870896125793457
+    },
+    "train_score_mean": 8.597075912331588,
+    "train_loss_mean": 0.5132152538782346,
+    "pair_count": 4951579292,
+    "early_eval": {
+      "enabled": true,
+      "steps": 100,
+      "baseline_validation_objective": 8.412976063537597,
+      "candidate_validation_objective": 8.334532046508789,
+      "early_stopped": false
+    },
+    "phases": {
+      "f1": {
+        "steps": 15630,
+        "train_score_mean": 8.597075912331588,
+        "train_loss_mean": 0.5132152538782346,
+        "pair_count": 4951579292
+      },
+      "f2": {
+        "steps": 0,
+        "train_score_mean": null,
+        "train_loss_mean": null,
+        "pair_count": 0
+      }
+    },
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 10,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          100
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 100,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:3",
+        "seed": 1234,
+        "num_validation_episodes": 10000,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 15630,
+        "f2_steps": 0,
+        "f3_enabled": false
+      }
+    },
+    "loss_ir": {
+      "name": "Adaptive_LogSigmoid_with_Dual_Adaptive_Margin",
+      "intuition": "Mode: combine. This loss function hybridizes the adaptive mechanisms of both parents to create a more nuanced and stable preference learning objective. It inherits the core `logsigmoid` loss structure, which is common to both parents and provides a solid probabilistic foundation. From Parent 1, it inherits the idea of an adaptive beta (temperature) for the `logsigmoid` function, which is inversely proportional to the standard deviation of `delta_logp`. This helps to soften the loss and prevent aggressive updates when the model's outputs are highly variable (i.e., it is uncertain). From Parent 2, it inherits the idea of making the cost temperature adaptive, based on the standard deviation of `delta_cost`. This makes the margin's sensitivity to cost differences dependent on the diversity of costs in the current batch. \n\nThe first new coupling idea is a **dual-component margin**. Instead of choosing one parent's margin, we combine them additively. The margin is now `margin = margin_A + margin_B`, where `margin_A` is the scaled cost-sigmoid from Parent 1 (`adaptive_scale * sigmoid(delta_cost / temp)`) and `margin_B` is a similar term using the adaptive temperature from Parent 2 (`adaptive_cost_temp`). This allows the margin to be influenced by both a fixed temperature and a batch-adaptive one, providing both stability and responsiveness. The second new coupling is a **dynamic re-weighting of the margin components**. I introduce a hyperparameter `alpha` (e.g., 0.5) to blend the two margin terms: `margin = alpha * margin_A + (1 - alpha) * margin_B`. This allows for explicit control over the influence of the fixed-temperature margin versus the adaptive-temperature margin, making the design more flexible and tunable. The overall structure remains a Bradley-Terry model with a sophisticated, dynamically constructed margin.",
+      "hyperparams": {
+        "fixed_temp": 1.0,
+        "alpha": 0.5,
+        "min_scale": 0.1,
+        "max_scale": 5.0,
+        "epsilon": 1e-08
+      },
+      "operators_used": [
+        "logsigmoid",
+        "sigmoid",
+        "clamp"
+      ]
+    }
+  }
+}

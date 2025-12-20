@@ -1,0 +1,47 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 7.89729854888916,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_FORWARD_ERROR",
+        "count": 26
+      },
+      {
+        "code": "E_LOSS_OUT_OF_RANGE",
+        "count": 15
+      },
+      {
+        "code": "E_COMPILE_ERROR",
+        "count": 6
+      },
+      {
+        "code": "E_EXPECTS_RETURNS_MISMATCH",
+        "count": 1
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 3,
+    "index": 3,
+    "name": "Adaptive_LogSigmoid_with_Dual_Adaptive_Margin",
+    "theoretical_basis": "A Bradley-Terry logistic preference model where the target log-odds is a dynamically constructed margin. This margin is a blended sum of two components: one sensitive to cost differences via a fixed temperature, and another sensitive via a batch-adaptive temperature. The loss function's steepness (beta) is inversely coupled to the model's output variance, ensuring stability by softening the loss during periods of high uncertainty.",
+    "operators_used": [
+      "logsigmoid",
+      "sigmoid",
+      "clamp"
+    ],
+    "hyperparams": {
+      "fixed_temp": 1.0,
+      "alpha": 0.5,
+      "min_scale": 0.1,
+      "max_scale": 5.0,
+      "epsilon": 1e-08
+    },
+    "hf_like_score": 7.870896125793457,
+    "validation_objective": 7.8704054779052735,
+    "generalization_penalty": 0.0004906478881832044,
+    "pair_count": 4951579292
+  }
+}
