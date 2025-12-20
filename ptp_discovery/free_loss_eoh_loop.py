@@ -20,6 +20,7 @@ from fitness.ptp_high_fidelity import (
     HighFidelityConfig,
     _set_seed,
     _evaluate_tsp_model,
+    get_hf_epoch_plan,
     get_total_hf_train_steps,
 )
 from ptp_discovery.free_loss_compiler import CompileError
@@ -156,6 +157,10 @@ def _build_global_feedback(
                 "hf_like_score": float(fitness.get("hf_like_score", float("inf"))),
                 "validation_objective": float(fitness.get("validation_objective", float("inf"))),
                 "generalization_penalty": float(fitness.get("generalization_penalty", 0.0)),
+                "epoch_objective_mean": float(fitness.get("epoch_objective_mean", float("inf")))
+                if fitness.get("epoch_objective_mean") is not None
+                else None,
+                "epoch_baseline_violations": fitness.get("epoch_baseline_violations"),
                 "pair_count": int(fitness.get("pair_count", 0) or 0),
             }
         )
@@ -263,6 +268,10 @@ def _write_run_analysis(
             "hf_like_score": float(fitness.get("hf_like_score", float("inf"))),
             "validation_objective": float(fitness.get("validation_objective", float("inf"))),
             "generalization_penalty": float(fitness.get("generalization_penalty", 0.0)),
+            "epoch_objective_mean": float(fitness.get("epoch_objective_mean", float("inf")))
+            if fitness.get("epoch_objective_mean") is not None
+            else None,
+            "epoch_baseline_violations": fitness.get("epoch_baseline_violations"),
             "pair_count": int(fitness.get("pair_count", 0) or 0),
         }
 
@@ -312,6 +321,7 @@ def _worker_evaluate_candidate(args: Tuple[
     int,
     int,
     float | None,
+    List[float] | None,
     int,
 ]) -> Tuple[int, Dict[str, Any]]:
     """Worker process: compile and evaluate a single candidate loss.
@@ -331,6 +341,7 @@ def _worker_evaluate_candidate(args: Tuple[
         gen,
         idx,
         baseline_early_valid,
+        baseline_epoch_objectives,
         early_eval_steps,
     ) = args
 
@@ -359,6 +370,9 @@ def _worker_evaluate_candidate(args: Tuple[
         f1_steps=int(free_cfg_dict.get("f1_steps", 32)),
         f2_steps=int(free_cfg_dict.get("f2_steps", 0)),
         f3_enabled=bool(free_cfg_dict.get("f3_enabled", False)),
+        baseline_epoch_violation_weight=float(
+            free_cfg_dict.get("baseline_epoch_violation_weight", 1.0)
+        ),
     )
 
     # Reconstruct IR and compiled loss in the worker.
@@ -372,6 +386,7 @@ def _worker_evaluate_candidate(args: Tuple[
             compiled,
             free_cfg,
             baseline_early_valid=baseline_early_valid,
+            baseline_epoch_objectives=baseline_epoch_objectives,
             early_eval_steps=early_eval_steps,
         )
     except Exception as exc:  # noqa: BLE001
@@ -393,6 +408,9 @@ def _worker_evaluate_candidate(args: Tuple[
             "validation_objective": worst_score,
             "generalization_penalty": 0.0,
             "generalization_objectives": {},
+            "epoch_objective_mean": None,
+            "epoch_baseline_violations": None,
+            "epoch_better_than_baseline": None,
             "train_score_mean": float("nan"),
             "train_loss_mean": float("nan"),
             "pair_count": 0,
@@ -402,6 +420,16 @@ def _worker_evaluate_candidate(args: Tuple[
                 "baseline_validation_objective": baseline_early_valid,
                 "candidate_validation_objective": None,
                 "early_stopped": False,
+            },
+            "epoch_eval": {
+                "enabled": False,
+                "steps_per_epoch": None,
+                "epochs_total": 0,
+                "objectives": [],
+                "objective_mean": None,
+                "baseline_margins": None,
+                "baseline_violations": None,
+                "better_than_baseline": None,
             },
         }
         fitness["eval_error"] = str(exc)
@@ -433,6 +461,7 @@ def _device_worker(
         int,
         int,
         float | None,
+        List[float] | None,
         int,
     ]],
     result_queue: "mp.Queue[Tuple[int, Dict[str, Any]]]",
@@ -576,6 +605,8 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
     score_meter = AverageMeter()
     loss_meter = AverageMeter()
     total_steps = get_total_hf_train_steps(cfg)
+    steps_per_epoch, epochs_total = get_hf_epoch_plan(cfg)
+    epoch_validation_objectives: List[float] = []
     # For early comparison we fix an absolute step budget (e.g., 100).
     early_eval_steps = min(100, total_steps)
     early_validation_objective: float | None = None
@@ -608,6 +639,23 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
                 float(score_meter.avg),
                 loss,
                 float(loss_meter.avg),
+            )
+        if steps_per_epoch > 0 and (step + 1) % steps_per_epoch == 0:
+            epoch_idx = (step + 1) // steps_per_epoch
+            epoch_valid_obj = _evaluate_tsp_model(
+                model=model,
+                problem_size=cfg.train_problem_size,
+                pomo_size=cfg.pomo_size,
+                device=device,
+                num_episodes=cfg.num_validation_episodes,
+                batch_size=cfg.validation_batch_size,
+            )
+            epoch_validation_objectives.append(epoch_valid_obj)
+            LOGGER.info(
+                "Baseline PO epoch %d/%d: validation_objective=%.6f",
+                epoch_idx,
+                epochs_total,
+                epoch_valid_obj,
             )
         if (step + 1) == early_eval_steps:
             # Early baseline performance for comparison with candidate losses.
@@ -648,7 +696,17 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
     max_gen_obj = max(gen_objectives.values()) if gen_objectives else main_valid_obj
     generalization_penalty = max(0.0, max_gen_obj - main_valid_obj)
 
+    epoch_objective_mean: float | None = None
+    if epoch_validation_objectives:
+        epoch_objective_mean = float(
+            sum(epoch_validation_objectives) / len(epoch_validation_objectives)
+        )
+
+    base_objective = (
+        epoch_objective_mean if epoch_objective_mean is not None else main_valid_obj
+    )
     hf_score = main_valid_obj + cfg.generalization_penalty_weight * generalization_penalty
+    fitness_score = base_objective + cfg.generalization_penalty_weight * generalization_penalty
 
     LOGGER.info(
         "Baseline PO timing: init=%.3fs, train=%.3fs, eval=%.3fs",
@@ -659,6 +717,7 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
 
     return {
         "hf_score": hf_score,
+        "fitness_score": fitness_score,
         "validation_objective": main_valid_obj,
         "generalization_penalty": generalization_penalty,
         "generalization_objectives": gen_objectives,
@@ -666,6 +725,13 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
         "train_loss_mean": float(loss_meter.avg),
         "early_validation_objective": early_validation_objective,
         "early_eval_steps": early_eval_steps,
+        "epoch_eval": {
+            "enabled": bool(steps_per_epoch),
+            "steps_per_epoch": int(steps_per_epoch) if steps_per_epoch > 0 else None,
+            "epochs_total": int(epochs_total),
+            "objectives": epoch_validation_objectives,
+            "objective_mean": epoch_objective_mean,
+        },
         "config": {
             "hf": cfg.__dict__,
             "baseline_type": "po_loss",
@@ -717,16 +783,21 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         f1_steps=int(cfg_yaml.get("f1_steps", 32)),
         f2_steps=int(cfg_yaml.get("f2_steps", 0)),
         f3_enabled=bool(cfg_yaml.get("f3_enabled", False)),
+        baseline_epoch_violation_weight=float(
+            cfg_yaml.get("baseline_epoch_violation_weight", 1.0)
+        ),
     )
     hf_cfg_dict: Dict[str, Any] = dict(hf_cfg.__dict__)
     free_cfg_dict: Dict[str, Any] = {
         "f1_steps": free_cfg.f1_steps,
         "f2_steps": free_cfg.f2_steps,
         "f3_enabled": free_cfg.f3_enabled,
+        "baseline_epoch_violation_weight": free_cfg.baseline_epoch_violation_weight,
     }
 
     baseline_hf_score: float | None = None
     baseline_early_valid: float | None = None
+    baseline_epoch_objectives: List[float] | None = None
     burn_in_objectives: List[Dict[str, Any]] = []
 
     # Baseline: evaluate the original POMO po_loss once, using the same HF
@@ -734,25 +805,33 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     # free-form preference losses.
     try:
         baseline = evaluate_po_baseline(hf_cfg)
-        baseline_hf_score = float(baseline["hf_score"])
+        baseline_hf_score = float(baseline.get("fitness_score", baseline["hf_score"]))
         baseline_early_valid = float(
-            baseline.get("early_validation_objective", baseline_hf_score)
+            baseline.get("early_validation_objective", baseline["validation_objective"])
         )
+        baseline_epoch_objectives = baseline.get("epoch_eval", {}).get("objectives")
+        if baseline_epoch_objectives:
+            baseline_epoch_objectives = [float(v) for v in baseline_epoch_objectives]
         burn_in_objectives.append(
             {
                 "name": "po_loss_baseline",
                 "type": "handcrafted_loss",
                 "description": "Original POMO policy optimization loss (po_loss).",
-                "hf_like_score": float(baseline["hf_score"]),
+                "hf_like_score": float(baseline.get("fitness_score", baseline["hf_score"])),
+                "fitness_score": float(baseline.get("fitness_score", baseline["hf_score"])),
                 "validation_objective": float(baseline["validation_objective"]),
                 "generalization_penalty": float(baseline["generalization_penalty"]),
                 "early_validation_objective": baseline.get("early_validation_objective"),
                 "early_eval_steps": baseline.get("early_eval_steps"),
+                "epoch_objective_mean": baseline.get("epoch_eval", {}).get("objective_mean"),
+                "epoch_validation_objectives": baseline.get("epoch_eval", {}).get("objectives"),
+                "epoch_steps_per_epoch": baseline.get("epoch_eval", {}).get("steps_per_epoch"),
             }
         )
         LOGGER.info(
-            "Baseline po_loss: hf_score=%.6f, validation_objective=%.6f, gen_penalty=%.6f",
+            "Baseline po_loss: hf_score=%.6f, fitness_score=%.6f, validation_objective=%.6f, gen_penalty=%.6f",
             baseline["hf_score"],
+            baseline.get("fitness_score", baseline["hf_score"]),
             baseline["validation_objective"],
             baseline["generalization_penalty"],
         )
@@ -853,7 +932,19 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         # Collect candidates that pass all gates and evaluate them in
         # parallel across available devices.
         eval_jobs: List[
-            Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], str, List[str], str, int, int, float | None, int]
+            Tuple[
+                Dict[str, Any],
+                Dict[str, Any],
+                Dict[str, Any],
+                str,
+                List[str],
+                str,
+                int,
+                int,
+                float | None,
+                List[float] | None,
+                int,
+            ]
         ] = []
         eval_candidates: Dict[int, FreeLossIR] = {}
 
@@ -1034,6 +1125,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                         gen,
                         idx,
                         baseline_early_valid,
+                        baseline_epoch_objectives,
                         100,
                     )
                 )
@@ -1063,6 +1155,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     int,
                     int,
                     float | None,
+                    List[float] | None,
                     int,
                 ]
             ]] = {dev: [] for dev in devices}
@@ -1099,18 +1192,25 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             ir = eval_candidates[idx]
 
             hf_like_score = float(fitness["hf_like_score"])
+            epoch_mean = fitness.get("epoch_objective_mean")
+            epoch_mean_val = float(epoch_mean) if epoch_mean is not None else float("nan")
+            epoch_violations = fitness.get("epoch_baseline_violations")
             better_than_baseline = None
-            if baseline_hf_score is not None:
+            if baseline_epoch_objectives is not None:
+                better_than_baseline = bool(epoch_violations == 0)
+            elif baseline_hf_score is not None:
                 # Lower score is better.
                 better_than_baseline = hf_like_score <= baseline_hf_score
 
             LOGGER.info(
                 "Gen %d cand %d: hf_like_score=%.6f, validation_objective=%.6f, "
-                "baseline=%.6f, better_than_baseline=%s",
+                "epoch_mean=%.6f, epoch_violations=%s, baseline=%.6f, better_than_baseline=%s",
                 gen,
                 idx,
                 hf_like_score,
                 float(fitness["validation_objective"]),
+                epoch_mean_val,
+                str(epoch_violations),
                 float(baseline_hf_score) if baseline_hf_score is not None else float("nan"),
                 str(better_than_baseline),
             )
@@ -1129,6 +1229,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     "index": idx,
                     "hf_like_score": fitness["hf_like_score"],
                     "validation_objective": fitness["validation_objective"],
+                    "epoch_objective_mean": epoch_mean,
+                    "epoch_baseline_violations": epoch_violations,
+                    "epoch_better_than_baseline": fitness.get("epoch_better_than_baseline"),
                     "baseline_hf_score": baseline_hf_score,
                     "better_than_baseline": better_than_baseline,
                 }
@@ -1144,6 +1247,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         def _elite_key(entry: Dict[str, Any]) -> Tuple[float, float, float]:
             score = float(entry["fitness"]["hf_like_score"])
             pair_count = float(entry["fitness"].get("pair_count", 0) or 0)
+            violations = entry["fitness"].get("epoch_baseline_violations")
+            if violations is not None:
+                return (float(violations), score, pair_count)
             if baseline_hf_score is None:
                 # Fallback: purely score-based, with pair_count as a tie-breaker.
                 return (0.0, score, pair_count)

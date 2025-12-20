@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from typing import Any, Dict, Mapping, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Sequence, Tuple
 
 import logging
 import torch
@@ -11,6 +11,7 @@ from .ptp_high_fidelity import (
     HighFidelityConfig,
     _set_seed,
     _evaluate_tsp_model,
+    get_hf_epoch_plan,
     get_total_hf_train_steps,
 )
 from ptp_discovery.free_loss_compiler import CompiledFreeLoss
@@ -29,6 +30,7 @@ class FreeLossFidelityConfig:
     f1_steps: int = 32
     f2_steps: int = 0
     f3_enabled: bool = False
+    baseline_epoch_violation_weight: float = 1.0
 
 
 def _build_preference_pairs(
@@ -126,6 +128,7 @@ def evaluate_free_loss_candidate(
     *,
     baseline_early_valid: float | None = None,
     early_eval_steps: int = 0,
+    baseline_epoch_objectives: Sequence[float] | None = None,
 ) -> Dict[str, Any]:
     _set_seed(cfg.hf.seed)
 
@@ -175,6 +178,8 @@ def evaluate_free_loss_candidate(
     steps_f1 = get_total_hf_train_steps(cfg.hf)
     steps_f2 = max(int(cfg.f2_steps), 0)
     steps = steps_f1 + steps_f2
+    steps_per_epoch, epochs_total = get_hf_epoch_plan(cfg.hf)
+    epoch_validation_objectives: List[float] = []
 
     score_meter_f1 = AverageMeter()
     loss_meter_f1 = AverageMeter()
@@ -231,6 +236,25 @@ def evaluate_free_loss_candidate(
                 total_pairs,
             )
 
+        if steps_per_epoch > 0 and (step + 1) % steps_per_epoch == 0:
+            epoch_idx = (step + 1) // steps_per_epoch
+            if epoch_idx <= epochs_total:
+                epoch_valid_obj = _evaluate_tsp_model(
+                    model=model,
+                    problem_size=cfg.hf.train_problem_size,
+                    pomo_size=cfg.hf.pomo_size,
+                    device=device,
+                    num_episodes=cfg.hf.num_validation_episodes,
+                    batch_size=cfg.hf.validation_batch_size,
+                )
+                epoch_validation_objectives.append(epoch_valid_obj)
+                logger.info(
+                    "Free-loss epoch %d/%d: validation_objective=%.6f",
+                    epoch_idx,
+                    epochs_total,
+                    epoch_valid_obj,
+                )
+
         # Early evaluation for comparison with the baseline after a small
         # fixed number of steps (e.g., 100). If the candidate performs
         # strictly worse than the baseline at this horizon, we stop training
@@ -285,7 +309,34 @@ def evaluate_free_loss_candidate(
     max_gen_obj = max(gen_objectives.values()) if gen_objectives else main_valid_obj
     generalization_penalty = max(0.0, max_gen_obj - main_valid_obj)
 
-    hf_like_score = main_valid_obj + cfg.hf.generalization_penalty_weight * generalization_penalty
+    epoch_objective_mean: float | None = None
+    if epoch_validation_objectives:
+        epoch_objective_mean = float(
+            sum(epoch_validation_objectives) / len(epoch_validation_objectives)
+        )
+
+    epoch_baseline_violations: int | None = None
+    epoch_better_than_baseline: bool | None = None
+    epoch_baseline_margins: List[float] | None = None
+    if baseline_epoch_objectives:
+        baseline_list = [float(v) for v in baseline_epoch_objectives]
+        compare_len = min(len(epoch_validation_objectives), len(baseline_list))
+        epoch_baseline_margins = []
+        for i in range(compare_len):
+            margin = float(epoch_validation_objectives[i]) - baseline_list[i]
+            epoch_baseline_margins.append(margin)
+        violations = sum(1 for m in epoch_baseline_margins if m > 0.0)
+        missing = max(len(baseline_list) - len(epoch_validation_objectives), 0)
+        violations += missing
+        epoch_baseline_violations = int(violations)
+        epoch_better_than_baseline = epoch_baseline_violations == 0
+
+    base_objective = (
+        epoch_objective_mean if epoch_objective_mean is not None else main_valid_obj
+    )
+    hf_like_score = base_objective + cfg.hf.generalization_penalty_weight * generalization_penalty
+    if epoch_baseline_violations is not None:
+        hf_like_score += cfg.baseline_epoch_violation_weight * float(epoch_baseline_violations)
 
     logger.info(
         "Free-loss timing: init=%.3fs, train=%.3fs, eval=%.3fs",
@@ -299,6 +350,19 @@ def evaluate_free_loss_candidate(
         "validation_objective": main_valid_obj,
         "generalization_penalty": generalization_penalty,
         "generalization_objectives": gen_objectives,
+        "epoch_objective_mean": epoch_objective_mean,
+        "epoch_baseline_violations": epoch_baseline_violations,
+        "epoch_better_than_baseline": epoch_better_than_baseline,
+        "epoch_eval": {
+            "enabled": bool(steps_per_epoch),
+            "steps_per_epoch": int(steps_per_epoch) if steps_per_epoch > 0 else None,
+            "epochs_total": int(epochs_total),
+            "objectives": epoch_validation_objectives,
+            "objective_mean": epoch_objective_mean,
+            "baseline_margins": epoch_baseline_margins,
+            "baseline_violations": epoch_baseline_violations,
+            "better_than_baseline": epoch_better_than_baseline,
+        },
         "train_score_mean": float(score_meter.avg),
         "train_loss_mean": float(loss_meter.avg),
         "pair_count": int(total_pairs),
@@ -332,6 +396,7 @@ def evaluate_free_loss_candidate(
                 "total_train_steps": steps,
                 "f2_steps": cfg.f2_steps,
                 "f3_enabled": cfg.f3_enabled,
+                "baseline_epoch_violation_weight": cfg.baseline_epoch_violation_weight,
             },
         },
         "loss_ir": {

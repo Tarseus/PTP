@@ -42,6 +42,7 @@ device: cuda
 num_validation_episodes: 10000
 validation_batch_size: 64
 generalization_penalty_weight: 1.0
+baseline_epoch_violation_weight: 1.0
 
 # Gate thresholds for dynamic checks.
 grad_norm_max: 10.0

@@ -90,6 +90,21 @@ def get_total_hf_train_steps(config: HighFidelityConfig) -> int:
     return max(int(config.hf_steps), 1)
 
 
+def get_hf_epoch_plan(config: HighFidelityConfig) -> Tuple[int, int]:
+    """Return (steps_per_epoch, epochs_total) for epoch-style HF configs.
+
+    When hf_epochs and hf_instances_per_epoch are set, we derive the number
+    of training steps per epoch; otherwise, return (0, 0).
+    """
+
+    if config.hf_epochs > 0 and config.hf_instances_per_epoch > 0:
+        batch_size = max(int(config.train_batch_size), 1)
+        steps_per_epoch = math.ceil(config.hf_instances_per_epoch / batch_size)
+        return max(int(steps_per_epoch), 1), int(config.hf_epochs)
+
+    return 0, 0
+
+
 def _set_seed(seed: int) -> None:
     random.seed(seed)
     np.random.seed(seed)

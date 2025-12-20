@@ -77,6 +77,9 @@ def _build_hf_configs_from_yaml(
         f1_steps=int(cfg_yaml.get("f1_steps", 32)),
         f2_steps=int(cfg_yaml.get("f2_steps", 0)),
         f3_enabled=bool(cfg_yaml.get("f3_enabled", False)),
+        baseline_epoch_violation_weight=float(
+            cfg_yaml.get("baseline_epoch_violation_weight", 1.0)
+        ),
     )
 
     operator_whitelist = list(cfg_yaml.get("operator_whitelist", []))
@@ -157,6 +160,7 @@ def _run_sequential_sanity_check(
             f1_steps=free_cfg.f1_steps,
             f2_steps=free_cfg.f2_steps,
             f3_enabled=free_cfg.f3_enabled,
+            baseline_epoch_violation_weight=free_cfg.baseline_epoch_violation_weight,
         )
 
         LOGGER.info(
@@ -262,4 +266,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
