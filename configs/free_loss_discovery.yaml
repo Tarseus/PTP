@@ -43,11 +43,27 @@ num_validation_episodes: 10000
 validation_batch_size: 64
 generalization_penalty_weight: 1.0
 baseline_epoch_violation_weight: 1.0
+pref_semantic_gate_enabled: true
+pref_semantic_trials: 6
+pref_semantic_batch_size: 128
+pref_semantic_min_pass_rate: 0.8
+pref_semantic_swap_tolerance: 0.001
+pref_semantic_gap_min_ratio: 0.9
 
 # Gate thresholds for dynamic checks.
 grad_norm_max: 10.0
 loss_soft_min: -5.0
 loss_soft_max: 5.0
+max_resample_rounds: 1
+
+# Diversity / novelty configuration.
+novelty_behavior_deltas: [-10, -5, -2, -1, 0, 1, 2, 5, 10]
+novelty_k: 5
+novelty_ops_weight: 1.0
+novelty_hparam_weight: 0.5
+novelty_behavior_weight: 1.0
+diversity_archive_size: 32
+burn_in_objectives_auto: true
 
 # Whitelist of allowed operators in free-form losses.
 operator_whitelist:

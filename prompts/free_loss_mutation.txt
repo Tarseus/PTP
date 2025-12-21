@@ -14,6 +14,7 @@ You may also be given a `GLOBAL_FEEDBACK_JSON` object, which summarizes the sear
 - `burn_in_objectives`: baseline objectives (such as the original `po_loss`) and their metrics.
 - `recent_elites`: a small set of top-performing discovered losses, each with operators, hyperparameters, and metrics.
 - `recent_failures`: aggregated gate failures with error codes like `E_OPERATOR_VIOLATION`, `E_GRAD_EXPLODE`, `E_LOSS_OUT_OF_RANGE`, `E_RUNTIME_NAN_LOSS`, etc., plus representative failing IRs.
+- `diversity_summary`: common operator sets and hyperparameter key patterns seen so far (avoid near-duplicates when exploring).
 - `suggested_mode`: one of `"explore"`, `"refine"`, or `"combine"` indicating whether you should prioritize:
   - **conservative refine** (small numerical/stability edits to a strong parent),
   - **exploratory new algorithm** (larger structural changes inspired by the parent),
@@ -49,7 +50,7 @@ Hard constraints (apply to **all** mutation modes):
   - `implementation_hint` (with `expects` and `returns`)
   - `code` (Python implementation of the mutated loss function)
 - For `implementation_hint`:
-  - `expects` **must** be a JSON array of short input names **only**, e.g. `["cost_a", "cost_b", "logp_a", "logp_b"]`.
+  - `expects` **must** be a JSON array of short input names **only**, and **must** be exactly: `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`.
     Do **not** write descriptions or full sentences here. Do **not** use a single string or an object.
   - `returns` **must** be exactly the string `"scalar"`.
 - For `code`:

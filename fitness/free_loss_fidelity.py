@@ -98,13 +98,11 @@ def _train_one_batch_with_free_loss(
         logp_w_tensor = log_prob[b_idx, winner_idx]
         logp_l_tensor = log_prob[b_idx, loser_idx]
 
-        weight = torch.ones_like(cost_a_tensor)
         batch = {
             "cost_a": cost_a_tensor,
             "cost_b": cost_b_tensor,
             "log_prob_w": logp_w_tensor,
             "log_prob_l": logp_l_tensor,
-            "weight": weight,
         }
         loss = compiled_loss.loss_fn(
             batch=batch,

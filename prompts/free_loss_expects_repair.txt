@@ -11,15 +11,14 @@ You will receive `IR_JSON`, which contains a single loss IR object with fields l
 Your task:
 - Leave all fields **unchanged** except `implementation_hint.expects`.
 - Rewrite `implementation_hint.expects` so that:
-  - It is a JSON **array** of short input names only, for example:
-    - `["cost_a", "cost_b", "logp_a", "logp_b"]`
+  - It is a JSON **array** of short input names only, and **must** be exactly:
+    - `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`
   - It does **not** contain descriptions, full sentences, or comments.
   - It does **not** contain nested objects or a single string; only a flat list of names.
 - Do **not** change `implementation_hint.returns` unless it is incompatible with `"scalar"`; in that case, set it to `"scalar"`.
 
 Examples of good `expects`:
-- `["cost_a", "cost_b", "logp_a", "logp_b"]`
-- `["cost_chosen", "cost_rejected", "logp_chosen", "logp_rejected"]`
+- `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`
 
 **Output requirements:**
 - Output **must** be a single JSON object that is a corrected version of the given IR.
@@ -27,4 +26,3 @@ Examples of good `expects`:
 - All text fields must be in **English only**.
 
 Return only the corrected JSON object, with no extra explanation or Markdown code fences.
-

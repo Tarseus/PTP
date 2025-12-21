@@ -196,6 +196,20 @@ def _build_operator_table() -> Dict[str, Callable[..., torch.Tensor]]:
     }
 
 
+class _OpsAccessor:
+    def __init__(self, table: Dict[str, Callable[..., torch.Tensor]]) -> None:
+        self._table = dict(table)
+
+    def __getattr__(self, name: str) -> Callable[..., torch.Tensor]:
+        try:
+            return self._table[name]
+        except KeyError as exc:
+            raise AttributeError(name) from exc
+
+    def __getitem__(self, name: str) -> Callable[..., torch.Tensor]:
+        return self._table[name]
+
+
 def parse_free_loss_from_text(text: str) -> FreeLossIR:
     obj = _extract_json_object(text)
     return ir_from_json(obj)
@@ -213,12 +227,17 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
     if code_str:
         _validate_user_code(code_str)
 
+        ops_table = _build_operator_table()
+        if operator_whitelist:
+            ops_table = {k: v for k, v in ops_table.items() if k in operator_whitelist}
+
         # Execute in a tightly restricted namespace. We deliberately strip
         # builtins to avoid access to filesystem, subprocesses, etc.
         safe_globals: Dict[str, Any] = {
             "__builtins__": {},
             "torch": torch,
             "F": F,
+            "ops": _OpsAccessor(ops_table),
         }
         local_ns: Dict[str, Any] = {}
         try:
@@ -245,6 +264,8 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
         # Backward-compatible fallback: use a simple template-based loss
         # when no explicit code is provided in the IR.
         table = _build_operator_table()
+        if operator_whitelist:
+            table = {k: v for k, v in table.items() if k in operator_whitelist}
 
         def _resolve_hparam(raw: Any, default: float) -> float:
             if isinstance(raw, dict):

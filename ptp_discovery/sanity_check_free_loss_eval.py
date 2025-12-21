@@ -91,9 +91,9 @@ def _build_sanity_ir(operator_whitelist: List[str]) -> FreeLossIR:
     """Construct a simple, known-good free-loss IR.
 
     This intentionally matches the fallback template in compile_free_loss:
-    it consumes (cost_a, cost_b, log_prob_w, log_prob_l, weight) and
-    applies a rank-gap/logsigmoid-style loss. The goal is to exercise the
-    same training code path as discovery, without requiring an LLM.
+    it consumes (cost_a, cost_b, log_prob_w, log_prob_l) and applies a
+    rank-gap/logsigmoid-style loss. The goal is to exercise the same
+    training code path as discovery, without requiring an LLM.
     """
 
     impl = FreeLossImplementationHint(
@@ -102,7 +102,6 @@ def _build_sanity_ir(operator_whitelist: List[str]) -> FreeLossIR:
             "cost_b",
             "log_prob_w",
             "log_prob_l",
-            "weight",
         ],
         returns="scalar",
     )

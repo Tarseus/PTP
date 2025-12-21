@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import ast
+import hashlib
 import json
 import os
 import time
 import logging
 import multiprocessing as mp
 from dataclasses import asdict
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Sequence, Tuple
 
 import torch
 import torch.nn.functional as F
@@ -26,8 +28,10 @@ from fitness.ptp_high_fidelity import (
 from ptp_discovery.free_loss_compiler import CompileError
 from ptp_discovery.free_loss_gates import (
     DynamicGateResult,
+    PreferenceSemanticGateResult,
     StaticGateResult,
     run_dynamic_gates,
+    run_preference_semantic_gates,
     run_static_gates,
 )
 from ptp_discovery.free_loss_ir import FreeLossIR, ir_from_json
@@ -47,6 +51,7 @@ from torch.optim import Adam
 
 
 LOGGER = logging.getLogger("ptp_discovery.free_loss_eoh")
+_REQUIRED_BATCH_KEYS = ("cost_a", "cost_b", "log_prob_w", "log_prob_l")
 
 
 def _classify_failure(stage: str, reason: str) -> str:
@@ -64,6 +69,8 @@ def _classify_failure(stage: str, reason: str) -> str:
             return "E_STATIC_MISSING_NAME"
         if "missing pseudocode" in msg:
             return "E_STATIC_MISSING_PSEUDOCODE"
+        if "duplicate_candidate" in msg:
+            return "E_DUPLICATE"
         if "operators_used must be non-empty" in msg:
             return "E_STATIC_EMPTY_OPERATORS"
         if "non-whitelisted operators" in msg:
@@ -80,6 +87,20 @@ def _classify_failure(stage: str, reason: str) -> str:
         return "E_COMPILE_ERROR"
 
     if stage == "dynamic":
+        if "missing_dependency" in msg:
+            return "E_MISSING_DEPENDENCY"
+        if (
+            "missing_batch_key" in msg
+            or "extra_batch_key" in msg
+            or "invalid_expects" in msg
+            or "missing_expects" in msg
+            or "unsupported_expects" in msg
+        ):
+            return "E_INPUT_MISMATCH"
+        if "pref_semantic_violation" in msg:
+            return "E_PREF_SEMANTIC"
+        if "pref_" in msg:
+            return "E_PREF_SEMANTIC"
         if "loss is not finite" in msg:
             return "E_RUNTIME_NAN_LOSS"
         if "nan/inf in gradients" in msg:
@@ -96,6 +117,289 @@ def _classify_failure(stage: str, reason: str) -> str:
 
     return "E_UNKNOWN"
 
+
+class _SignatureNormalizer(ast.NodeTransformer):
+    def visit_Constant(self, node: ast.Constant) -> ast.AST:  # type: ignore[override]
+        if isinstance(node.value, (int, float)):
+            return ast.copy_location(ast.Constant(value=0), node)
+        if isinstance(node.value, str):
+            return ast.copy_location(ast.Constant(value=""), node)
+        return node
+
+    def visit_Name(self, node: ast.Name) -> ast.AST:  # type: ignore[override]
+        return ast.copy_location(ast.Name(id="v", ctx=node.ctx), node)
+
+    def visit_arg(self, node: ast.arg) -> ast.AST:  # type: ignore[override]
+        return ast.copy_location(ast.arg(arg="v", annotation=None), node)
+
+
+def _candidate_signature(ir: FreeLossIR) -> str:
+    code_str = (ir.code or "").strip()
+    if code_str:
+        try:
+            tree = ast.parse(code_str, mode="exec")
+            tree = _SignatureNormalizer().visit(tree)
+            ast.fix_missing_locations(tree)
+            dump = ast.dump(tree, include_attributes=False)
+        except Exception:
+            dump = code_str
+        digest = hashlib.sha1(dump.encode("utf-8")).hexdigest()
+        return f"code:{digest}"
+
+    ops = ",".join(sorted(ir.operators_used or []))
+    hp_keys = ",".join(sorted((ir.hyperparams or {}).keys()))
+    return f"template:{ops}|{hp_keys}"
+
+
+def _behavior_descriptor(
+    compiled: Any,
+    *,
+    deltas: Sequence[float],
+    batch_size: int,
+) -> List[float] | None:
+    if not deltas:
+        return []
+
+    vec: List[float] = []
+    for delta in deltas:
+        cost_a = torch.rand(batch_size)
+        gap = torch.rand(batch_size)
+        cost_b = cost_a + gap
+
+        log_prob_l = torch.empty(batch_size).uniform_(-20.0, 0.0)
+        log_prob_w = log_prob_l + float(delta)
+        log_prob_l = log_prob_l.clone().detach().requires_grad_(True)
+        log_prob_w = log_prob_w.clone().detach().requires_grad_(True)
+
+        batch = {
+            "cost_a": cost_a,
+            "cost_b": cost_b,
+            "log_prob_w": log_prob_w,
+            "log_prob_l": log_prob_l,
+        }
+        try:
+            loss = compiled.loss_fn(batch=batch, model_output={}, extra={})
+        except Exception:
+            return None
+        if not torch.isfinite(loss):
+            return None
+
+        grad_w, grad_l = torch.autograd.grad(
+            loss,
+            [log_prob_w, log_prob_l],
+            allow_unused=True,
+        )
+        if grad_w is None or grad_l is None:
+            return None
+
+        vec.append(float(loss.item()))
+        grad_delta = (grad_w - grad_l).mean().item()
+        vec.append(float(grad_delta))
+
+    return vec
+
+
+def _jaccard_distance(a: Sequence[str], b: Sequence[str]) -> float:
+    set_a = set(a)
+    set_b = set(b)
+    if not set_a and not set_b:
+        return 0.0
+    union = set_a | set_b
+    inter = set_a & set_b
+    return 1.0 - (len(inter) / len(union))
+
+
+def _descriptor_distance(
+    a: Dict[str, Any],
+    b: Dict[str, Any],
+    *,
+    ops_weight: float,
+    hparam_weight: float,
+    behavior_weight: float,
+) -> float:
+    beh_a = a.get("behavior") or []
+    beh_b = b.get("behavior") or []
+    beh_dist = 0.0
+    if beh_a and beh_b and len(beh_a) == len(beh_b):
+        beh_dist = sum((x - y) ** 2 for x, y in zip(beh_a, beh_b)) ** 0.5
+
+    ops_dist = _jaccard_distance(a.get("ops", []), b.get("ops", []))
+    hp_dist = _jaccard_distance(a.get("hyperparams", []), b.get("hyperparams", []))
+
+    return behavior_weight * beh_dist + ops_weight * ops_dist + hparam_weight * hp_dist
+
+
+def _novelty_score(
+    desc: Dict[str, Any] | None,
+    archive: List[Dict[str, Any]],
+    *,
+    k: int,
+    ops_weight: float,
+    hparam_weight: float,
+    behavior_weight: float,
+) -> float:
+    if desc is None:
+        return 0.0
+    if not archive:
+        return 0.0
+    distances = [
+        _descriptor_distance(
+            desc,
+            other,
+            ops_weight=ops_weight,
+            hparam_weight=hparam_weight,
+            behavior_weight=behavior_weight,
+        )
+        for other in archive
+    ]
+    distances.sort()
+    top_k = distances[: max(1, min(k, len(distances)))]
+    return float(sum(top_k) / len(top_k))
+
+
+def _pareto_ranks(entries: List[Dict[str, Any]]) -> List[int]:
+    n = len(entries)
+    ranks = [0] * n
+    dominated_by = [0] * n
+    dominates: List[List[int]] = [[] for _ in range(n)]
+    fronts: List[List[int]] = [[]]
+
+    def _dominates(a: Dict[str, Any], b: Dict[str, Any]) -> bool:
+        a_fit = float(a["fitness"]["hf_like_score"])
+        b_fit = float(b["fitness"]["hf_like_score"])
+        a_nov = float(a.get("novelty", 0.0))
+        b_nov = float(b.get("novelty", 0.0))
+        return (a_fit <= b_fit and a_nov >= b_nov) and (a_fit < b_fit or a_nov > b_nov)
+
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                continue
+            if _dominates(entries[i], entries[j]):
+                dominates[i].append(j)
+            elif _dominates(entries[j], entries[i]):
+                dominated_by[i] += 1
+        if dominated_by[i] == 0:
+            ranks[i] = 0
+            fronts[0].append(i)
+
+    current = 0
+    while fronts[current]:
+        next_front: List[int] = []
+        for i in fronts[current]:
+            for j in dominates[i]:
+                dominated_by[j] -= 1
+                if dominated_by[j] == 0:
+                    ranks[j] = current + 1
+                    next_front.append(j)
+        current += 1
+        fronts.append(next_front)
+
+    return ranks
+
+
+def _select_parents(entries: List[Dict[str, Any]], k: int) -> List[Dict[str, Any]]:
+    if not entries:
+        return []
+    ranks = _pareto_ranks(entries)
+    ranked = sorted(
+        zip(entries, ranks),
+        key=lambda x: (x[1], -float(x[0].get("novelty", 0.0)), float(x[0]["fitness"]["hf_like_score"])),
+    )
+    return [entry for entry, _ in ranked[:k]]
+
+
+def _summarize_diversity(archive: List[Dict[str, Any]], top_k: int = 5) -> Dict[str, Any]:
+    op_counts: Dict[str, int] = {}
+    hp_counts: Dict[str, int] = {}
+    for entry in archive:
+        ops = tuple(sorted(entry.get("ops", [])))
+        op_counts[str(ops)] = op_counts.get(str(ops), 0) + 1
+        hps = tuple(sorted(entry.get("hyperparams", [])))
+        hp_counts[str(hps)] = hp_counts.get(str(hps), 0) + 1
+
+    op_common = sorted(op_counts.items(), key=lambda kv: kv[1], reverse=True)[:top_k]
+    hp_common = sorted(hp_counts.items(), key=lambda kv: kv[1], reverse=True)[:top_k]
+
+    return {
+        "common_operator_sets": [{"operators_used": k, "count": v} for k, v in op_common],
+        "common_hparam_keys": [{"hyperparams": k, "count": v} for k, v in hp_common],
+    }
+
+
+def _build_auto_seed_objectives() -> List[Dict[str, Any]]:
+    return [
+        {
+            "name": "seed_logsigmoid",
+            "type": "auto_seed",
+            "description": "Base Bradley-Terry style loss: -logsigmoid(alpha * (logp_w - logp_l)).",
+            "operators_used": ["logsigmoid"],
+            "hyperparams": {"alpha": 1.0},
+        },
+        {
+            "name": "seed_softplus_margin",
+            "type": "auto_seed",
+            "description": "Softplus hinge: softplus(margin - (logp_w - logp_l)).",
+            "operators_used": ["softplus"],
+            "hyperparams": {"margin": 0.5},
+        },
+        {
+            "name": "seed_focal_logsigmoid",
+            "type": "auto_seed",
+            "description": "Focal modulated: exp(gamma * log(1 - sigmoid(delta))) * -logsigmoid(delta).",
+            "operators_used": ["sigmoid", "logsigmoid", "exp", "log"],
+            "hyperparams": {"gamma": 2.0},
+        },
+        {
+            "name": "seed_cost_gap_margin",
+            "type": "auto_seed",
+            "description": "Margin grows with cost gap: margin = beta * (cost_b - cost_a).",
+            "operators_used": ["logsigmoid"],
+            "hyperparams": {"beta": 1.0},
+        },
+        {
+            "name": "seed_softplus_cost_scale",
+            "type": "auto_seed",
+            "description": "Scale by softplus(cost_gap): softplus(cost_gap) * -logsigmoid(delta).",
+            "operators_used": ["softplus", "logsigmoid"],
+            "hyperparams": {},
+        },
+        {
+            "name": "seed_tanh_margin",
+            "type": "auto_seed",
+            "description": "Tanh margin: margin = tanh(scale * cost_gap).",
+            "operators_used": ["tanh", "logsigmoid"],
+            "hyperparams": {"scale": 1.0},
+        },
+        {
+            "name": "seed_exp_penalty",
+            "type": "auto_seed",
+            "description": "Exponential penalty on negative delta: exp(-delta).",
+            "operators_used": ["exp"],
+            "hyperparams": {},
+        },
+        {
+            "name": "seed_sigmoid_margin",
+            "type": "auto_seed",
+            "description": "Sigmoid margin: margin = sigmoid(beta * cost_gap).",
+            "operators_used": ["sigmoid", "logsigmoid"],
+            "hyperparams": {"beta": 1.0},
+        },
+        {
+            "name": "seed_mix_logsigmoid_softplus",
+            "type": "auto_seed",
+            "description": "Mixture: alpha * logsigmoid + (1-alpha) * softplus hinge.",
+            "operators_used": ["logsigmoid", "softplus", "sigmoid"],
+            "hyperparams": {"alpha": 0.5},
+        },
+        {
+            "name": "seed_zscore_margin",
+            "type": "auto_seed",
+            "description": "Z-score cost gap to set margin scale.",
+            "operators_used": ["zscore", "logsigmoid"],
+            "hyperparams": {"scale": 1.0},
+        },
+    ]
 
 def _build_failure_payload(
     *,
@@ -126,6 +430,7 @@ def _build_global_feedback(
     gates_log: List[Dict[str, Any]],
     burn_in_objectives: List[Dict[str, Any]],
     baseline_hf_score: float | None,
+    diversity_archive: List[Dict[str, Any]] | None = None,
     max_elites: int = 8,
     max_failures: int = 64,
 ) -> Dict[str, Any]:
@@ -213,6 +518,8 @@ def _build_global_feedback(
         else:
             suggested_mode = "refine"
 
+    diversity_summary = _summarize_diversity(diversity_archive or [])
+
     return {
         "burn_in_objectives": burn_in_objectives,
         "recent_elites": elite_summaries,
@@ -220,6 +527,7 @@ def _build_global_feedback(
             "by_code": failures_by_code,
             "examples": failure_examples,
         },
+        "diversity_summary": diversity_summary,
         "suggested_mode": suggested_mode,
     }
 
@@ -799,6 +1107,12 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     baseline_early_valid: float | None = None
     baseline_epoch_objectives: List[float] | None = None
     burn_in_objectives: List[Dict[str, Any]] = []
+    diversity_archive: List[Dict[str, Any]] = []
+    diverse_elites: List[Dict[str, Any]] = []
+    seen_signatures: set[str] = set()
+
+    if burn_in_objectives_auto:
+        burn_in_objectives.extend(_build_auto_seed_objectives())
 
     # Baseline: evaluate the original POMO po_loss once, using the same HF
     # configuration. This provides a reference score before searching over
@@ -845,6 +1159,23 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     mutation_prompt = prompts.get("mutation")
     repair_prompt = prompts.get("repair")
     expects_repair_prompt = prompts.get("expects_repair")
+    max_resample_rounds = int(cfg_yaml.get("max_resample_rounds", 1) or 0)
+
+    pref_semantic_gate_enabled = bool(cfg_yaml.get("pref_semantic_gate_enabled", True))
+    pref_semantic_trials = int(cfg_yaml.get("pref_semantic_trials", 6))
+    pref_semantic_batch_size = int(cfg_yaml.get("pref_semantic_batch_size", 128))
+    pref_semantic_min_pass_rate = float(cfg_yaml.get("pref_semantic_min_pass_rate", 0.8))
+    pref_semantic_swap_tolerance = float(cfg_yaml.get("pref_semantic_swap_tolerance", 1e-3))
+    pref_semantic_gap_min_ratio = float(cfg_yaml.get("pref_semantic_gap_min_ratio", 0.9))
+
+    behavior_deltas = cfg_yaml.get("novelty_behavior_deltas") or [-10, -5, -2, -1, 0, 1, 2, 5, 10]
+    behavior_deltas = [float(v) for v in behavior_deltas]
+    novelty_k = int(cfg_yaml.get("novelty_k", 5))
+    novelty_ops_weight = float(cfg_yaml.get("novelty_ops_weight", 1.0))
+    novelty_hparam_weight = float(cfg_yaml.get("novelty_hparam_weight", 0.5))
+    novelty_behavior_weight = float(cfg_yaml.get("novelty_behavior_weight", 1.0))
+    diversity_archive_size = int(cfg_yaml.get("diversity_archive_size", 32))
+    burn_in_objectives_auto = bool(cfg_yaml.get("burn_in_objectives_auto", True))
 
     out_root = cfg_yaml.get("output_root", "runs/free_loss_discovery")
     run_dir = _timestamp_dir(out_root)
@@ -872,6 +1203,43 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             LOGGER.warning("Failed to repair expects via LLM: %s", exc)
             return ir
 
+    def _sample_candidate(
+        *,
+        parent_irs: List[FreeLossIR],
+        parents: List[Dict[str, Any]],
+        global_feedback: Dict[str, Any],
+    ) -> FreeLossIR:
+        if len(parent_irs) >= 2 and crossover_prompt:
+            return crossover_free_loss(
+                crossover_prompt,
+                parent_irs[:2],
+                parents_fitness=[p["fitness"] for p in parents[:2]],
+                global_feedback=global_feedback,
+            )
+        if parent_irs and mutation_prompt:
+            return mutate_free_loss(
+                mutation_prompt,
+                parent_irs[0],
+                parent_fitness=parents[0]["fitness"],
+                global_feedback=global_feedback,
+            )
+        return generate_free_loss_candidate(
+            gen_prompt,
+            operator_whitelist=operator_whitelist,
+            global_feedback=global_feedback,
+        )
+
+    def _should_resample_dynamic(reason: str) -> bool:
+        msg = (reason or "").lower()
+        return (
+            "missing_dependency" in msg
+            or "missing_batch_key" in msg
+            or "extra_batch_key" in msg
+            or "invalid_expects" in msg
+            or "missing_expects" in msg
+            or "unsupported_expects" in msg
+        )
+
     for gen in range(generations):
         LOGGER.info("=== Generation %d/%d ===", gen, generations - 1)
         global_feedback = _build_global_feedback(
@@ -879,19 +1247,23 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             gates_log=gates_log,
             burn_in_objectives=burn_in_objectives,
             baseline_hf_score=baseline_hf_score,
+            diversity_archive=diversity_archive,
         )
         population: List[FreeLossIR] = []
+        parents: List[Dict[str, Any]] = []
+        parent_irs: List[FreeLossIR] = []
         if gen == 0:
             LOGGER.info("Generating initial population with %d LLM candidates", init_llm)
             for _ in range(init_llm):
-                ir = generate_free_loss_candidate(
-                    gen_prompt,
-                    operator_whitelist=operator_whitelist,
+                ir = _sample_candidate(
+                    parent_irs=parent_irs,
+                    parents=parents,
                     global_feedback=global_feedback,
                 )
                 population.append(_maybe_repair_expects(ir))
         else:
-            parents = sorted(elites, key=lambda e: e["fitness"]["hf_like_score"])[:elite_size]
+            parent_pool = diverse_elites if diverse_elites else elites
+            parents = _select_parents(parent_pool, elite_size)
             parent_irs = [p["ir"] for p in parents]
             LOGGER.info(
                 "Generating population via crossover/mutation: size=%d, elite_size=%d, available_elites=%d",
@@ -900,26 +1272,11 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 len(parent_irs),
             )
             for _ in range(population_size):
-                if len(parent_irs) >= 2 and crossover_prompt:
-                    ir = crossover_free_loss(
-                        crossover_prompt,
-                        parent_irs[:2],
-                        parents_fitness=[p["fitness"] for p in parents[:2]],
-                        global_feedback=global_feedback,
-                    )
-                elif parent_irs and mutation_prompt:
-                    ir = mutate_free_loss(
-                        mutation_prompt,
-                        parent_irs[0],
-                        parent_fitness=parents[0]["fitness"],
-                        global_feedback=global_feedback,
-                    )
-                else:
-                    ir = generate_free_loss_candidate(
-                        gen_prompt,
-                        operator_whitelist=operator_whitelist,
-                        global_feedback=global_feedback,
-                    )
+                ir = _sample_candidate(
+                    parent_irs=parent_irs,
+                    parents=parents,
+                    global_feedback=global_feedback,
+                )
                 population.append(_maybe_repair_expects(ir))
 
         LOGGER.info("Population size for generation %d: %d", gen, len(population))
@@ -950,185 +1307,291 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
         for idx, original_ir in enumerate(population):
             ir = original_ir
-
-            for attempt in range(max_repair_rounds + 1):
-                static_res: StaticGateResult
-                static_res = run_static_gates(ir, operator_whitelist=operator_whitelist)
-                static_code = "" if static_res.ok else _classify_failure("static", static_res.reason)
-                gate_entry: Dict[str, Any] = {
-                    "generation": gen,
-                    "index": idx,
-                    "attempt": attempt,
-                    "ir": asdict(ir),
-                    "static_ok": static_res.ok,
-                    "static_reason": static_res.reason,
-                    "static_error_code": static_code,
-                }
-
-                if not static_res.ok:
-                    if attempt < max_repair_rounds and repair_prompt:
-                        try:
-                            failure_payload = _build_failure_payload(
-                                generation=gen,
-                                index=idx,
-                                attempt=attempt,
-                                stage="static_gate",
-                                code=static_code,
-                                message=static_res.reason,
-                                extra=None,
-                            )
-                            ir = repair_free_loss(repair_prompt, ir, failure_payload)
-                            continue
-                        except Exception as exc:  # noqa: BLE001
-                            LOGGER.warning(
-                                "Failed to repair static gate error for gen=%d, idx=%d: %s",
-                                gen,
-                                idx,
-                                exc,
-                            )
-                    static_fail += 1
-                    gates_log.append(gate_entry)
-                    break
-
-                try:
-                    compiled = compile_free_loss_candidate(ir, operator_whitelist=operator_whitelist)
-                except CompileError as exc:
-                    compile_code = _classify_failure("compile", str(exc))
-                    gate_entry["dynamic_ok"] = False
-                    gate_entry["dynamic_reason"] = f"compile_error: {exc}"
-                    gate_entry["dynamic_error_code"] = compile_code
-                    if attempt < max_repair_rounds and repair_prompt:
-                        try:
-                            failure_payload = _build_failure_payload(
-                                generation=gen,
-                                index=idx,
-                                attempt=attempt,
-                                stage="compile",
-                                code=compile_code,
-                                message=str(exc),
-                                extra=None,
-                            )
-                            ir = repair_free_loss(repair_prompt, ir, failure_payload)
-                            continue
-                        except Exception as exc2:  # noqa: BLE001
-                            LOGGER.warning(
-                                "Failed to repair compile error for gen=%d, idx=%d: %s",
-                                gen,
-                                idx,
-                                exc2,
-                            )
-                    gates_log.append(gate_entry)
-                    break
-
-                model = TSPModel(
-                    embedding_dim=128,
-                    sqrt_embedding_dim=128 ** 0.5,
-                    encoder_layer_num=1,
-                    decoder_layer_num=1,
-                    qkv_dim=16,
-                    head_num=8,
-                    logit_clipping=50,
-                    ff_hidden_dim=128,
-                    eval_type="argmax",
-                )
-
-                dummy_batch = {
-                    "cost_a": torch.zeros(16),
-                    "cost_b": torch.ones(16),
-                    "log_prob_w": torch.zeros(16),
-                    "log_prob_l": torch.zeros(16),
-                    "weight": torch.ones(16),
-                }
-
-                dyn_res: DynamicGateResult
-                dyn_res = run_dynamic_gates(
-                    compiled,
-                    batch=dummy_batch,
-                    model=model,
-                    grad_norm_max=float(cfg_yaml.get("grad_norm_max", 10.0)),
-                    loss_soft_min=float(cfg_yaml.get("loss_soft_min", -5.0)),
-                    loss_soft_max=float(cfg_yaml.get("loss_soft_max", 5.0)),
-                )
-
-                gate_entry.update(
-                    {
-                        "dynamic_ok": dyn_res.ok,
-                        "dynamic_reason": dyn_res.reason,
-                        "loss_value": dyn_res.loss_value,
-                        "grad_norm": dyn_res.grad_norm,
+            resample_attempts = 0
+            while True:
+                resampled = False
+                for attempt in range(max_repair_rounds + 1):
+                    signature = _candidate_signature(ir)
+                    static_res: StaticGateResult
+                    if signature in seen_signatures:
+                        static_res = StaticGateResult(ok=False, reason="duplicate_candidate")
+                    else:
+                        static_res = run_static_gates(ir, operator_whitelist=operator_whitelist)
+                    static_code = "" if static_res.ok else _classify_failure("static", static_res.reason)
+                    gate_entry: Dict[str, Any] = {
+                        "generation": gen,
+                        "index": idx,
+                        "attempt": attempt,
+                        "ir": asdict(ir),
+                        "static_ok": static_res.ok,
+                        "static_reason": static_res.reason,
+                        "static_error_code": static_code,
                     }
-                )
-                if not dyn_res.ok:
-                    gate_entry["dynamic_error_code"] = _classify_failure("dynamic", dyn_res.reason)
-                gates_log.append(gate_entry)
 
-                if not dyn_res.ok:
-                    if attempt < max_repair_rounds and repair_prompt:
+                    if not static_res.ok:
+                        if attempt < max_repair_rounds and repair_prompt:
+                            try:
+                                failure_payload = _build_failure_payload(
+                                    generation=gen,
+                                    index=idx,
+                                    attempt=attempt,
+                                    stage="static_gate",
+                                    code=static_code,
+                                    message=static_res.reason,
+                                    extra=None,
+                                )
+                                ir = repair_free_loss(repair_prompt, ir, failure_payload)
+                                continue
+                            except Exception as exc:  # noqa: BLE001
+                                LOGGER.warning(
+                                    "Failed to repair static gate error for gen=%d, idx=%d: %s",
+                                    gen,
+                                    idx,
+                                    exc,
+                                )
+                        static_fail += 1
+                        gates_log.append(gate_entry)
+                        break
+
+                    try:
+                        compiled = compile_free_loss_candidate(
+                            ir,
+                            operator_whitelist=operator_whitelist,
+                        )
+                    except CompileError as exc:
+                        compile_code = _classify_failure("compile", str(exc))
+                        gate_entry["dynamic_ok"] = False
+                        gate_entry["dynamic_reason"] = f"compile_error: {exc}"
+                        gate_entry["dynamic_error_code"] = compile_code
+                        if attempt < max_repair_rounds and repair_prompt:
+                            try:
+                                failure_payload = _build_failure_payload(
+                                    generation=gen,
+                                    index=idx,
+                                    attempt=attempt,
+                                    stage="compile",
+                                    code=compile_code,
+                                    message=str(exc),
+                                    extra=None,
+                                )
+                                ir = repair_free_loss(repair_prompt, ir, failure_payload)
+                                continue
+                            except Exception as exc2:  # noqa: BLE001
+                                LOGGER.warning(
+                                    "Failed to repair compile error for gen=%d, idx=%d: %s",
+                                    gen,
+                                    idx,
+                                    exc2,
+                                )
+                        gates_log.append(gate_entry)
+                        break
+
+                    model = TSPModel(
+                        embedding_dim=128,
+                        sqrt_embedding_dim=128 ** 0.5,
+                        encoder_layer_num=1,
+                        decoder_layer_num=1,
+                        qkv_dim=16,
+                        head_num=8,
+                        logit_clipping=50,
+                        ff_hidden_dim=128,
+                        eval_type="argmax",
+                    )
+
+                    dummy_batch = {
+                        "cost_a": torch.zeros(16),
+                        "cost_b": torch.ones(16),
+                        "log_prob_w": torch.zeros(16),
+                        "log_prob_l": torch.zeros(16),
+                    }
+
+                    dyn_res: DynamicGateResult
+                    dyn_res = run_dynamic_gates(
+                        compiled,
+                        batch=dummy_batch,
+                        model=model,
+                        required_batch_keys=_REQUIRED_BATCH_KEYS,
+                        grad_norm_max=float(cfg_yaml.get("grad_norm_max", 10.0)),
+                        loss_soft_min=float(cfg_yaml.get("loss_soft_min", -5.0)),
+                        loss_soft_max=float(cfg_yaml.get("loss_soft_max", 5.0)),
+                    )
+
+                    gate_entry.update(
+                        {
+                            "dynamic_ok": dyn_res.ok,
+                            "dynamic_reason": dyn_res.reason,
+                            "loss_value": dyn_res.loss_value,
+                            "grad_norm": dyn_res.grad_norm,
+                        }
+                    )
+                    if not dyn_res.ok:
+                        gate_entry["dynamic_error_code"] = _classify_failure("dynamic", dyn_res.reason)
+
+                    if not dyn_res.ok:
+                        gates_log.append(gate_entry)
+                        if _should_resample_dynamic(dyn_res.reason) and resample_attempts < max_resample_rounds:
+                            resample_attempts += 1
+                            LOGGER.warning(
+                                "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
+                                "dropping candidate and resampling (attempt=%d/%d)",
+                                gen,
+                                idx,
+                                ir.name,
+                                dyn_res.reason,
+                                resample_attempts,
+                                max_resample_rounds,
+                            )
+                            ir = _maybe_repair_expects(
+                                _sample_candidate(
+                                    parent_irs=parent_irs,
+                                    parents=parents,
+                                    global_feedback=global_feedback,
+                                )
+                            )
+                            resampled = True
+                            break
+                        if attempt < max_repair_rounds and repair_prompt:
+                            LOGGER.warning(
+                                "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s, "
+                                "loss_value=%s, grad_norm=%s; attempting repair (attempt=%d/%d)",
+                                gen,
+                                idx,
+                                ir.name,
+                                dyn_res.reason,
+                                str(dyn_res.loss_value),
+                                str(dyn_res.grad_norm),
+                                attempt + 1,
+                                max_repair_rounds,
+                            )
+                            try:
+                                failure_payload = _build_failure_payload(
+                                    generation=gen,
+                                    index=idx,
+                                    attempt=attempt,
+                                    stage="dynamic_gate",
+                                    code=gate_entry.get("dynamic_error_code", "E_DYNAMIC_OTHER"),
+                                    message=dyn_res.reason,
+                                    extra={
+                                        "loss_value": dyn_res.loss_value,
+                                        "grad_norm": dyn_res.grad_norm,
+                                    },
+                                )
+                                ir = repair_free_loss(repair_prompt, ir, failure_payload)
+                                continue
+                            except Exception as exc:  # noqa: BLE001
+                                LOGGER.warning(
+                                    "Failed to repair dynamic gate error for gen=%d, idx=%d: %s",
+                                    gen,
+                                    idx,
+                                    exc,
+                                )
+                        dynamic_fail += 1
                         LOGGER.warning(
                             "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s, "
-                            "loss_value=%s, grad_norm=%s; attempting repair (attempt=%d/%d)",
+                            "loss_value=%s, grad_norm=%s",
                             gen,
                             idx,
                             ir.name,
                             dyn_res.reason,
                             str(dyn_res.loss_value),
                             str(dyn_res.grad_norm),
-                            attempt + 1,
-                            max_repair_rounds,
                         )
-                        try:
-                            failure_payload = _build_failure_payload(
-                                generation=gen,
-                                index=idx,
-                                attempt=attempt,
-                                stage="dynamic_gate",
-                                code=gate_entry.get("dynamic_error_code", "E_DYNAMIC_OTHER"),
-                                message=dyn_res.reason,
-                                extra={
-                                    "loss_value": dyn_res.loss_value,
-                                    "grad_norm": dyn_res.grad_norm,
-                                },
+                        break
+
+                    pref_res: PreferenceSemanticGateResult | None = None
+                    if pref_semantic_gate_enabled:
+                        pref_res = run_preference_semantic_gates(
+                            compiled,
+                            trials=pref_semantic_trials,
+                            batch_size=pref_semantic_batch_size,
+                            min_pass_rate=pref_semantic_min_pass_rate,
+                            swap_tolerance=pref_semantic_swap_tolerance,
+                            gap_min_ratio=pref_semantic_gap_min_ratio,
+                        )
+                        gate_entry.update(
+                            {
+                                "pref_ok": pref_res.ok,
+                                "pref_reason": pref_res.reason,
+                                "pref_mono_pass_rate": pref_res.mono_pass_rate,
+                                "pref_swap_pass_rate": pref_res.swap_pass_rate,
+                                "pref_gap_pass_rate": pref_res.gap_pass_rate,
+                            }
+                        )
+                        if not pref_res.ok:
+                            gate_entry["dynamic_error_code"] = _classify_failure(
+                                "dynamic",
+                                pref_res.reason,
                             )
-                            ir = repair_free_loss(repair_prompt, ir, failure_payload)
-                            continue
-                        except Exception as exc:  # noqa: BLE001
+                            gates_log.append(gate_entry)
+                            if attempt < max_repair_rounds and repair_prompt:
+                                LOGGER.warning(
+                                    "Preference gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
+                                    "attempting repair (attempt=%d/%d)",
+                                    gen,
+                                    idx,
+                                    ir.name,
+                                    pref_res.reason,
+                                    attempt + 1,
+                                    max_repair_rounds,
+                                )
+                                try:
+                                    failure_payload = _build_failure_payload(
+                                        generation=gen,
+                                        index=idx,
+                                        attempt=attempt,
+                                        stage="preference_gate",
+                                        code=gate_entry.get("dynamic_error_code", "E_PREF_SEMANTIC"),
+                                        message=pref_res.reason,
+                                        extra={
+                                            "mono_pass_rate": pref_res.mono_pass_rate,
+                                            "swap_pass_rate": pref_res.swap_pass_rate,
+                                            "gap_pass_rate": pref_res.gap_pass_rate,
+                                        },
+                                    )
+                                    ir = repair_free_loss(repair_prompt, ir, failure_payload)
+                                    continue
+                                except Exception as exc:  # noqa: BLE001
+                                    LOGGER.warning(
+                                        "Failed to repair preference gate error for gen=%d, idx=%d: %s",
+                                        gen,
+                                        idx,
+                                        exc,
+                                    )
+                            dynamic_fail += 1
                             LOGGER.warning(
-                                "Failed to repair dynamic gate error for gen=%d, idx=%d: %s",
+                                "Preference gates failed for gen=%d, idx=%d, name=%s: reason=%s",
                                 gen,
                                 idx,
-                                exc,
+                                ir.name,
+                                pref_res.reason,
                             )
-                    dynamic_fail += 1
-                    LOGGER.warning(
-                        "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s, "
-                        "loss_value=%s, grad_norm=%s",
-                        gen,
-                        idx,
-                        ir.name,
-                        dyn_res.reason,
-                        str(dyn_res.loss_value),
-                        str(dyn_res.grad_norm),
-                    )
-                    break
+                            break
 
-                # Candidate passes all gates; queue it for evaluation.
-                eval_candidates[idx] = ir
-                ir_payload = asdict(ir)
-                eval_jobs.append(
-                    (
-                        ir_payload,
-                        hf_cfg_dict,
-                        free_cfg_dict,
-                        "",  # device to be filled after we know available devices
-                        operator_whitelist,
-                        run_dir,
-                        gen,
-                        idx,
-                        baseline_early_valid,
-                        baseline_epoch_objectives,
-                        100,
+                    if pref_res is None or pref_res.ok:
+                        gates_log.append(gate_entry)
+
+                    # Candidate passes all gates; queue it for evaluation.
+                    eval_candidates[idx] = ir
+                    ir_payload = asdict(ir)
+                    eval_jobs.append(
+                        (
+                            ir_payload,
+                            hf_cfg_dict,
+                            free_cfg_dict,
+                            "",  # device to be filled after we know available devices
+                            operator_whitelist,
+                            run_dir,
+                            gen,
+                            idx,
+                            baseline_early_valid,
+                            baseline_epoch_objectives,
+                            100,
+                        )
                     )
-                )
+                    seen_signatures.add(signature)
+                    break
+                if resampled:
+                    continue
                 break
 
         # Evaluate all surviving candidates in parallel across GPUs / devices.
@@ -1191,6 +1654,36 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             evaluated += 1
             ir = eval_candidates[idx]
 
+            descriptor: Dict[str, Any] | None = None
+            novelty = 0.0
+            try:
+                compiled = compile_free_loss_candidate(ir, operator_whitelist=operator_whitelist)
+                behavior = _behavior_descriptor(
+                    compiled,
+                    deltas=behavior_deltas,
+                    batch_size=pref_semantic_batch_size,
+                )
+                if behavior is not None:
+                    descriptor = {
+                        "behavior": behavior,
+                        "ops": list(ir.operators_used or []),
+                        "hyperparams": list((ir.hyperparams or {}).keys()),
+                        "signature": _candidate_signature(ir),
+                    }
+                    novelty = _novelty_score(
+                        descriptor,
+                        diversity_archive,
+                        k=novelty_k,
+                        ops_weight=novelty_ops_weight,
+                        hparam_weight=novelty_hparam_weight,
+                        behavior_weight=novelty_behavior_weight,
+                    )
+            except Exception:  # noqa: BLE001
+                descriptor = None
+                novelty = 0.0
+
+            fitness["novelty"] = novelty
+
             hf_like_score = float(fitness["hf_like_score"])
             epoch_mean = fitness.get("epoch_objective_mean")
             epoch_mean_val = float(epoch_mean) if epoch_mean is not None else float("nan")
@@ -1221,6 +1714,8 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 "ir": asdict(ir),
                 "fitness": fitness,
                 "better_than_baseline": better_than_baseline,
+                "novelty": novelty,
+                "diversity_descriptor": descriptor,
             }
             candidates_log.append(cand_entry_log)
             fitness_log.append(
@@ -1234,6 +1729,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     "epoch_better_than_baseline": fitness.get("epoch_better_than_baseline"),
                     "baseline_hf_score": baseline_hf_score,
                     "better_than_baseline": better_than_baseline,
+                    "novelty": novelty,
                 }
             )
             elite_entry = {
@@ -1241,8 +1737,14 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 "index": idx,
                 "ir": ir,
                 "fitness": fitness,
+                "novelty": novelty,
             }
             gen_elites.append(elite_entry)
+
+            if descriptor is not None:
+                diversity_archive.append(descriptor)
+                if len(diversity_archive) > diversity_archive_size:
+                    diversity_archive.pop(0)
 
         def _elite_key(entry: Dict[str, Any]) -> Tuple[float, float, float]:
             score = float(entry["fitness"]["hf_like_score"])
@@ -1272,6 +1774,13 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         elites.extend(gen_elites)
         elites.sort(key=_elite_key)
         elites = elites[:elite_size]
+
+        if gen_elites:
+            diverse_pool = diverse_elites + gen_elites
+            diverse_elites = _select_parents(
+                diverse_pool,
+                min(diversity_archive_size, len(diverse_pool)),
+            )
 
     _dump_jsonl(os.path.join(run_dir, "candidates.jsonl"), candidates_log)
     _dump_jsonl(os.path.join(run_dir, "gate_reports.jsonl"), gates_log)

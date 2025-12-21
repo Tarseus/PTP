@@ -29,6 +29,7 @@ You may also be given a `GLOBAL_FEEDBACK_JSON` object with fields:
 - `recent_failures`: statistics about recent gate failures, including:
   - `by_code`: aggregated counts for error codes such as `E_OPERATOR_VIOLATION`, `E_GRAD_EXPLODE`, `E_LOSS_OUT_OF_RANGE`, `E_RUNTIME_NAN_LOSS`, etc.
   - `examples`: representative failing IRs and their `static_reason` / `dynamic_reason`.
+- `diversity_summary`: common operator sets and hyperparameter key patterns seen so far (use to avoid near-duplicates when exploring).
 - `suggested_mode`: one of `"explore"`, `"refine"`, or `"combine"`, indicating whether you should focus on:
   - **explore**: propose qualitatively new structures far from existing elites;
   - **refine**: make targeted improvements to common successful patterns;
@@ -48,7 +49,7 @@ In the `intuition` field, explicitly mention which mode you conceptually followe
   - `implementation_hint` (JSON object with `expects` and `returns`)
   - `code` (string containing valid Python source code for the loss function)
 - For `implementation_hint`:
-  - `expects` **must** be a JSON array of short input names **only**, e.g. `["cost_a", "cost_b", "logp_a", "logp_b"]`.
+  - `expects` **must** be a JSON array of short input names **only**, and **must** be exactly: `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`.
     Do **not** write descriptions or full sentences here. Do **not** use a single string or an object.
   - `returns` **must** be exactly the string `"scalar"`.
 - For `code`:
