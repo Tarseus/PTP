@@ -1160,6 +1160,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     repair_prompt = prompts.get("repair")
     expects_repair_prompt = prompts.get("expects_repair")
     max_resample_rounds = int(cfg_yaml.get("max_resample_rounds", 1) or 0)
+    burn_in_objectives_auto = bool(cfg_yaml.get("burn_in_objectives_auto", True))
 
     pref_semantic_gate_enabled = bool(cfg_yaml.get("pref_semantic_gate_enabled", True))
     pref_semantic_trials = int(cfg_yaml.get("pref_semantic_trials", 6))
@@ -1175,7 +1176,6 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     novelty_hparam_weight = float(cfg_yaml.get("novelty_hparam_weight", 0.5))
     novelty_behavior_weight = float(cfg_yaml.get("novelty_behavior_weight", 1.0))
     diversity_archive_size = int(cfg_yaml.get("diversity_archive_size", 32))
-    burn_in_objectives_auto = bool(cfg_yaml.get("burn_in_objectives_auto", True))
 
     out_root = cfg_yaml.get("output_root", "runs/free_loss_discovery")
     run_dir = _timestamp_dir(out_root)
