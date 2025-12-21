@@ -1111,9 +1111,6 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     diverse_elites: List[Dict[str, Any]] = []
     seen_signatures: set[str] = set()
 
-    if burn_in_objectives_auto:
-        burn_in_objectives.extend(_build_auto_seed_objectives())
-
     # Baseline: evaluate the original POMO po_loss once, using the same HF
     # configuration. This provides a reference score before searching over
     # free-form preference losses.
@@ -1188,6 +1185,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     elites: List[Dict[str, Any]] = []
 
     max_repair_rounds = int(cfg_yaml.get("max_repair_rounds", 0) or 0)
+
+    if burn_in_objectives_auto:
+        burn_in_objectives.extend(_build_auto_seed_objectives())
 
     def _maybe_repair_expects(ir: FreeLossIR) -> FreeLossIR:
         if not expects_repair_prompt:
