@@ -1,0 +1,43 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 7.940531983871459,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_FORWARD_ERROR",
+        "count": 76
+      },
+      {
+        "code": "E_COMPILE_ERROR",
+        "count": 7
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 3,
+    "index": 3,
+    "name": "NormalizedFocalBradleyTerryLoss",
+    "theoretical_basis": "",
+    "operators_used": [
+      "zscore",
+      "log",
+      "relu",
+      "tanh",
+      "sigmoid",
+      "logsigmoid"
+    ],
+    "hyperparams": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "gamma": 2.0,
+      "epsilon": 1e-06
+    },
+    "hf_like_score": 18.196041364898683,
+    "validation_objective": 8.230753393554687,
+    "generalization_penalty": 0.0,
+    "epoch_objective_mean": 8.196041364898681,
+    "epoch_baseline_violations": 10,
+    "pair_count": 4951581407
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "generation": 3,
+  "index": 3,
+  "ir": {
+    "name": "NormalizedFocalBradleyTerryLoss",
+    "intuition": "Based on the compile error `E_COMPILE_ERROR`, the `import` statements were removed from the code. The core logic of the loss remains unchanged. The fix involves replacing `F.relu` and `F.logsigmoid` with their `torch` counterparts, `torch.relu` and `torch.nn.functional.logsigmoid`, which are available in the execution environment. This loss function still uses a Bradley-Terry model where the preference strength is scaled by a log-transformed, z-scored cost difference, and modulated by a focal weight to focus on hard examples.",
+    "pseudocode": "1. For each pair (winner 'a', loser 'b'), calculate the log-probability difference: `logp_diff = logp_a - logp_b`.\n2. Calculate the cost difference: `cost_diff = cost_b - cost_a`.\n3. **New idea 1:** Normalize the cost differences across the batch using z-score: `z_cost_diff = zscore(cost_diff, epsilon)`.\n4. **New idea 2:** Create a non-linear, adaptive scaling factor from the normalized cost difference: `cost_scale = alpha * log(1 + relu(z_cost_diff))`.\n5. Calculate a focal weight. First, compute a stable probability of correctness `p_t = sigmoid(logp_diff)`. Then, `focal_weight = (1 - p_t)^gamma`.\n6. Bound the log-probability difference for stability: `bounded_logp_diff = tanh(beta * logp_diff)`.\n7. Combine the bounded log-probability difference with the adaptive cost scaling: `argument = bounded_logp_diff * cost_scale`.\n8. The loss for the pair is the focal-weighted negative log-sigmoid of the argument, following a Bradley-Terry model: `loss = focal_weight * -logsigmoid(argument)`.\n9. The final loss is the mean of these values over the batch.",
+    "hyperparams": {
+      "alpha": 1.0,
+      "beta": 1.0,
+      "gamma": 2.0,
+      "epsilon": 1e-06
+    },
+    "operators_used": [
+      "zscore",
+      "log",
+      "relu",
+      "tanh",
+      "sigmoid",
+      "logsigmoid"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "This loss function expects a batch containing `cost_a`, `cost_b`, `log_prob_w` (for winner a), `log_prob_l` (for loser b), and optionally `weight` for each pair. `cost_a` and `cost_b` are scalar costs, and `log_prob_w` and `log_prob_l` are the log probabilities of the model generating the respective sequences."
+      ],
+      "returns": "The function returns a single scalar value representing the mean loss over the batch."
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    \"\"\"\n    A focal-loss-modulated Bradley-Terry model where the preference strength is scaled by a\n    log-transformed, z-scored cost difference for batch-adaptive learning.\n    \"\"\"\n    hyperparams = extra.get('hyperparams', {})\n    alpha = hyperparams.get('alpha', 1.0)\n    beta = hyperparams.get('beta', 1.0)\n    gamma = hyperparams.get('gamma', 2.0)\n    epsilon = hyperparams.get('epsilon', 1e-6)\n\n    cost_a = batch['cost_a']\n    cost_b = batch['cost_b']\n    logp_a = batch['log_prob_w']\n    logp_b = batch['log_prob_l']\n    weights = batch.get('weight')\n\n    logp_diff = logp_a - logp_b\n    cost_diff = cost_b - cost_a\n\n    # 1. Inherit focal modulation from Parent 1\n    # We use the raw logp_diff for a more accurate probability estimate.\n    with torch.no_grad():\n        p_t = torch.sigmoid(logp_diff)\n        focal_weight = torch.pow(1.0 - p_t, gamma)\n\n    # 2. New Coupling: Batch-wise Z-Score Normalization of cost_diff\n    # This makes the loss adaptive to the scale of costs in the current batch.\n    if cost_diff.numel() > 1:\n        z_cost_diff = (cost_diff - cost_diff.mean()) / (cost_diff.std() + epsilon)\n    else:\n        z_cost_diff = torch.zeros_like(cost_diff)\n\n    # 3. New Coupling: Log-scaling of the normalized cost difference\n    # This creates a non-linear scaling factor. relu ensures the argument to log is >= 0.\n    # The resulting cost_scale modulates the strength of the learning signal.\n    cost_scale = alpha * torch.log(1 + torch.relu(z_cost_diff))\n\n    # 4. Inherit stability trick (tanh) from Parent 0\n    bounded_logp_diff = torch.tanh(beta * logp_diff)\n\n    # 5. Combine into a Bradley-Terry style loss\n    # The argument's magnitude is now sensitive to both logp_diff and the relative cost_diff.\n    argument = bounded_logp_diff * cost_scale\n    pair_loss = -torch.nn.functional.logsigmoid(argument)\n\n    # 6. Apply focal weight and optional sample weights\n    final_loss = focal_weight * pair_loss\n\n    if weights is not None:\n        return (final_loss * weights).mean()\n    else:\n        return final_loss.mean()",
+    "theoretical_basis": ""
+  },
+  "fitness": {
+    "hf_like_score": 18.196041364898683,
+    "validation_objective": 8.230753393554687,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "100": 8.228437161254883
+    },
+    "epoch_objective_mean": 8.196041364898681,
+    "epoch_baseline_violations": 10,
+    "epoch_better_than_baseline": false,
+    "epoch_eval": {
+      "enabled": true,
+      "steps_per_epoch": 1563,
+      "epochs_total": 10,
+      "objectives": [
+        8.27351904144287,
+        8.190232092285155,
+        8.194036651611329,
+        8.181348393249511,
+        8.168542208862304,
+        8.151848077392579,
+        8.15121432800293,
+        8.180781069946288,
+        8.242110469055175,
+        8.226781317138672
+      ],
+      "objective_mean": 8.196041364898681,
+      "baseline_margins": [
+        0.249384133911132,
+        0.20264616165161087,
+        0.22737518615722774,
+        0.22810676727294865,
+        0.23810428161621022,
+        0.23169675903320375,
+        0.2307540313720695,
+        0.2714980178833004,
+        0.34179388656616183,
+        0.33373458480834906
+      ],
+      "baseline_violations": 10,
+      "better_than_baseline": false
+    },
+    "train_score_mean": 13.377185530183564,
+    "train_loss_mean": 0.06221953745447552,
+    "pair_count": 4951581407,
+    "early_eval": {
+      "enabled": true,
+      "steps": 100,
+      "baseline_validation_objective": 8.402480014038085,
+      "candidate_validation_objective": 8.358731225585938,
+      "early_stopped": false
+    },
+    "phases": {
+      "f1": {
+        "steps": 15630,
+        "train_score_mean": 13.377185530183564,
+        "train_loss_mean": 0.06221953745447552,
+        "pair_count": 4951581407
+      },
+      "f2": {
+        "steps": 0,
+        "train_score_mean": null,
+        "train_loss_mean": null,
+        "pair_count": 0
+      }
+    },
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 10,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          100
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 100,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:0",
+        "seed": 1234,
+        "num_validation_episodes": 10000,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 15630,
+        "f2_steps": 0,
+        "f3_enabled": false,
+        "baseline_epoch_violation_weight": 1.0
+      }
+    },
+    "loss_ir": {
+      "name": "NormalizedFocalBradleyTerryLoss",
+      "intuition": "Based on the compile error `E_COMPILE_ERROR`, the `import` statements were removed from the code. The core logic of the loss remains unchanged. The fix involves replacing `F.relu` and `F.logsigmoid` with their `torch` counterparts, `torch.relu` and `torch.nn.functional.logsigmoid`, which are available in the execution environment. This loss function still uses a Bradley-Terry model where the preference strength is scaled by a log-transformed, z-scored cost difference, and modulated by a focal weight to focus on hard examples.",
+      "hyperparams": {
+        "alpha": 1.0,
+        "beta": 1.0,
+        "gamma": 2.0,
+        "epsilon": 1e-06
+      },
+      "operators_used": [
+        "zscore",
+        "log",
+        "relu",
+        "tanh",
+        "sigmoid",
+        "logsigmoid"
+      ]
+    }
+  }
+}
