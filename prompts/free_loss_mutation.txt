@@ -70,3 +70,10 @@ Hard constraints (apply to **all** mutation modes):
 - All text fields must be in **English only**.
 
 Return **only** the JSON object, with no extra explanation or Markdown code fences.
+
+Minimal valid example (structure only, keep your own content):
+{"name":"MinimalLogsigmoidLoss","intuition":"Mode: conservative. Minimal baseline-consistent loss.","pseudocode":"Compute delta = log_prob_w - log_prob_l; loss = -logsigmoid(delta).","hyperparams":{},"operators_used":["logsigmoid"],"theoretical_basis":"Bradley-Terry logistic preference model.","implementation_hint":{"expects":["cost_a","cost_b","log_prob_w","log_prob_l"],"returns":"scalar"},"code":"def generated_loss(batch, model_output, extra):\\n    log_prob_w = batch['log_prob_w']\\n    log_prob_l = batch['log_prob_l']\\n    delta = log_prob_w - log_prob_l\\n    loss = -F.logsigmoid(delta)\\n    return loss.mean()"}
+
+Common mistakes to avoid:
+- Do NOT define generated_loss with positional args like generated_loss(cost_a, cost_b, ...).
+- Do NOT call bare tanh/sigmoid/zscore; use torch.tanh, torch.sigmoid, F.logsigmoid, or ops.*.
