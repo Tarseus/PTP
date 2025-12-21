@@ -141,6 +141,11 @@ def run_dynamic_gates(
 
     try:
         loss = compiled.loss_fn(batch=batch, model_output=dummy_output, extra={})
+        if not isinstance(loss, torch.Tensor):
+            return DynamicGateResult(
+                ok=False,
+                reason=f"loss_not_tensor: {type(loss)}",
+            )
     except KeyError as exc:
         return DynamicGateResult(ok=False, reason=f"missing_batch_key: {exc}")
     except NameError as exc:
@@ -243,6 +248,11 @@ def run_preference_semantic_gates(
 
         try:
             loss = compiled.loss_fn(batch=batch, model_output={}, extra={})
+            if not isinstance(loss, torch.Tensor):
+                return PreferenceSemanticGateResult(
+                    ok=False,
+                    reason=f"pref_loss_not_tensor: {type(loss)}",
+                )
         except Exception as exc:  # noqa: BLE001
             return PreferenceSemanticGateResult(ok=False, reason=f"pref_forward_error: {exc}")
 
@@ -270,6 +280,11 @@ def run_preference_semantic_gates(
         }
         try:
             swap_loss = compiled.loss_fn(batch=swap_batch, model_output={}, extra={})
+            if not isinstance(swap_loss, torch.Tensor):
+                return PreferenceSemanticGateResult(
+                    ok=False,
+                    reason=f"pref_loss_not_tensor: {type(swap_loss)}",
+                )
         except Exception as exc:  # noqa: BLE001
             return PreferenceSemanticGateResult(ok=False, reason=f"pref_swap_error: {exc}")
         swap_total += 1
@@ -300,6 +315,11 @@ def run_preference_semantic_gates(
         try:
             loss_small = compiled.loss_fn(batch=batch_small, model_output={}, extra={})
             loss_large = compiled.loss_fn(batch=batch_large, model_output={}, extra={})
+            if not isinstance(loss_small, torch.Tensor) or not isinstance(loss_large, torch.Tensor):
+                return PreferenceSemanticGateResult(
+                    ok=False,
+                    reason="pref_loss_not_tensor",
+                )
         except Exception as exc:  # noqa: BLE001
             return PreferenceSemanticGateResult(ok=False, reason=f"pref_gap_error: {exc}")
 
