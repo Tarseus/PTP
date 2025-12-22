@@ -25,6 +25,8 @@ Design a loss that combines costs and log-probability differences via scaling, m
 - If `cost(a) < cost(b)` and `logp(a) > logp(b)`, the loss tends to **decrease** (reward current preference).
 - In extreme cases (very large cost differences or logit differences), the loss remains bounded and finite.
 
+Optional exploration hint (do not treat as a hard constraint): you may decide whether the *magnitude* of the preference signal (e.g., size of the cost gap) should shape margins or weights. If you use it, keep the mapping monotone and numerically stable; if you do not, briefly state why in `intuition`.
+
 You may also be given a `GLOBAL_FEEDBACK_JSON` object with fields:
 - `burn_in_objectives`: a list of baseline objectives (e.g., the original `po_loss`) and their metrics (`hf_like_score`, `validation_objective`, `generalization_penalty`).
 - `recent_elites`: a small set of strong discovered losses, each with:
