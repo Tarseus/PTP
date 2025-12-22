@@ -26,6 +26,13 @@ f2_steps: 0    # set >0 to enable F2
 f3_enabled: false
 max_repair_rounds: 2
 
+# Early-eval horizon for baseline/candidates, expressed in epochs/instances.
+# If both are > 0, we compute:
+#   early_eval_steps = early_eval_epochs * ceil(early_eval_instances_per_epoch / train_batch_size)
+# Otherwise we fall back to a legacy 100-step early evaluation.
+early_eval_epochs: 0
+early_eval_instances_per_epoch: 0
+
 # Training / evaluation config for TSP.
 # Use TSP20 for both training and evaluation so that each candidate's
 # fitness reflects full training behaviour on the canonical small-scale

@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import math
 import os
 import time
 import logging
@@ -619,6 +620,34 @@ def _get_available_devices(base_device: str) -> List[str]:
     return [base_device]
 
 
+def _compute_early_eval_steps(cfg_yaml: Dict[str, Any], hf_cfg: HighFidelityConfig) -> int:
+    total_steps = get_total_hf_train_steps(hf_cfg)
+    early_eval_epochs = int(cfg_yaml.get("early_eval_epochs", 0) or 0)
+    early_eval_instances_per_epoch = int(
+        cfg_yaml.get("early_eval_instances_per_epoch", 0) or 0
+    )
+    early_eval_steps_cfg = cfg_yaml.get("early_eval_steps")
+
+    if early_eval_epochs > 0:
+        instances_per_epoch = early_eval_instances_per_epoch
+        if instances_per_epoch <= 0:
+            instances_per_epoch = int(hf_cfg.hf_instances_per_epoch or 0)
+        if instances_per_epoch > 0:
+            batch_size = max(int(hf_cfg.train_batch_size), 1)
+            steps_per_epoch = math.ceil(instances_per_epoch / batch_size)
+            steps = early_eval_epochs * steps_per_epoch
+        else:
+            steps = 0
+    elif early_eval_steps_cfg is not None:
+        steps = int(early_eval_steps_cfg or 0)
+    else:
+        steps = min(100, total_steps)
+
+    if steps <= 0:
+        return 0
+    return min(int(steps), int(total_steps))
+
+
 def _worker_evaluate_candidate(args: Tuple[
     Dict[str, Any],
     Dict[str, Any],
@@ -862,7 +891,11 @@ def _train_one_batch_with_po(
     return score_mean.item(), float(loss.item())
 
 
-def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
+def evaluate_po_baseline(
+    cfg: HighFidelityConfig,
+    *,
+    early_eval_steps: int | None = None,
+) -> Dict[str, Any]:
     """Short-run HF-style evaluation using the original POMO po_loss.
 
     In addition to the final evaluation, this function records an
@@ -915,8 +948,10 @@ def evaluate_po_baseline(cfg: HighFidelityConfig) -> Dict[str, Any]:
     total_steps = get_total_hf_train_steps(cfg)
     steps_per_epoch, epochs_total = get_hf_epoch_plan(cfg)
     epoch_validation_objectives: List[float] = []
-    # For early comparison we fix an absolute step budget (e.g., 100).
-    early_eval_steps = min(100, total_steps)
+    if early_eval_steps is None:
+        early_eval_steps = min(100, total_steps)
+    else:
+        early_eval_steps = min(max(int(early_eval_steps), 0), total_steps)
     early_validation_objective: float | None = None
 
     LOGGER.info(
@@ -1103,6 +1138,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         "baseline_epoch_violation_weight": free_cfg.baseline_epoch_violation_weight,
     }
 
+    early_eval_steps = _compute_early_eval_steps(cfg_yaml, hf_cfg)
     baseline_hf_score: float | None = None
     baseline_early_valid: float | None = None
     baseline_epoch_objectives: List[float] | None = None
@@ -1115,7 +1151,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     # configuration. This provides a reference score before searching over
     # free-form preference losses.
     try:
-        baseline = evaluate_po_baseline(hf_cfg)
+        baseline = evaluate_po_baseline(hf_cfg, early_eval_steps=early_eval_steps)
         baseline_hf_score = float(baseline.get("fitness_score", baseline["hf_score"]))
         baseline_early_valid = float(
             baseline.get("early_validation_objective", baseline["validation_objective"])
@@ -1585,7 +1621,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                             idx,
                             baseline_early_valid,
                             baseline_epoch_objectives,
-                            100,
+                            early_eval_steps,
                         )
                     )
                     seen_signatures.add(signature)
