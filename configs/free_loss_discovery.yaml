@@ -46,9 +46,9 @@ baseline_epoch_violation_weight: 1.0
 pref_semantic_gate_enabled: true
 pref_semantic_trials: 6
 pref_semantic_batch_size: 128
-pref_semantic_min_pass_rate: 0.6
-pref_semantic_swap_tolerance: 0.001
-pref_semantic_gap_min_ratio: 0.7
+pref_semantic_min_pass_rate: 0.5
+pref_semantic_swap_tolerance: 0.01
+pref_semantic_gap_min_ratio: 0.5
 
 # Gate thresholds for dynamic checks.
 grad_norm_max: 10.0

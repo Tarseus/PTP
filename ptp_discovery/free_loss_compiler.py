@@ -252,6 +252,7 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
         ops_table = _build_operator_table()
         if operator_whitelist:
             ops_table = {k: v for k, v in ops_table.items() if k in operator_whitelist}
+        ops_accessor = _OpsAccessor(ops_table)
 
         # Execute in a tightly restricted namespace. We deliberately strip
         # builtins to avoid access to filesystem, subprocesses, etc.
@@ -259,7 +260,7 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
             "__builtins__": {},
             "torch": torch,
             "F": F,
-            "ops": _OpsAccessor(ops_table),
+            "ops": ops_accessor,
         }
         local_ns: Dict[str, Any] = {}
         try:
@@ -278,7 +279,14 @@ def compile_free_loss(ir: FreeLossIR, *, operator_whitelist: Sequence[str] | Non
             model_output: Mapping[str, torch.Tensor],
             extra: Mapping[str, Any] | None,
         ) -> torch.Tensor:
-            merged_extra: Dict[str, Any] = {"hyperparams": ir.hyperparams}
+            merged_extra: Dict[str, Any] = {
+                "hyperparams": ir.hyperparams,
+                "ops": ops_accessor,
+                "operators": ops_accessor,
+                "torch": torch,
+                "F": F,
+                "torch.nn.functional": F,
+            }
             if extra:
                 merged_extra.update(extra)
             return fn(batch, model_output, merged_extra)

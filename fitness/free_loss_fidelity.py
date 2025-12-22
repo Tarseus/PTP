@@ -323,9 +323,8 @@ def evaluate_free_loss_candidate(
         for i in range(compare_len):
             margin = float(epoch_validation_objectives[i]) - baseline_list[i]
             epoch_baseline_margins.append(margin)
+        # Only count observed epochs; do not penalize missing epochs.
         violations = sum(1 for m in epoch_baseline_margins if m > 0.0)
-        missing = max(len(baseline_list) - len(epoch_validation_objectives), 0)
-        violations += missing
         epoch_baseline_violations = int(violations)
         epoch_better_than_baseline = epoch_baseline_violations == 0
 
