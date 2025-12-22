@@ -1,0 +1,64 @@
+{
+  "generation": 9,
+  "index": 5,
+  "ir": {
+    "name": "ConfidenceAwareFocalLossWithDynamicMargin",
+    "intuition": "Mode: explore. This loss function aims to improve upon the strong focal loss framework of the parents by introducing a more direct and theoretically grounded mechanism for handling model confidence and pair difficulty. It combines the stable, normalized core of the parents with new couplings that modulate both the margin and the focal strength based on model uncertainty.\n\nInherited Ideas:\n1. From both parents: The core structure is a focal-modulated Bradley-Terry loss, `focal_weight * -logsigmoid(normalized_delta + margin)`. This retains the powerful hard-example mining capability.\n2. From both parents: The use of `ops.zscore` on the log-probability difference (`delta`) is kept for batch-level normalization, ensuring stability and consistent scaling of the primary learning signal.\n\nNew Coupling Ideas:\n1. **Entropy-Based Dynamic Margin**: Instead of a margin based on cost rank or cost gap, which can be noisy, this loss introduces a margin that is directly proportional to the model's uncertainty about the pair. We calculate the Shannon entropy of the model's win probability `p_win`. A high entropy (near `log(2)`) signifies high uncertainty (p_win is close to 0.5), while low entropy means high confidence. The margin is then `beta * entropy`. This encourages the model to create a larger separation (`delta`) for pairs it is currently uncertain about, directly focusing the learning effort where it's most needed. The entropy is detached to ensure the margin only sets the target separation, without creating conflicting gradients.\n2. **Confidence-Penalized Focal Re-weighting**: Parent 1 penalizes focal strength `gamma` using `1 - tanh(abs(delta))`. We adopt this effective idea but simplify the focal mechanism. Instead of a dynamic `gamma`, we use a fixed `gamma` for the standard focal term `(1-p_win)^gamma` and multiply it by a confidence penalty `(1 - tanh(abs(delta)))`. This creates a two-part focal weight: one part focusing on misclassified examples (`(1-p_win)^gamma`) and a second part that reduces the weight on examples the model is already very confident about (large `abs(delta)`), preventing overfitting on easy pairs and stabilizing training.",
+    "pseudocode": "1. Calculate the log-probability difference: delta = log_prob_w - log_prob_l.\n2. Normalize delta across the batch for stability: normalized_delta = zscore(delta).\n3. Calculate the model's win probability: p_win = sigmoid(delta).\n4. Calculate the Shannon entropy of the win probability to quantify model uncertainty: entropy = -(p_win * log(p_win) + (1-p_win) * log(1-p_win)).\n5. Compute the entropy-based dynamic margin: margin = beta * entropy.detach().\n6. Compute the core preference loss term: loss_core = -logsigmoid(normalized_delta + margin).\n7. Compute the standard focal modulating factor: focal_factor = (1 - p_win)^gamma.\n8. Compute the confidence penalty factor: confidence_penalty = 1.0 - tanh(abs(delta)).\n9. Combine the factors to create the final loss weight: final_weight = (focal_factor * confidence_penalty).detach().\n10. Apply the final weight to the core loss: final_loss = final_weight * loss_core.\n11. Return the mean of the final loss.",
+    "hyperparams": {
+      "beta": 1.5,
+      "gamma": 2.0,
+      "epsilon": 1e-08
+    },
+    "operators_used": [
+      "zscore",
+      "sigmoid",
+      "log",
+      "tanh",
+      "logsigmoid"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "log_prob_w",
+        "log_prob_l"
+      ],
+      "returns": "scalar"
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    \"\"\"\n    Combines z-score normalization and focal loss with two new couplings:\n    1. A dynamic margin based on the Shannon entropy of the model's prediction.\n    2. A confidence-penalized focal weight using (1 - tanh|delta|).\n    \"\"\"\n    # Read hyperparameters with defaults\n    beta = extra.get('beta', 1.5)\n    gamma = extra.get('gamma', 2.0)\n    epsilon = extra.get('epsilon', 1e-8)\n\n    # Read required tensors from the batch\n    log_prob_w = batch['log_prob_w']\n    log_prob_l = batch['log_prob_l']\n    weight = batch.get('weight')\n\n    # 1. Calculate the log-probability difference\n    delta = log_prob_w - log_prob_l\n\n    # 2. Inherited: Normalize delta for stability\n    normalized_delta = ops.zscore(delta)\n\n    # 3. Calculate win probability for entropy and focal terms\n    p_win = torch.sigmoid(delta)\n\n    # 4. New Coupling 1: Entropy-Based Dynamic Margin\n    # Clamp p_win for numerical stability in log\n    p_win_stable = torch.clamp(p_win, min=epsilon, max=1.0 - epsilon)\n    entropy = -(p_win_stable * torch.log(p_win_stable) + (1.0 - p_win_stable) * torch.log(1.0 - p_win_stable))\n    # Margin is proportional to uncertainty. Detach to only set a target.\n    margin = beta * entropy.detach()\n\n    # 5. Compute the core preference loss\n    loss_core = -F.logsigmoid(normalized_delta + margin)\n\n    # 6. New Coupling 2: Confidence-Penalized Focal Re-weighting\n    # Inherit confidence penalty from Parent 1\n    confidence_penalty = 1.0 - torch.tanh(torch.abs(delta))\n    # Standard focal factor for hard-example mining\n    focal_factor = torch.pow(1.0 - p_win, gamma)\n    # Combine and detach to only re-weight the loss\n    final_weight = (focal_factor * confidence_penalty).detach()\n\n    # 7. Apply the final weight to the core loss\n    final_loss = final_weight * loss_core\n\n    # Apply optional instance weights if provided\n    if weight is not None:\n        final_loss = final_loss * weight\n\n    # Return the mean loss over the batch\n    return final_loss.mean()",
+    "theoretical_basis": "A dynamically modulated Bradley-Terry preference model with an information-theoretic margin. The core loss is logistic on z-scored log-probabilities. It introduces two main couplings: (1) An adaptive margin directly proportional to the Shannon entropy of the model's prediction, which sets a larger separation target for pairs with high model uncertainty. (2) A focal-style re-weighting scheme that is penalized by model confidence (via tanh), concentrating learning on examples that are both misclassified and uncertain."
+  },
+  "fitness": {
+    "hf_like_score": 1000000000.0,
+    "validation_objective": 1000000000.0,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {},
+    "epoch_objective_mean": null,
+    "epoch_baseline_violations": null,
+    "epoch_better_than_baseline": null,
+    "train_score_mean": NaN,
+    "train_loss_mean": NaN,
+    "pair_count": 0,
+    "early_eval": {
+      "enabled": false,
+      "steps": 100,
+      "baseline_validation_objective": 8.390928588867187,
+      "candidate_validation_objective": null,
+      "early_stopped": false
+    },
+    "epoch_eval": {
+      "enabled": false,
+      "steps_per_epoch": null,
+      "epochs_total": 0,
+      "objectives": [],
+      "objective_mean": null,
+      "baseline_margins": null,
+      "baseline_violations": null,
+      "better_than_baseline": null
+    },
+    "eval_error": "probability tensor contains either `inf`, `nan` or element < 0",
+    "novelty": 213.43043770344443
+  },
+  "novelty": 213.43043770344443
+}
