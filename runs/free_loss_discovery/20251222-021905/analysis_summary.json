@@ -1,0 +1,53 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 7.941913296203611,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_PREF_SEMANTIC",
+        "count": 103
+      },
+      {
+        "code": "E_COMPILE_ERROR",
+        "count": 17
+      },
+      {
+        "code": "E_FORWARD_ERROR",
+        "count": 6
+      },
+      {
+        "code": "E_INPUT_MISMATCH",
+        "count": 6
+      },
+      {
+        "code": "E_MISSING_DEPENDENCY",
+        "count": 1
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 8,
+    "index": 0,
+    "name": "AdaptiveClippedMarginLoss",
+    "theoretical_basis": "A margin-based extension of the Bradley-Terry model. It introduces a confidence-aware margin and a dynamic, cost-gap-aware clipping mechanism to stabilize gradients and focus learning on moderately difficult examples, preventing overconfidence and large updates from outliers.",
+    "operators_used": [
+      "logsigmoid",
+      "tanh",
+      "softplus",
+      "relu",
+      "clamp"
+    ],
+    "hyperparams": {
+      "margin_scale": 1.0,
+      "confidence_scale": 0.1,
+      "clip_range": 5.0
+    },
+    "hf_like_score": 18.515498635864258,
+    "validation_objective": 8.515498635864258,
+    "generalization_penalty": 0.0,
+    "epoch_objective_mean": null,
+    "epoch_baseline_violations": 10,
+    "pair_count": 31679975
+  }
+}

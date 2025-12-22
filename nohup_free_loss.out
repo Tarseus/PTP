@@ -1,674 +1,573 @@
-[2025-12-21 20:50:39,366] INFO:ptp_discovery.free_loss_eoh: Starting free loss EoH search with config=configs/free_loss_discovery.yaml
-[2025-12-21 20:50:42,205] INFO:ptp_discovery.free_loss_eoh: Baseline PO training: steps=15630, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda, init_time=1.746s
-[2025-12-21 20:50:43,765] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 1/15630: score=48.226318 (avg=48.226318), loss=0.356016 (avg=0.356016)
-[2025-12-21 20:51:17,720] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 20:55:27,704] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 781/15630: score=8.222811 (avg=8.627734), loss=0.308354 (avg=0.302990)
-[2025-12-21 20:59:48,940] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 1562/15630: score=8.054997 (avg=8.387561), loss=0.313347 (avg=0.306963)
-[2025-12-21 20:59:49,265] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 21:00:07,938] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 1/10: validation_objective=8.029157
-[2025-12-21 21:04:25,150] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 2343/15630: score=8.084939 (avg=8.287253), loss=0.314736 (avg=0.309503)
-[2025-12-21 21:08:41,394] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 3124/15630: score=8.046007 (avg=8.229865), loss=0.316155 (avg=0.311236)
-[2025-12-21 21:08:42,036] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 21:09:00,834] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 2/10: validation_objective=7.991730
-[2025-12-21 21:13:18,834] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 3905/15630: score=7.996192 (avg=8.190816), loss=0.316873 (avg=0.312547)
-[2025-12-21 21:17:41,103] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 4686/15630: score=7.993162 (avg=8.162209), loss=0.319532 (avg=0.313620)
-[2025-12-21 21:17:42,122] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 21:18:00,621] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 3/10: validation_objective=7.971019
-[2025-12-21 21:22:24,838] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 5467/15630: score=7.972812 (avg=8.139440), loss=0.321374 (avg=0.314575)
-[2025-12-21 21:26:50,654] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 6248/15630: score=7.992186 (avg=8.121090), loss=0.321278 (avg=0.315445)
-[2025-12-21 21:26:51,973] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 21:27:10,469] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 4/10: validation_objective=7.951083
-[2025-12-21 21:31:29,050] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 7029/15630: score=7.975810 (avg=8.105587), loss=0.322280 (avg=0.316205)
-[2025-12-21 21:35:46,222] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 7810/15630: score=7.899570 (avg=8.092183), loss=0.322773 (avg=0.316882)
-[2025-12-21 21:35:47,871] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 21:36:06,648] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 5/10: validation_objective=7.937990
-[2025-12-21 21:40:28,461] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 8591/15630: score=7.998396 (avg=8.080600), loss=0.323160 (avg=0.317499)
-[2025-12-21 21:44:53,284] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 9372/15630: score=7.951269 (avg=8.070247), loss=0.322800 (avg=0.318054)
-[2025-12-21 21:44:55,265] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 21:45:14,145] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 6/10: validation_objective=7.925610
-[2025-12-21 21:49:34,131] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 10153/15630: score=7.956112 (avg=8.060979), loss=0.323996 (avg=0.318548)
-[2025-12-21 21:53:58,874] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 10934/15630: score=7.965070 (avg=8.052635), loss=0.325974 (avg=0.319000)
-[2025-12-21 21:54:01,269] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 21:54:20,018] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 7/10: validation_objective=7.920070
-[2025-12-21 21:58:43,049] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 11715/15630: score=7.918342 (avg=8.044877), loss=0.323686 (avg=0.319402)
-[2025-12-21 22:03:07,090] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 12496/15630: score=7.949409 (avg=8.037990), loss=0.324866 (avg=0.319775)
-[2025-12-21 22:03:09,743] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 22:03:28,516] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 8/10: validation_objective=7.917229
-[2025-12-21 22:07:48,170] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 13277/15630: score=7.867681 (avg=8.031544), loss=0.325174 (avg=0.320125)
-[2025-12-21 22:12:08,923] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 14058/15630: score=7.926992 (avg=8.025683), loss=0.324729 (avg=0.320439)
-[2025-12-21 22:12:11,871] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 22:12:30,495] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 9/10: validation_objective=7.900449
-[2025-12-21 22:16:46,116] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 14839/15630: score=7.875456 (avg=8.020143), loss=0.326889 (avg=0.320727)
-[2025-12-21 22:21:08,585] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 15620/15630: score=7.942103 (avg=8.014831), loss=0.324950 (avg=0.320994)
-[2025-12-21 22:21:11,972] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 22:21:30,538] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 10/10: validation_objective=7.901255
-[2025-12-21 22:21:30,538] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 22:21:49,234] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
-[2025-12-21 22:22:07,952] INFO:ptp_discovery.free_loss_eoh: Baseline PO timing: init=1.746s, train=5448.333s, eval=37.414s
-[2025-12-21 22:22:07,954] INFO:ptp_discovery.free_loss_eoh: Baseline po_loss: hf_score=7.902569, fitness_score=7.944559, validation_objective=7.902569, gen_penalty=0.000000
-[2025-12-21 22:22:07,954] INFO:ptp_discovery.free_loss_eoh: Run directory: /data1/gushengda/PTP/runs/free_loss_discovery/20251221-222207
-[2025-12-21 22:22:07,954] INFO:ptp_discovery.free_loss_eoh: === Generation 0/9 ===
-[2025-12-21 22:22:07,954] INFO:ptp_discovery.free_loss_eoh: Generating initial population with 8 LLM candidates
-[2025-12-21 22:22:22,786] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:22:34,610] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:22:48,913] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:23:00,238] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:23:15,244] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:23:27,522] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:23:43,973] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:23:57,186] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:24:15,377] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:24:29,390] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:24:46,742] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:25:00,868] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:25:15,323] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:25:27,303] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:25:41,617] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:25:52,263] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:25:52,266] INFO:ptp_discovery.free_loss_eoh: Population size for generation 0: 8
-[2025-12-21 22:26:03,718] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:26:03,728] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=0, name=AdaptiveSigmoidFlowLoss: reason=forward_error: generated_loss() missing 1 required positional argument: 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:26:15,083] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:26:15,093] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=0, name=AdaptiveSigmoidFlowLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'extra', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 22:26:25,449] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:26:25,489] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=1, name=AdaptiveSigmoidFlowLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-21 22:26:37,238] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:26:49,715] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:26:49,728] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=2, name=AdaptiveHingeLogSigmoid: reason=missing_dependency: name 'logsigmoid' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:27:07,738] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:27:20,945] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:27:33,437] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:27:33,452] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=2, name=AdaptiveHingeLogLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:27:44,689] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:27:44,701] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=2, name=AdaptiveHingeLogLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 22:27:57,735] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:27:57,746] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=3, name=AdaptiveHingeLogLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:28:09,214] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:28:09,225] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=3, name=AdaptiveHingeLogLoss: reason=forward_error: generated_loss() missing 1 required positional argument: 'log_prob_l', loss_value=None, grad_norm=None
-[2025-12-21 22:28:21,770] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:28:21,786] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=4, name=AdaptiveHingeLogLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:28:34,440] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:28:34,453] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=4, name=AdaptiveHingeLogLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 22:28:46,596] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:28:57,740] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:28:57,754] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=5, name=AdaptiveSigmoidFlowLoss: reason=missing_dependency: name 'sigmoid' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:29:13,527] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:29:26,189] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:29:38,347] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:29:38,358] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=5, name=AdaptiveSigmoidFlowLoss: reason=forward_error: 'NoneType' object is not callable, loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:29:49,433] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:29:49,446] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=5, name=AdaptiveSigmoidFlowLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 22:30:00,389] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:30:00,401] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=6, name=AdaptiveSigmoidFlowLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'device', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:30:11,560] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:30:21,645] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:30:21,658] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=7, name=AdaptiveHingeLogLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:30:31,304] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:30:31,308] INFO:ptp_discovery.free_loss_eoh: Generation 0 summary: static_fail=0, dynamic_fail=5, evaluated=0, new_elites=0
-[2025-12-21 22:30:31,308] INFO:ptp_discovery.free_loss_eoh: === Generation 1/9 ===
-[2025-12-21 22:30:31,308] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-21 22:30:47,977] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:30:59,574] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:31:16,189] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:31:27,658] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:31:43,089] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:31:55,985] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:32:11,368] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:32:23,105] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:32:37,283] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:32:48,186] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:33:06,788] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:33:21,212] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:33:35,864] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:33:47,720] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:34:05,431] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:34:11,734] INFO:openai._base_client: Retrying request to /chat/completions in 0.379193 seconds
-[2025-12-21 22:34:26,098] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:34:26,101] INFO:ptp_discovery.free_loss_eoh: Population size for generation 1: 8
-[2025-12-21 22:34:36,592] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:34:36,604] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=0, name=AdaptiveFocalLogSigmoidLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'operators', and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:34:46,998] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:34:47,010] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=0, name=AdaptiveFocalLogSigmoidLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'operators', and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 22:34:57,496] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:35:08,106] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:35:08,123] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=1, name=AdaptiveTanhMarginLoss: reason=missing_dependency: name 'zscore' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:35:23,109] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:35:33,881] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:35:45,204] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:35:45,217] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=1, name=AdaptiveTanhMarginLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:35:54,398] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:35:54,409] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=1, name=AdaptiveTanhMarginLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 22:36:04,736] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:36:04,748] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=2, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'op', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:36:14,731] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:36:14,742] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=2, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'op', loss_value=None, grad_norm=None
-[2025-12-21 22:36:24,719] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:36:35,453] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:36:35,466] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=3, name=AdaptiveTanhMarginLogSigmoid: reason=missing_batch_key: 'log_prob_w'; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:36:51,167] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:37:02,889] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:37:13,991] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:37:25,194] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:37:25,206] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=3, name=DynamicMarginFocalLoss: reason=missing_batch_key: 'log_prob_w', loss_value=None, grad_norm=None
-[2025-12-21 22:37:36,695] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:37:36,706] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=4, name=AdaptiveTanhMarginLogSigmoid: reason=forward_error: generated_loss() missing 13 required positional arguments: 'log_prob_l', 'logsigmoid', 'softplus', 'sigmoid', 'exp', 'log', 'tanh', 'relu', 'clamp', 'normalize', 'zscore', 'rank_gap', and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:37:48,050] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:37:48,061] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=4, name=AdaptiveTanhMarginLogSigmoid: reason=forward_error: generated_loss() missing 13 required positional arguments: 'log_prob_l', 'logsigmoid', 'softplus', 'sigmoid', 'exp', 'log', 'tanh', 'relu', 'clamp', 'normalize', 'zscore', 'rank_gap', and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 22:38:02,518] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:38:02,531] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=5, name=AdaptiveSigmoidFocalLoss: reason=missing_dependency: name 'zscore' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:38:16,747] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:38:27,673] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:38:37,989] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:38:38,001] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=5, name=AdaptiveMarginLogSigmoid: reason=forward_error: generated_loss() missing 4 required positional arguments: 'log_prob_l', 'operators', 'hyperparams', and 'weights', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:38:48,547] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:38:48,560] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=5, name=AdaptiveMarginLogSigmoid: reason=forward_error: generated_loss() missing 4 required positional arguments: 'log_prob_l', 'operators', 'hyperparams', and 'weights', loss_value=None, grad_norm=None
-[2025-12-21 22:38:58,882] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:38:58,894] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=6, name=AdaptiveTanhMarginLoss: reason=missing_dependency: name 'tanh' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:39:16,187] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:39:29,696] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:39:41,888] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:39:41,902] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=6, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 1 required positional argument: 'torch', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:39:54,707] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:40:08,156] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:40:08,169] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=7, name=AdaptiveTanhMarginLoss: reason=missing_dependency: name 'isinstance' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:40:22,543] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:40:34,729] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:40:45,540] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:40:45,552] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=7, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:40:56,386] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:40:56,399] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=7, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 22:40:56,399] INFO:ptp_discovery.free_loss_eoh: Generation 1 summary: static_fail=0, dynamic_fail=7, evaluated=0, new_elites=0
-[2025-12-21 22:40:56,399] INFO:ptp_discovery.free_loss_eoh: === Generation 2/9 ===
-[2025-12-21 22:40:56,399] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-21 22:41:11,697] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:41:23,000] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:41:41,467] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:41:55,554] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:42:09,348] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:42:20,154] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:42:35,147] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:42:48,232] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:43:06,862] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:43:22,228] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:43:37,899] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:43:50,199] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:44:08,048] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:44:21,629] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:44:38,671] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:44:51,771] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:44:51,774] INFO:ptp_discovery.free_loss_eoh: Population size for generation 2: 8
-[2025-12-21 22:45:01,379] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:45:01,391] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=0, name=AdaptiveTanhMarginLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:45:11,613] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:45:23,194] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:45:34,768] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:45:34,784] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=1, name=AdaptiveSigmoidFocalLoss: reason=missing_batch_key: 'log_prob_w'; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:45:52,359] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:46:04,997] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:46:17,508] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:46:17,520] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=1, name=AdaptiveSigmoidFocalLoss: reason=forward_error: module 'torch' has no attribute 'softplus', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:46:29,950] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:46:40,672] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:46:40,693] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=2, name=AdaptiveHingeLoss: reason=missing_dependency: name 'all' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:46:57,006] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:47:10,306] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:47:22,317] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:47:22,328] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=2, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'extra_info', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:47:34,213] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:47:34,225] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=2, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'state', loss_value=None, grad_norm=None
-[2025-12-21 22:47:45,503] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:47:46,289] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=3, name=AdaptiveLogSigmoidWithClippedCostRatio: reason=missing_dependency: name 'clamp' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:48:02,527] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:48:14,862] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:48:26,393] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:48:37,514] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:48:37,525] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=3, name=SigmoidScaledHingeLoss: reason=missing_dependency: name 'max' is not defined, loss_value=None, grad_norm=None
-[2025-12-21 22:48:50,525] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:48:50,537] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=4, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:49:03,088] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:49:03,101] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=4, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 22:49:14,547] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:49:14,558] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=5, name=AdaptiveSigmoidFlowLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:49:25,701] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:49:25,711] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=5, name=AdaptiveSigmoidFlowLoss: reason=forward_error: generated_loss() takes 2 positional arguments but 3 were given, loss_value=None, grad_norm=None
-[2025-12-21 22:49:37,240] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:49:37,253] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=6, name=AdaptiveSigmoidFocalLoss: reason=missing_dependency: name 'logsigmoid' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:49:52,427] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:50:04,194] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:50:15,802] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:50:15,813] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=6, name=AdaptiveSigmoidFocalLoss: reason=missing_dependency: name 'operators' is not defined, loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:50:27,961] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:50:27,977] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=6, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 1 required positional argument: 'log_prob_l', loss_value=None, grad_norm=None
-[2025-12-21 22:50:41,210] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:50:41,222] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=7, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'torch' and 'F', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:50:52,505] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:50:52,517] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=7, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 4 required positional arguments: 'log_prob_l', 'hyperparams', 'torch', and 'F', loss_value=None, grad_norm=None
-[2025-12-21 22:50:52,517] INFO:ptp_discovery.free_loss_eoh: Generation 2 summary: static_fail=0, dynamic_fail=6, evaluated=0, new_elites=0
-[2025-12-21 22:50:52,517] INFO:ptp_discovery.free_loss_eoh: === Generation 3/9 ===
-[2025-12-21 22:50:52,517] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-21 22:51:09,643] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:51:21,687] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:51:37,345] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:51:49,087] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:52:04,904] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:52:17,589] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:52:34,043] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:52:46,567] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:53:02,296] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:53:14,289] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:53:30,067] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:53:41,156] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:53:55,906] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:54:07,388] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:54:25,002] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:54:38,399] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:54:38,402] INFO:ptp_discovery.free_loss_eoh: Population size for generation 3: 8
-[2025-12-21 22:54:48,167] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:54:48,179] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=0, name=AdaptiveSigmoidFlowLoss: reason=forward_error: generated_loss() missing 4 required positional arguments: 'log_prob_l', 'hyperparams', 'a_is_best', and 'weight', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:54:59,035] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:54:59,046] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=0, name=AdaptiveSigmoidFlowLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 22:55:10,683] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:55:22,392] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:55:35,875] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:55:48,009] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:55:48,021] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=2, name=AdaptiveLogSigmoidWithCostAttention: reason=missing_batch_key: 'log_prob_w'; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:56:01,793] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:56:12,943] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:56:23,362] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:56:23,375] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=2, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:56:33,571] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:56:45,338] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:56:57,296] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:57:08,762] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:57:08,773] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=4, name=AdaptiveSigmoidFocalLoss: reason=missing_batch_key: 'logsigmoid'; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:57:26,309] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:57:40,367] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:57:52,280] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:57:52,292] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=4, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:58:05,427] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:58:05,439] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=4, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() takes 2 positional arguments but 3 were given, loss_value=None, grad_norm=None
-[2025-12-21 22:58:16,864] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:58:16,876] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=5, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 22:58:27,288] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:58:27,298] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=5, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 22:58:38,466] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:58:38,478] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=6, name=AdaptiveMarginHingeLoss: reason=missing_dependency: name 'tanh' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 22:58:55,232] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:59:08,022] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:59:20,807] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:59:32,009] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:59:42,797] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:59:55,539] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 22:59:55,553] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=7, name=AdaptiveSigmoidFocalLoss: reason=missing_dependency: name 'clamp' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:00:08,849] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:00:19,293] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:00:29,116] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:00:29,128] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=7, name=AdaptiveHingeLogLoss: reason=missing_dependency: name 'max' is not defined, loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:00:38,497] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:00:38,510] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=7, name=AdaptiveHingeLogLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 23:00:38,510] INFO:ptp_discovery.free_loss_eoh: Generation 3 summary: static_fail=0, dynamic_fail=4, evaluated=0, new_elites=0
-[2025-12-21 23:00:38,510] INFO:ptp_discovery.free_loss_eoh: === Generation 4/9 ===
-[2025-12-21 23:00:38,510] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-21 23:00:55,362] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:01:08,445] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:01:21,936] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:01:32,427] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:01:47,778] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:02:01,676] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:02:18,113] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:02:29,734] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:02:45,514] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:02:57,026] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:03:11,905] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:03:23,091] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:03:37,499] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:03:48,155] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:04:03,252] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:04:15,664] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:04:15,667] INFO:ptp_discovery.free_loss_eoh: Population size for generation 4: 8
-[2025-12-21 23:04:27,405] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:04:27,422] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=0, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:04:39,000] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:04:39,013] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=0, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:04:49,340] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:04:49,350] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=1, name=AdaptiveMarginHingeLoss: reason=missing_dependency: name 'abs' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:05:06,483] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:05:19,014] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:05:30,983] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:05:30,995] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=1, name=AdaptiveFocalLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:05:40,954] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:05:40,966] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=1, name=AdaptiveFocalLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:05:51,995] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:05:52,007] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=2, name=AdaptiveMarginHingeLoss: reason=missing_dependency: name 'isinstance' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:06:07,508] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:06:18,767] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:06:29,527] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:06:29,546] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=2, name=AdaptiveHingeLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-21 23:06:42,024] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:06:51,802] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:06:51,813] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=3, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:07:02,807] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:07:02,818] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=3, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() takes 1 positional argument but 3 were given, loss_value=None, grad_norm=None
-[2025-12-21 23:07:12,555] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:07:12,565] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=4, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'weight', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:07:23,091] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:07:23,102] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=4, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 1 required positional argument: 'log_prob_l', loss_value=None, grad_norm=None
-[2025-12-21 23:07:33,938] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:07:33,950] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=5, name=AdaptiveMarginHingeLoss: reason=missing_dependency: name 'softplus' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:07:51,443] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:08:03,502] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:08:14,880] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:08:26,031] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:08:34,939] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:08:46,123] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:08:46,135] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=6, name=AdaptiveTanhMarginLogSigmoid: reason=missing_dependency: name 'tanh' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:09:00,051] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:09:11,956] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:09:22,876] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:09:33,399] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:09:33,409] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=6, name=AdaptiveMarginHingeLoss: reason=missing_batch_key: 'tanh', loss_value=None, grad_norm=None
-[2025-12-21 23:09:45,121] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:09:45,133] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=7, name=AdaptiveFocalLogLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:09:56,767] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:09:56,778] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=7, name=AdaptiveFocalLogLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:09:56,778] INFO:ptp_discovery.free_loss_eoh: Generation 4 summary: static_fail=0, dynamic_fail=6, evaluated=0, new_elites=0
-[2025-12-21 23:09:56,779] INFO:ptp_discovery.free_loss_eoh: === Generation 5/9 ===
-[2025-12-21 23:09:56,779] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-21 23:10:16,099] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:10:29,896] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:10:45,101] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:10:56,484] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:11:14,015] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:11:27,585] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:11:46,046] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:11:59,686] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:12:14,988] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:12:26,646] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:12:56,660] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:13:20,850] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:13:50,347] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:14:15,340] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:14:45,436] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:15:10,634] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:15:10,637] INFO:ptp_discovery.free_loss_eoh: Population size for generation 5: 8
-[2025-12-21 23:15:34,948] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:15:34,975] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=0, name=AsymmetricFocalMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-21 23:16:01,956] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:16:01,969] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=0, name=AsymmetricFocalMarginLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:16:26,040] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:16:26,053] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=1, name=AdaptiveSigmoidFocalLoss: reason=missing_batch_key: 'sigmoid'; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:16:55,932] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:17:21,999] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:17:45,730] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:17:45,741] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=1, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:18:08,534] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:18:08,550] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=1, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_w' and 'log_prob_l', loss_value=None, grad_norm=None
-[2025-12-21 23:18:31,982] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:18:31,995] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=2, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:18:55,908] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:18:55,920] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=2, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'weight', and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:19:17,183] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:19:17,194] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=3, name=AdaptiveTanhMarginLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:19:36,747] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:19:36,758] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=3, name=AdaptiveTanhMarginLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'cost_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 23:19:56,012] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:19:56,024] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=4, name=AdaptiveTanhMarginLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:20:16,153] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:20:16,165] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=4, name=AdaptiveTanhMarginLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_w' and 'log_prob_l', loss_value=None, grad_norm=None
-[2025-12-21 23:20:36,839] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:20:36,848] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=5, name=AdaptiveSigmoidFocalLoss: reason=missing_batch_key: 'zscore'; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:21:03,142] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:21:24,416] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:21:44,962] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:21:44,973] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=5, name=AdaptiveSigmoidFocalLoss: reason=missing_batch_key: 'tanh', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:22:04,713] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:22:04,725] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=5, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 13 required positional arguments: 'log_prob_l', 'logsigmoid', 'softplus', 'sigmoid', 'exp', 'log', 'tanh', 'relu', 'clamp', 'normalize', 'zscore', 'rank_gap', and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:22:25,017] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:22:25,029] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=6, name=AdaptiveSigmoidFocalLoss: reason=missing_dependency: name 'tanh' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:22:49,733] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:23:11,236] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:23:29,879] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:23:29,889] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=6, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:23:49,679] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:23:49,693] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=6, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_w' and 'log_prob_l', loss_value=None, grad_norm=None
-[2025-12-21 23:24:10,538] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:24:10,550] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=7, name=AdaptiveSigmoidFocalLoss: reason=missing_dependency: name 'tanh' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:24:38,728] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:25:02,153] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:25:26,815] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:25:26,827] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=7, name=AdaptiveSigmoidFocalLoss: reason=forward_error: module 'torch' has no attribute 'logsigmoid', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:25:51,128] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:25:51,134] INFO:ptp_discovery.free_loss_eoh: Generation 5 summary: static_fail=0, dynamic_fail=7, evaluated=0, new_elites=0
-[2025-12-21 23:25:51,134] INFO:ptp_discovery.free_loss_eoh: === Generation 6/9 ===
-[2025-12-21 23:25:51,134] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-21 23:26:17,592] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:26:37,642] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:27:04,753] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:27:27,764] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:27:54,049] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:28:16,986] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:28:44,948] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:29:08,391] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:29:33,826] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:29:55,024] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:30:22,493] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:30:43,788] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:31:10,637] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:31:31,540] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:31:57,391] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:32:18,466] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:32:18,468] INFO:ptp_discovery.free_loss_eoh: Population size for generation 6: 8
-[2025-12-21 23:32:37,645] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:32:37,662] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=0, name=AdaptiveMarginHingeLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-21 23:32:58,238] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:33:19,413] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:33:39,529] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:33:39,543] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=1, name=RobustCostGapModulatedLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 23:34:00,127] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:34:00,138] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=2, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:34:20,943] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:34:20,953] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=2, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 23:34:41,630] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:34:41,642] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=3, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:35:03,023] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:35:03,035] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=3, name=AdaptiveSigmoidFocalLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 23:35:24,547] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:35:24,561] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=4, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:35:43,791] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:35:43,803] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=4, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-21 23:36:03,092] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:36:03,104] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=5, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:36:24,607] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:36:24,618] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=5, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() takes 1 positional argument but 3 were given, loss_value=None, grad_norm=None
-[2025-12-21 23:36:47,943] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:36:47,955] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=6, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 1 required positional argument: 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:37:09,804] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:37:09,818] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=6, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 1 required positional argument: 'operators', loss_value=None, grad_norm=None
-[2025-12-21 23:37:28,849] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:37:28,861] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=7, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:37:48,354] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:37:48,365] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=7, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:37:48,365] INFO:ptp_discovery.free_loss_eoh: Generation 6 summary: static_fail=0, dynamic_fail=7, evaluated=0, new_elites=0
-[2025-12-21 23:37:48,365] INFO:ptp_discovery.free_loss_eoh: === Generation 7/9 ===
-[2025-12-21 23:37:48,365] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-21 23:38:15,267] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:38:35,870] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:39:03,330] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:39:26,340] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:39:51,440] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:40:12,735] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:40:41,932] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:41:06,074] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:41:33,500] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:41:56,518] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:42:23,703] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:42:45,104] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:43:11,122] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:43:31,035] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:43:57,321] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:44:18,624] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:44:18,626] INFO:ptp_discovery.free_loss_eoh: Population size for generation 7: 8
-[2025-12-21 23:44:38,232] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:44:58,107] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:45:18,962] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:45:18,978] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=1, name=AdaptiveFocalLogSigmoid: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:45:39,177] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:45:39,189] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=1, name=AdaptiveFocalLogSigmoid: reason=forward_error: generated_loss() missing 1 required positional argument: 'log_prob_l', loss_value=None, grad_norm=None
-[2025-12-21 23:45:59,317] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:45:59,328] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=2, name=AdaptiveTanhMarginLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:46:21,421] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:46:21,432] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=2, name=AdaptiveTanhMarginLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:46:44,477] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:46:44,490] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=3, name=AsymmetricFocalMarginLoss: reason=missing_dependency: name 'zscore' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:47:13,606] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:47:34,999] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:47:57,923] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:47:57,938] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=3, name=AdaptiveFocalLogLoss: reason=missing_dependency: name 'abs' is not defined, loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:48:21,110] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:48:21,122] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=3, name=AdaptiveFocalLogLoss: reason=missing_dependency: name 'tanh' is not defined, loss_value=None, grad_norm=None
-[2025-12-21 23:48:42,340] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:48:42,353] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=4, name=AdaptiveMarginFocalLoss: reason=missing_dependency: name 'tanh' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:49:09,312] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:49:31,921] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:49:53,180] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:49:53,194] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=4, name=AdaptiveFocalLogLoss: reason=missing_dependency: name 'tanh' is not defined, loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:50:14,974] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:50:14,987] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=4, name=AdaptiveFocalLogLoss: reason=missing_dependency: name 'sigmoid' is not defined, loss_value=None, grad_norm=None
-[2025-12-21 23:50:32,801] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:50:53,042] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:50:53,055] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=5, name=AdaptiveFocalLossWithTanhMargin: reason=missing_dependency: name 'loss' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:51:20,038] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:51:41,114] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:52:00,335] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:52:00,348] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=5, name=AdaptiveFocalLossWithDynamicMargin: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'operators', and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:52:19,179] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:52:19,190] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=5, name=AdaptiveFocalLossWithDynamicMargin: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'operators', and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:52:37,169] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:52:37,182] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=6, name=AdaptiveTanhMarginLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:52:57,339] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:52:57,352] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=6, name=AdaptiveTanhMarginLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:53:17,849] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:53:37,599] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:53:37,611] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=7, name=AdaptiveTanhMarginLoss: reason=missing_batch_key: 'log_prob_w'; dropping candidate and resampling (attempt=1/1)
-[2025-12-21 23:54:05,734] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:54:28,414] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:54:50,056] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:54:50,066] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=7, name=AdaptiveFocalLogSigmoid: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'operators', and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-21 23:55:12,607] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:55:12,619] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=7, name=AdaptiveFocalLogSigmoid: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'operators', and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-21 23:55:12,619] INFO:ptp_discovery.free_loss_eoh: Generation 7 summary: static_fail=0, dynamic_fail=7, evaluated=0, new_elites=0
-[2025-12-21 23:55:12,619] INFO:ptp_discovery.free_loss_eoh: === Generation 8/9 ===
-[2025-12-21 23:55:12,619] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-21 23:55:38,016] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:55:59,925] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:56:28,759] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:56:51,141] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:57:19,420] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:57:41,143] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:58:07,408] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:58:27,848] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:58:54,050] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:59:18,429] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-21 23:59:40,819] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:00:01,112] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:00:30,264] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:00:53,622] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:01:21,470] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:01:42,074] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:01:42,076] INFO:ptp_discovery.free_loss_eoh: Population size for generation 8: 8
-[2025-12-22 00:02:03,540] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:02:03,554] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=0, name=AdaptiveMarginHingeLoss: reason=missing_dependency: name 'sigmoid' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-22 00:02:30,920] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:02:53,111] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:03:15,097] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:03:15,105] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=0, name=AdaptiveHingeLoss: reason=forward_error: generated_loss() missing 4 required positional arguments: 'log_prob_l', 'hyperparams', 'torch', and 'F', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:03:35,197] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:03:35,214] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=0, name=AdaptiveHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'torch', loss_value=None, grad_norm=None
-[2025-12-22 00:03:55,114] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:03:55,125] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=1, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 6 required positional arguments: 'log_prob_l', 'weight', 'alpha', 'margin_scale', 'softplus', and 'tanh', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:04:16,778] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:04:16,789] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=1, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 1 required positional argument: 'log_prob_l', loss_value=None, grad_norm=None
-[2025-12-22 00:04:35,519] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:04:35,532] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=2, name=AdaptiveMarginZScoreLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:04:56,476] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:04:56,490] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=2, name=AdaptiveMarginZScoreLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-22 00:05:18,401] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:05:18,413] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=3, name=AdaptiveMarginHingeLoss: reason=missing_dependency: name 'zscore' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-22 00:05:44,000] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:06:06,270] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:06:26,882] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:06:48,558] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:06:48,575] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=3, name=AdaptiveMarginHingeLoss: reason=missing_batch_key: 'log_prob_w', loss_value=None, grad_norm=None
-[2025-12-22 00:07:11,858] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:07:33,018] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:07:33,031] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=4, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 4 required positional arguments: 'log_prob_l', 'weight', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-22 00:07:54,720] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:07:54,733] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=5, name=AdaptiveMarginHingeLoss: reason=missing_dependency: name 'tanh' is not defined; dropping candidate and resampling (attempt=1/1)
-[2025-12-22 00:08:26,079] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:08:50,520] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:09:13,087] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:09:13,105] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=5, name=AdaptiveMarginHingeLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-22 00:09:32,976] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:09:53,877] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:09:53,890] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=6, name=AdaptiveFocalLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:10:15,240] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:10:15,252] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=6, name=AdaptiveFocalLogSigmoid: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-22 00:10:32,931] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:10:53,526] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:10:53,539] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=7, name=AdaptiveMarginHingeLoss: reason=missing_batch_key: 'log_prob_w'; dropping candidate and resampling (attempt=1/1)
-[2025-12-22 00:11:20,586] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:11:42,001] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:12:04,611] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:12:04,628] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=7, name=AdaptiveMarginHingeLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-22 00:12:26,645] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:12:26,657] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=7, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-22 00:12:26,657] INFO:ptp_discovery.free_loss_eoh: Generation 8 summary: static_fail=0, dynamic_fail=7, evaluated=0, new_elites=0
-[2025-12-22 00:12:26,657] INFO:ptp_discovery.free_loss_eoh: === Generation 9/9 ===
-[2025-12-22 00:12:26,657] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=0
-[2025-12-22 00:12:56,792] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:13:21,896] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:13:47,805] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:14:10,731] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:14:39,141] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:15:03,099] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:15:31,836] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:15:54,393] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:16:22,770] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:16:46,553] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:17:14,477] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:17:36,522] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:18:05,494] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:18:28,586] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:18:54,089] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:19:16,007] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:19:16,009] INFO:ptp_discovery.free_loss_eoh: Population size for generation 9: 8
-[2025-12-22 00:19:36,925] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:19:59,243] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:19:59,258] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=0, name=AsymmetricFocalMarginLoss: reason=missing_batch_key: 'log_prob_w'; dropping candidate and resampling (attempt=1/1)
-[2025-12-22 00:20:28,784] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:20:51,965] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:21:13,963] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:21:13,973] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=0, name=AdaptiveFocalLogSigmoidLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'operators', and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:21:35,741] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:21:35,753] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=0, name=AdaptiveFocalLogSigmoidLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'operators', and 'hyperparams', loss_value=None, grad_norm=None
-[2025-12-22 00:21:58,054] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:21:58,065] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=1, name=AdaptiveTanhMarginLogSigmoid: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'ops', and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:22:19,237] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:22:19,248] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=1, name=AdaptiveTanhMarginLogSigmoid: reason=forward_error: 'dict' object has no attribute 'tanh', loss_value=None, grad_norm=None
-[2025-12-22 00:22:40,145] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:22:40,158] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=2, name=AsymmetricFocalMarginLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'ops', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:23:02,133] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:23:02,152] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=2, name=AsymmetricFocalMarginLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hparams', and 'ops', loss_value=None, grad_norm=None
-[2025-12-22 00:23:23,316] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:23:23,338] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=3, name=AdaptiveTanhMarginLogSigmoid: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-22 00:23:43,850] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:24:04,130] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:24:04,142] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=4, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 15 required positional arguments: 'log_prob_l', 'margin_scale', 'temp_cost', 'weight_scale', 'tanh', 'relu', 'softplus', 'logsigmoid', 'sigmoid', 'exp', 'log', 'clamp', 'normalize', 'zscore', and 'rank_gap', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:24:25,629] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:24:25,641] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=4, name=AdaptiveMarginHingeLoss: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-22 00:24:44,720] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:24:44,731] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=5, name=AdaptiveMarginHinge: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-22 00:25:04,723] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:25:04,734] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=5, name=AdaptiveMarginHinge: reason=forward_error: generated_loss() missing 3 required positional arguments: 'log_prob_l', 'hyperparams', and 'operators', loss_value=None, grad_norm=None
-[2025-12-22 00:25:26,548] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 00:25:26,561] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=6, name=AdaptiveTanhMarginLoss: reason=forward_error: generated_loss() missing 2 required positional arguments: 'log_prob_l' and 'hyperparams', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
+[2025-12-22 00:46:46,171] INFO:ptp_discovery.free_loss_eoh: Starting free loss EoH search with config=configs/free_loss_discovery.yaml
+[2025-12-22 00:46:49,138] INFO:ptp_discovery.free_loss_eoh: Baseline PO training: steps=15630, train_problem_size=100, pomo_size=100, batch_size=64, device=cuda, init_time=1.766s
+[2025-12-22 00:46:50,804] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 1/15630: score=48.226318 (avg=48.226318), loss=0.356016 (avg=0.356016)
+[2025-12-22 00:47:24,857] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 00:51:31,523] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 781/15630: score=8.231989 (avg=8.628531), loss=0.309646 (avg=0.302932)
+[2025-12-22 00:55:58,845] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 1562/15630: score=8.065319 (avg=8.386970), loss=0.312961 (avg=0.306812)
+[2025-12-22 00:55:59,182] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 00:56:17,919] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 1/10: validation_objective=8.028352
+[2025-12-22 01:00:46,318] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 2343/15630: score=8.103248 (avg=8.286343), loss=0.316041 (avg=0.309357)
+[2025-12-22 01:05:08,841] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 3124/15630: score=8.039026 (avg=8.228615), loss=0.314203 (avg=0.311075)
+[2025-12-22 01:05:09,514] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 01:05:28,272] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 2/10: validation_objective=7.988210
+[2025-12-22 01:09:52,740] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 3905/15630: score=7.993048 (avg=8.189843), loss=0.317273 (avg=0.312366)
+[2025-12-22 01:14:18,883] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 4686/15630: score=7.971683 (avg=8.161405), loss=0.320888 (avg=0.313437)
+[2025-12-22 01:14:19,879] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 01:14:38,996] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 3/10: validation_objective=7.968035
+[2025-12-22 01:19:01,098] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 5467/15630: score=7.983955 (avg=8.138846), loss=0.320361 (avg=0.314412)
+[2025-12-22 01:23:25,819] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 6248/15630: score=7.996319 (avg=8.120527), loss=0.321038 (avg=0.315272)
+[2025-12-22 01:23:27,114] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 01:23:45,830] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 4/10: validation_objective=7.950004
+[2025-12-22 01:28:06,185] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 7029/15630: score=7.978591 (avg=8.105066), loss=0.321388 (avg=0.316051)
+[2025-12-22 01:32:27,258] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 7810/15630: score=7.907010 (avg=8.091619), loss=0.323203 (avg=0.316754)
+[2025-12-22 01:32:28,911] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 01:32:47,715] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 5/10: validation_objective=7.936737
+[2025-12-22 01:37:10,560] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 8591/15630: score=7.991270 (avg=8.079943), loss=0.324334 (avg=0.317361)
+[2025-12-22 01:41:34,379] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 9372/15630: score=7.957341 (avg=8.069440), loss=0.324735 (avg=0.317906)
+[2025-12-22 01:41:36,413] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 01:41:55,307] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 6/10: validation_objective=7.929108
+[2025-12-22 01:46:18,423] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 10153/15630: score=7.951082 (avg=8.060011), loss=0.325052 (avg=0.318398)
+[2025-12-22 01:50:46,083] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 10934/15630: score=7.962477 (avg=8.051467), loss=0.325714 (avg=0.318847)
+[2025-12-22 01:50:48,400] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 01:51:07,272] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 7/10: validation_objective=7.919309
+[2025-12-22 01:55:25,612] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 11715/15630: score=7.922665 (avg=8.043538), loss=0.324725 (avg=0.319257)
+[2025-12-22 01:59:47,938] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 12496/15630: score=7.939869 (avg=8.036493), loss=0.324522 (avg=0.319632)
+[2025-12-22 01:59:50,674] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 02:00:09,545] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 8/10: validation_objective=7.908992
+[2025-12-22 02:04:32,688] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 13277/15630: score=7.869372 (avg=8.029866), loss=0.326324 (avg=0.319971)
+[2025-12-22 02:08:57,212] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 14058/15630: score=7.911475 (avg=8.023864), loss=0.325613 (avg=0.320294)
+[2025-12-22 02:09:00,200] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 02:09:18,928] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 9/10: validation_objective=7.897369
+[2025-12-22 02:13:41,465] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 14839/15630: score=7.875738 (avg=8.018190), loss=0.326290 (avg=0.320599)
+[2025-12-22 02:18:04,503] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 15620/15630: score=7.945146 (avg=8.012754), loss=0.325901 (avg=0.320880)
+[2025-12-22 02:18:08,640] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 02:18:27,773] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 10/10: validation_objective=7.893018
+[2025-12-22 02:18:27,773] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 02:18:46,586] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=100, pomo_size=100, episodes=10000, batch_size=64
+[2025-12-22 02:19:05,359] INFO:ptp_discovery.free_loss_eoh: Baseline PO timing: init=1.766s, train=5498.635s, eval=37.585s
+[2025-12-22 02:19:05,361] INFO:ptp_discovery.free_loss_eoh: Baseline po_loss: hf_score=7.894443, fitness_score=7.941913, validation_objective=7.894443, gen_penalty=0.000000
+[2025-12-22 02:19:05,361] INFO:ptp_discovery.free_loss_eoh: Run directory: /data1/gushengda/PTP/runs/free_loss_discovery/20251222-021905
+[2025-12-22 02:19:05,361] INFO:ptp_discovery.free_loss_eoh: === Generation 0/9 ===
+[2025-12-22 02:19:05,362] INFO:ptp_discovery.free_loss_eoh: Generating initial population with 8 LLM candidates
+[2025-12-22 02:19:30,263] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:19:51,325] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:20:14,985] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:20:33,082] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:20:56,310] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:21:19,264] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:21:40,598] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:22:02,489] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:22:25,440] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:22:44,576] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:23:06,539] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:23:25,429] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:23:46,578] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:24:06,507] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:24:29,584] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:24:51,674] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:24:51,676] INFO:ptp_discovery.free_loss_eoh: Population size for generation 0: 8
+[2025-12-22 02:25:14,132] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:25:14,169] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=0, name=CostGapAdaptiveFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:25:36,109] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:25:36,132] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=0, name=CostGapAdaptiveFocalLoss: reason=pref_semantic_violation
+[2025-12-22 02:25:57,048] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:25:57,067] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=1, name=CostGapAdaptiveMarginLogSigmoid: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:26:18,017] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:26:18,039] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=1, name=CostGapAdaptiveMarginLogSigmoid: reason=pref_semantic_violation
+[2025-12-22 02:26:37,325] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:26:37,349] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=2, name=AdaptiveSigmoidFlowLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:26:59,091] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:27:19,396] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:27:19,423] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=3, name=CostGapWeightedFocalLogsigmoidLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:27:38,637] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:27:38,663] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=3, name=CostGapWeightedFocalLogsigmoidLoss: reason=pref_semantic_violation
+[2025-12-22 02:27:58,836] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:28:20,342] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:28:20,369] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=5, name=AdaptiveTanhMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:28:39,200] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:28:39,222] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=5, name=AdaptiveTanhMarginLoss: reason=pref_semantic_violation
+[2025-12-22 02:28:59,453] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:28:59,465] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=6, name=ZScoreCostAdaptiveMarginLoss: reason=forward_error: _safe_zscore() got an unexpected keyword argument 'epsilon', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
+[2025-12-22 02:29:19,066] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:29:19,089] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=6, name=ZScoreCostAdaptiveMarginLoss: reason=pref_semantic_violation
+[2025-12-22 02:29:37,573] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:29:37,585] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=7, name=CostNormalizedLogRatioLoss: reason=forward_error: torch, loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
+[2025-12-22 02:30:01,356] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:30:01,369] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=7, name=CostNormalizedLogRatioLoss: reason=forward_error: torch, loss_value=None, grad_norm=None
+[free_loss_eoh][device_worker] pid=36546 device=cuda:0 jobs=[(0, 4)]
+[2025-12-22 02:31:16,933] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 4: hf_like_score=32.250886, validation_objective=22.250886, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 02:31:16,933] INFO:ptp_discovery.free_loss_eoh: Generation 0 summary: static_fail=0, dynamic_fail=6, evaluated=1, new_elites=1
+[2025-12-22 02:31:16,933] INFO:ptp_discovery.free_loss_eoh: === Generation 1/9 ===
+[2025-12-22 02:31:16,933] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=1
+[2025-12-22 02:31:37,784] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:31:57,381] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:32:19,779] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:32:38,374] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:32:59,696] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:33:19,311] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:33:41,065] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:34:00,165] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:34:23,107] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:34:43,169] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:35:07,709] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:35:28,838] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:35:53,061] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:36:14,524] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:36:37,779] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:36:59,433] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:36:59,435] INFO:ptp_discovery.free_loss_eoh: Population size for generation 1: 8
+[2025-12-22 02:36:59,457] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=0, name=SoftplusScaledAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:37:19,645] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:37:38,590] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:37:38,615] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=0, name=SoftplusScaledAdaptiveMarginLoss: reason=pref_semantic_violation
+[2025-12-22 02:37:38,639] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=2, name=CostSensitiveLogProbScalingLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:38:01,112] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:38:01,136] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=2, name=CostSensitiveLogProbScalingLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:38:23,434] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:38:43,497] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:38:43,555] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=4, name=CostGapScaledLogsigLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:39:05,710] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:39:25,293] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:39:25,306] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=1, idx=4, name=CostGapScaledLogsigLoss: reason=missing_batch_key: 'ops'; dropping candidate and resampling (attempt=1/1)
+[2025-12-22 02:39:46,557] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:40:07,557] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:40:07,577] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=4, name=AdaptiveMarginSoftplusTanhLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:40:29,121] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:40:29,158] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=5, name=SoftplusClippedAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:40:50,138] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:40:50,167] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=5, name=SoftplusClippedAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:41:11,966] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:41:11,994] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=5, name=SoftplusClippedAdaptiveMarginLoss: reason=pref_semantic_violation
+[2025-12-22 02:41:12,009] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=6, name=SoftplusScaledLogsigTanhLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:41:34,242] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:41:34,265] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=6, name=SoftplusScaledLogsigTanhLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:41:55,374] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:42:16,890] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=42464 device=cuda:0 jobs=[(1, 1)]
+[free_loss_eoh][device_worker] pid=42465 device=cuda:1 jobs=[(1, 3)]
+[free_loss_eoh][device_worker] pid=42467 device=cuda:3 jobs=[(1, 7)]
+[free_loss_eoh][device_worker] pid=42466 device=cuda:2 jobs=[(1, 4)]
+[2025-12-22 02:43:34,092] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 1: hf_like_score=31.109331, validation_objective=21.109331, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 02:43:34,099] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 3: hf_like_score=31.295094, validation_objective=21.295094, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 02:43:34,104] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 4: hf_like_score=31.400837, validation_objective=21.400837, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 02:43:34,109] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 7: hf_like_score=31.032589, validation_objective=21.032589, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 02:43:34,109] INFO:ptp_discovery.free_loss_eoh: Generation 1 summary: static_fail=0, dynamic_fail=2, evaluated=4, new_elites=4
+[2025-12-22 02:43:34,109] INFO:ptp_discovery.free_loss_eoh: === Generation 2/9 ===
+[2025-12-22 02:43:34,109] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
+[2025-12-22 02:43:56,147] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:44:16,726] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:44:37,446] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:44:57,125] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:45:21,492] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:45:40,311] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:46:03,386] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:46:23,030] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:46:46,716] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:47:08,769] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:47:30,914] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:47:51,482] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:48:17,954] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:48:39,528] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:49:05,072] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:49:27,230] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:49:27,233] INFO:ptp_discovery.free_loss_eoh: Population size for generation 2: 8
+[2025-12-22 02:49:27,258] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=0, name=CostGapScaledLogProbLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:49:48,338] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:50:08,731] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:50:08,749] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=0, name=CostGapScaledLogProbLoss: reason=missing_batch_key: 'ops'; dropping candidate and resampling (attempt=1/1)
+[2025-12-22 02:50:32,165] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:50:52,351] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:50:52,379] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=0, name=DynamicLogProbScaledMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:51:14,667] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:51:32,922] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:51:32,959] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=0, name=DynamicLogProbScaledMarginLoss: reason=pref_semantic_violation
+[2025-12-22 02:51:32,971] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=1, name=NormalizedDeltaAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:51:52,816] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:52:13,959] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:52:13,985] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=1, name=NormalizedDeltaAdaptiveMarginLoss: reason=pref_semantic_violation
+[2025-12-22 02:52:13,998] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=2, name=DynamicLogProbScaledMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:52:33,088] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:52:33,117] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=2, name=DynamicLogProbScaledMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:52:51,947] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:52:51,971] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=3, name=DynamicRangeAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:53:13,640] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:53:13,660] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=3, name=DynamicRangeAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:53:31,752] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:53:31,778] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=4, name=DynamicLogProbScaledMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:53:51,707] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:53:51,733] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=4, name=DynamicLogProbScaledMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 02:54:10,894] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:54:10,917] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=4, name=DynamicLogProbScaledMarginLoss: reason=pref_semantic_violation
+[2025-12-22 02:54:10,929] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=5, name=DynamicLogProbScaledMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 02:54:31,531] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:54:52,521] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:55:13,687] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:55:33,262] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:55:54,239] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:55:54,252] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=2, idx=7, name=DynamicLogProbGapScalingLoss: reason=missing_batch_key: 'torch'; dropping candidate and resampling (attempt=1/1)
+[2025-12-22 02:56:19,972] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:56:39,857] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=49669 device=cuda:0 jobs=[(2, 5)]
+[free_loss_eoh][device_worker] pid=49670 device=cuda:1 jobs=[(2, 6)]
+[free_loss_eoh][device_worker] pid=49671 device=cuda:2 jobs=[(2, 7)]
+[2025-12-22 02:57:58,101] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 5: hf_like_score=32.157112, validation_objective=22.157112, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 02:57:58,107] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 6: hf_like_score=31.365990, validation_objective=21.365990, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 02:57:58,112] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 7: hf_like_score=31.872830, validation_objective=21.872830, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 02:57:58,113] INFO:ptp_discovery.free_loss_eoh: Generation 2 summary: static_fail=0, dynamic_fail=3, evaluated=3, new_elites=3
+[2025-12-22 02:57:58,113] INFO:ptp_discovery.free_loss_eoh: === Generation 3/9 ===
+[2025-12-22 02:57:58,113] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
+[2025-12-22 02:58:23,414] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:58:44,391] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:59:09,975] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:59:29,570] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 02:59:55,373] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:00:17,799] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:00:40,461] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:01:01,312] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:01:26,979] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:01:49,163] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:02:15,895] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:02:36,869] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:03:05,096] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:03:26,865] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:03:50,060] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:04:12,129] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:04:12,132] INFO:ptp_discovery.free_loss_eoh: Population size for generation 3: 8
+[2025-12-22 03:04:30,566] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:04:30,587] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=0, name=DynamicConfidenceMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:04:50,435] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:04:50,462] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=0, name=DynamicConfidenceMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:05:11,238] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:05:11,264] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=2, name=ConfidenceGatedAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:05:29,768] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:05:29,795] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=3, name=ConfidenceAnnealedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:05:50,230] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:06:09,260] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:06:09,288] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=3, name=ConfidenceAnnealedMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:06:27,445] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:06:46,402] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:06:46,426] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=5, name=DynamicConfidenceAnnealedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:07:06,450] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:07:25,384] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:07:25,414] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=6, name=ConfidenceClippedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:07:45,193] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:07:45,219] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=6, name=ConfidenceClippedMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:08:05,006] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=55378 device=cuda:1 jobs=[(3, 4)]
+[free_loss_eoh][device_worker] pid=55377 device=cuda:0 jobs=[(3, 1)]
+[free_loss_eoh][device_worker] pid=55379 device=cuda:2 jobs=[(3, 7)]
+[2025-12-22 03:09:23,829] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 1: hf_like_score=31.290524, validation_objective=21.290524, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:09:23,836] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 4: hf_like_score=31.516254, validation_objective=21.516254, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:09:23,841] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 7: hf_like_score=20.749596, validation_objective=10.749596, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:09:23,841] INFO:ptp_discovery.free_loss_eoh: Generation 3 summary: static_fail=0, dynamic_fail=3, evaluated=3, new_elites=3
+[2025-12-22 03:09:23,841] INFO:ptp_discovery.free_loss_eoh: === Generation 4/9 ===
+[2025-12-22 03:09:23,841] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
+[2025-12-22 03:09:47,349] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:10:08,384] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:10:35,124] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:10:55,950] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:11:21,186] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:11:40,949] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:12:05,688] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:12:26,113] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:12:49,608] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:13:11,679] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:13:34,856] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:13:56,228] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:14:23,035] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:14:42,195] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:15:05,736] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:15:26,421] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:15:26,424] INFO:ptp_discovery.free_loss_eoh: Population size for generation 4: 8
+[2025-12-22 03:15:45,586] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:15:45,606] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=0, name=AdaptiveFocalMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:16:04,949] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:16:04,998] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=0, name=AdaptiveFocalMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:16:25,806] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:16:43,747] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:16:43,774] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=2, name=AdaptiveSigmoidMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:17:02,910] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:17:02,944] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=2, name=AdaptiveSigmoidMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:17:02,955] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=3, name=ConfidenceGatedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:17:22,400] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:17:41,082] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:17:41,102] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=3, name=ConfidenceGatedMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:17:59,299] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:17:59,329] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=4, name=ConfidenceGatedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:18:19,267] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:18:19,288] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=4, name=ConfidenceGatedMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:18:37,343] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:18:37,363] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=5, name=AdaptiveMarginFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:18:56,749] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:18:56,763] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=4, idx=5, name=AdaptiveMarginFocalLoss: reason=missing_batch_key: 'ops'; dropping candidate and resampling (attempt=1/1)
+[2025-12-22 03:19:21,425] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:19:39,955] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:19:57,889] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:20:17,587] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:20:17,615] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=6, name=HybridConfidenceModulatedLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:20:36,868] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:20:36,899] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=6, name=HybridConfidenceModulatedLoss: reason=pref_semantic_violation
+[free_loss_eoh][device_worker] pid=61406 device=cuda:0 jobs=[(4, 1)]
+[free_loss_eoh][device_worker] pid=61407 device=cuda:1 jobs=[(4, 5)]
+[free_loss_eoh][device_worker] pid=61408 device=cuda:2 jobs=[(4, 7)]
+[2025-12-22 03:21:55,773] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 1: hf_like_score=32.325500, validation_objective=22.325500, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:21:55,780] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 5: hf_like_score=33.090151, validation_objective=23.090151, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:21:55,787] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 7: hf_like_score=33.750391, validation_objective=23.750391, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:21:55,787] INFO:ptp_discovery.free_loss_eoh: Generation 4 summary: static_fail=0, dynamic_fail=5, evaluated=3, new_elites=3
+[2025-12-22 03:21:55,787] INFO:ptp_discovery.free_loss_eoh: === Generation 5/9 ===
+[2025-12-22 03:21:55,788] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
+[2025-12-22 03:22:20,900] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:22:40,685] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:23:06,568] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:23:27,544] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:23:51,261] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:24:12,182] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:24:37,211] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:25:00,372] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:25:26,736] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:25:48,900] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:26:15,282] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:26:35,607] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:27:03,019] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:27:24,801] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:27:49,945] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:28:12,291] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:28:12,294] INFO:ptp_discovery.free_loss_eoh: Population size for generation 5: 8
+[2025-12-22 03:28:31,271] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:28:49,030] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:28:49,051] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=1, name=AdaptiveMarginFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:29:09,026] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:29:28,244] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:29:48,142] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:29:48,166] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=2, name=AdaptiveMarginFocalLoss: reason=pref_semantic_violation
+[2025-12-22 03:30:09,786] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:30:29,127] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:30:29,139] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=4, name=ConfidenceGatedMarginLoss: reason=missing_batch_key: 'torch'; dropping candidate and resampling (attempt=1/1)
+[2025-12-22 03:30:54,375] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:31:16,590] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:31:16,616] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=4, name=HybridConfidenceModulatedLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:31:37,617] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:31:56,954] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:31:57,004] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=4, name=HybridConfidenceModulatedLoss: reason=pref_semantic_violation
+[2025-12-22 03:32:16,744] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:32:16,775] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=5, name=BalancedConfidenceMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:32:36,217] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:32:36,240] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=5, name=BalancedConfidenceMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:32:36,253] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=6, name=ConfidenceGatedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:32:56,735] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:32:56,769] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=6, name=ConfidenceGatedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:33:18,298] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:33:37,409] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:33:37,435] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=7, name=AdaptiveAnnealedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:33:59,787] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=67987 device=cuda:0 jobs=[(5, 0)]
+[free_loss_eoh][device_worker] pid=67988 device=cuda:1 jobs=[(5, 3)]
+[free_loss_eoh][device_worker] pid=67989 device=cuda:2 jobs=[(5, 7)]
+[2025-12-22 03:35:17,378] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 0: hf_like_score=33.324821, validation_objective=23.324821, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:35:17,383] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 3: hf_like_score=20.734397, validation_objective=10.734397, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:35:17,389] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 7: hf_like_score=30.703870, validation_objective=20.695531, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:35:17,389] INFO:ptp_discovery.free_loss_eoh: Generation 5 summary: static_fail=0, dynamic_fail=3, evaluated=3, new_elites=3
+[2025-12-22 03:35:17,390] INFO:ptp_discovery.free_loss_eoh: === Generation 6/9 ===
+[2025-12-22 03:35:17,390] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
+[2025-12-22 03:35:39,954] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:36:01,370] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:36:25,247] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:36:45,330] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:37:11,292] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:37:31,647] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:37:56,515] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:38:18,729] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:38:41,232] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:39:02,789] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:39:27,831] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:39:48,207] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:40:13,830] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:40:33,687] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:40:58,561] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:41:21,577] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:41:21,580] INFO:ptp_discovery.free_loss_eoh: Population size for generation 6: 8
+[2025-12-22 03:41:21,612] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=0, name=CostNormalizedConfidenceLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:41:42,978] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:41:43,009] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=0, name=CostNormalizedConfidenceLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:42:06,381] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:42:06,407] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=0, name=CostNormalizedConfidenceLoss: reason=pref_semantic_violation
+[2025-12-22 03:42:06,420] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=1, name=AdaptiveNormalizedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:42:27,893] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:42:46,791] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:42:46,827] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=1, name=AdaptiveNormalizedMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:42:46,839] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=2, name=AdaptiveNormalizedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:43:08,047] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:43:27,948] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:43:27,963] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=2, name=AdaptiveNormalizedMarginLoss: reason=forward_error: _safe_zscore() got an unexpected keyword argument 'epsilon', loss_value=None, grad_norm=None
+[2025-12-22 03:43:27,990] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=3, name=AdaptiveFocalMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:43:48,493] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:43:48,517] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=3, name=AdaptiveFocalMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:44:10,400] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:44:10,430] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=4, name=AdaptiveNormalizedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:44:31,580] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:44:52,448] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:44:52,478] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=4, name=AdaptiveNormalizedMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:44:52,491] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=5, name=CostConditionedDynamicLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:45:16,547] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:45:36,442] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:45:36,517] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=7, name=ClippedConfidenceAnnealedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:45:57,871] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:46:20,117] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=73916 device=cuda:1 jobs=[(6, 6)]
+[free_loss_eoh][device_worker] pid=73915 device=cuda:0 jobs=[(6, 5)]
+[free_loss_eoh][device_worker] pid=73917 device=cuda:2 jobs=[(6, 7)]
+[2025-12-22 03:47:36,942] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 5: hf_like_score=54.048286, validation_objective=44.039722, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:47:36,948] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 6: hf_like_score=31.603051, validation_objective=21.603051, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:47:36,953] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 7: hf_like_score=30.733042, validation_objective=20.733042, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:47:36,954] INFO:ptp_discovery.free_loss_eoh: Generation 6 summary: static_fail=0, dynamic_fail=4, evaluated=3, new_elites=3
+[2025-12-22 03:47:36,954] INFO:ptp_discovery.free_loss_eoh: === Generation 7/9 ===
+[2025-12-22 03:47:36,955] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
+[2025-12-22 03:48:02,090] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:48:23,956] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:48:46,852] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:49:07,697] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:49:30,969] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:49:52,028] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:50:18,574] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:50:39,840] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:51:05,022] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:51:25,568] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:51:48,093] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:52:09,454] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:52:33,581] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:52:55,098] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:53:21,312] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:53:42,274] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:53:42,277] INFO:ptp_discovery.free_loss_eoh: Population size for generation 7: 8
+[2025-12-22 03:53:42,300] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=0, name=AdaptiveLogRatioMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:54:04,543] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:54:25,101] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:54:25,126] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=0, name=AdaptiveLogRatioMarginLoss: reason=pref_semantic_violation
+[2025-12-22 03:54:25,132] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=1, name=CostNormalizedConfidenceAnnealing: reason=pref_loss_not_finite; attempting repair (attempt=1/2)
+[2025-12-22 03:54:46,111] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:54:46,127] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=1, name=CostNormalizedConfidenceAnnealing: reason=pref_loss_not_finite; attempting repair (attempt=2/2)
+[2025-12-22 03:55:10,087] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:55:10,101] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=7, idx=2, name=NormalizedConfidenceMarginLoss: reason=missing_dependency: name '_safe_zscore' is not defined; dropping candidate and resampling (attempt=1/1)
+[2025-12-22 03:55:35,250] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:55:58,053] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:55:58,093] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=3, name=AdaptiveSigmoidMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:56:21,869] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:56:21,896] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=3, name=AdaptiveSigmoidMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 03:56:43,197] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:56:43,272] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=5, name=NormalizedConfidenceAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:57:04,324] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:57:23,778] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:57:23,815] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=6, name=NormalizedConfidenceMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 03:57:46,913] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 03:58:09,209] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=79637 device=cuda:3 jobs=[(7, 7)]
+[free_loss_eoh][device_worker] pid=79635 device=cuda:1 jobs=[(7, 4)]
+[free_loss_eoh][device_worker] pid=79634 device=cuda:0 jobs=[(7, 2)]
+[free_loss_eoh][device_worker] pid=79636 device=cuda:2 jobs=[(7, 5)]
+[2025-12-22 03:59:26,856] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 2: hf_like_score=33.001475, validation_objective=23.001475, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:59:26,870] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 4: hf_like_score=33.170312, validation_objective=23.170312, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:59:26,880] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 5: hf_like_score=31.773553, validation_objective=21.773553, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:59:26,891] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 7: hf_like_score=32.550585, validation_objective=22.550585, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 03:59:26,891] INFO:ptp_discovery.free_loss_eoh: Generation 7 summary: static_fail=0, dynamic_fail=1, evaluated=4, new_elites=4
+[2025-12-22 03:59:26,891] INFO:ptp_discovery.free_loss_eoh: === Generation 8/9 ===
+[2025-12-22 03:59:26,892] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
+[2025-12-22 03:59:53,080] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:00:15,212] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:00:39,829] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:01:01,591] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:01:28,356] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:01:51,198] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:02:16,780] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:02:37,699] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:03:03,302] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:03:24,186] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:03:47,353] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:04:10,051] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:04:34,659] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:04:54,581] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:05:21,338] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:05:42,445] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:05:42,447] INFO:ptp_discovery.free_loss_eoh: Population size for generation 8: 8
+[2025-12-22 04:05:42,486] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=1, name=CostNormalizedConfidenceAnnealingLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:06:04,204] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:06:25,443] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:06:25,471] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=1, name=CostNormalizedConfidenceAnnealingLoss: reason=pref_semantic_violation
+[2025-12-22 04:06:25,485] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=2, name=AdaptiveLogProbNormalizedLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:06:49,256] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:06:49,284] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=2, name=AdaptiveLogProbNormalizedLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 04:07:12,758] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:07:12,779] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=3, name=AdaptiveClippedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:07:35,279] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:07:35,313] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=3, name=AdaptiveClippedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 04:07:57,037] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:07:57,086] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=4, name=ZScoreNormalizedClippedAnnealingLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:08:19,481] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:08:39,968] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:08:39,983] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=8, idx=4, name=ZScoreNormalizedClippedAnnealingLoss: reason=forward_error: _safe_zscore() got an unexpected keyword argument 'epsilon', loss_value=None, grad_norm=None
+[2025-12-22 04:08:39,995] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=5, name=CostNormalizedConfidenceLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:09:01,670] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:09:23,380] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:09:23,410] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=5, name=CostNormalizedConfidenceLoss: reason=pref_semantic_violation
+[2025-12-22 04:09:23,421] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=6, name=AdaptiveSigmoidFlowLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:09:45,337] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:10:06,268] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:10:06,285] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=6, name=AdaptiveSigmoidFlowLoss: reason=pref_semantic_violation
+[free_loss_eoh][device_worker] pid=85465 device=cuda:1 jobs=[(8, 7)]
+[free_loss_eoh][device_worker] pid=85464 device=cuda:0 jobs=[(8, 0)]
+[2025-12-22 04:11:22,217] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 0: hf_like_score=18.515499, validation_objective=8.515499, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 04:11:22,225] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 7: hf_like_score=27.938558, validation_objective=17.938558, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 04:11:22,225] INFO:ptp_discovery.free_loss_eoh: Generation 8 summary: static_fail=0, dynamic_fail=4, evaluated=2, new_elites=2
+[2025-12-22 04:11:22,225] INFO:ptp_discovery.free_loss_eoh: === Generation 9/9 ===
+[2025-12-22 04:11:22,226] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
+[2025-12-22 04:11:49,692] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:12:12,945] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:12:39,022] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:12:59,627] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:13:25,321] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:13:45,886] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:14:10,032] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:14:29,876] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:14:55,280] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:15:16,996] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:15:42,150] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:16:03,897] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:16:29,256] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:16:49,192] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:17:14,093] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:17:34,045] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:17:34,048] INFO:ptp_discovery.free_loss_eoh: Population size for generation 9: 8
+[2025-12-22 04:17:34,073] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=0, name=ZScoreClippedAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:17:54,318] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:17:54,330] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=0, name=ZScoreClippedAdaptiveMarginLoss: reason=missing_batch_key: 'ops'; dropping candidate and resampling (attempt=1/1)
+[2025-12-22 04:18:20,078] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:18:39,400] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:18:39,424] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=0, name=ProgressiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:19:00,847] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:19:21,795] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:19:21,823] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=0, name=ProgressiveMarginLoss: reason=pref_semantic_violation
+[2025-12-22 04:19:21,861] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=2, name=NormalizedConfidenceAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:19:43,212] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:19:43,238] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=2, name=NormalizedConfidenceAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
+[2025-12-22 04:20:06,129] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:20:06,163] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=3, name=NormalizedConfidenceMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:20:27,725] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:20:46,600] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:20:46,639] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=4, name=AdaptiveSigmoidFlowLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:21:10,320] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:21:29,040] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:21:29,070] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=4, name=AdaptiveSigmoidFlowLoss: reason=pref_semantic_violation
+[2025-12-22 04:21:29,085] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=5, name=AsymmetricConfidenceMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:21:49,010] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:22:10,970] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:22:10,984] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=5, name=AsymmetricConfidenceMarginLoss: reason=forward_error: 'NoneType' object has no attribute 'tanh', loss_value=None, grad_norm=None
+[2025-12-22 04:22:10,999] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=6, name=ZScoreNormalizedMarginLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
+[2025-12-22 04:22:30,514] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-22 04:22:50,534] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=91586 device=cuda:1 jobs=[(9, 3)]
+[free_loss_eoh][device_worker] pid=91587 device=cuda:2 jobs=[(9, 7)]
+[free_loss_eoh][device_worker] pid=91585 device=cuda:0 jobs=[(9, 1)]
+[2025-12-22 04:24:06,949] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 1: hf_like_score=33.078433, validation_objective=23.078433, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 04:24:06,955] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 3: hf_like_score=31.027825, validation_objective=21.027825, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 04:24:06,960] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 7: hf_like_score=32.873311, validation_objective=22.873311, epoch_mean=nan, epoch_violations=10, baseline=7.941913, better_than_baseline=False
+[2025-12-22 04:24:06,960] INFO:ptp_discovery.free_loss_eoh: Generation 9 summary: static_fail=0, dynamic_fail=3, evaluated=3, new_elites=3
+[2025-12-22 04:24:06,975] INFO:ptp_discovery.free_loss_eoh: Search complete. Best hf_like_score=18.515499 (generation=8, index=0)

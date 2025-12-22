@@ -1,0 +1,125 @@
+{
+  "generation": 8,
+  "index": 0,
+  "ir": {
+    "name": "AdaptiveClippedMarginLoss",
+    "intuition": "Mode: explore. This loss combines ideas from both parents while introducing a new coupling for stability and targeted learning. From both parents, it inherits the core Bradley-Terry structure with a margin derived from the cost gap (`-logsigmoid(delta_log_probs - margin)`). From Parent 1 (`HybridConfidenceModulatedMarginLoss`), it inherits the idea of modulating the margin itself based on model confidence, but simplifies the mechanism. Instead of a complex `exp(-beta * delta)` scaling, it uses a simpler `relu`-based adjustment that only increases the margin when the model is already confident (`delta > 0`). This prevents the margin from collapsing on hard examples where `delta` is negative. The new coupling idea is a dynamic clipping of the log-probability difference (`delta_log_probs`) before it enters the `logsigmoid`. This clipping is based on the cost gap, preventing extremely large negative deltas (model is very wrong) from generating huge, unstable gradients, focusing the model's learning on a more reasonable range of errors. It also prevents the model from becoming overconfident on easy examples by capping the positive delta.",
+    "pseudocode": "1. Calculate the log-probability difference: delta_log_probs = log_prob_w - log_prob_l.\n2. Calculate the cost gap: cost_gap = cost_a - cost_b.\n3. (Inherited) Compute a base margin from the cost gap using softplus and tanh: base_margin = margin_scale * tanh(softplus(cost_gap)).\n4. (Inherited & Modified) Compute a confidence-based margin adjustment. Only increase the margin for already confident predictions (delta > 0): margin_adjustment = confidence_scale * relu(delta_log_probs.detach()).\n5. Combine the base margin and adjustment: final_margin = base_margin + margin_adjustment.\n6. (New Coupling) Compute dynamic clipping bounds for the log-probability difference based on the cost gap. The bounds are centered around the final margin. This prevents extreme gradients from very wrong or very confident predictions: lower_bound = final_margin - clip_range, upper_bound = final_margin + clip_range.\n7. Apply the dynamic clipping: clipped_delta = clamp(delta_log_probs, lower_bound, upper_bound).\n8. Compute the final loss using the clipped delta and the final margin: loss = -logsigmoid(clipped_delta - final_margin).\n9. Return the mean loss.",
+    "hyperparams": {
+      "margin_scale": 1.0,
+      "confidence_scale": 0.1,
+      "clip_range": 5.0
+    },
+    "operators_used": [
+      "logsigmoid",
+      "tanh",
+      "softplus",
+      "relu",
+      "clamp"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "log_prob_w",
+        "log_prob_l"
+      ],
+      "returns": "scalar"
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    hyperparams = extra.get('hyperparams', {})\n    margin_scale = hyperparams.get('margin_scale', 1.0)\n    confidence_scale = hyperparams.get('confidence_scale', 0.1)\n    clip_range = hyperparams.get('clip_range', 5.0)\n\n    cost_a = batch['cost_a'].float()\n    cost_b = batch['cost_b'].float()\n    log_prob_w = batch['log_prob_w'].float()\n    log_prob_l = batch['log_prob_l'].float()\n\n    delta_log_probs = log_prob_w - log_prob_l\n    cost_gap = cost_a - cost_b\n\n    # Inherited Idea: Base margin from cost gap.\n    base_margin = margin_scale * torch.tanh(F.softplus(cost_gap))\n\n    # Inherited & Modified Idea: Modulate margin based on confidence.\n    # Using relu on detached delta only increases margin for confident predictions,\n    # which is a simpler and potentially more stable mechanism than exp().\n    margin_adjustment = confidence_scale * F.relu(delta_log_probs.detach())\n    final_margin = base_margin + margin_adjustment\n\n    # New Coupling: Dynamic, margin-aware clipping of delta_log_probs for stability.\n    # This prevents extreme gradients from dominating the loss signal.\n    lower_bound = final_margin.detach() - clip_range\n    upper_bound = final_margin.detach() + clip_range\n    clipped_delta = torch.clamp(delta_log_probs, min=lower_bound, max=upper_bound)\n\n    # Core loss calculation using the modulated margin and clipped delta.\n    loss = -F.logsigmoid(clipped_delta - final_margin)\n\n    weights = batch.get('weight')\n    if weights is not None:\n        loss = loss * weights.float()\n\n    return loss.mean()",
+    "theoretical_basis": "A margin-based extension of the Bradley-Terry model. It introduces a confidence-aware margin and a dynamic, cost-gap-aware clipping mechanism to stabilize gradients and focus learning on moderately difficult examples, preventing overconfidence and large updates from outliers."
+  },
+  "fitness": {
+    "hf_like_score": 18.515498635864258,
+    "validation_objective": 8.515498635864258,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "100": 8.508040454101563
+    },
+    "epoch_objective_mean": null,
+    "epoch_baseline_violations": 10,
+    "epoch_better_than_baseline": false,
+    "epoch_eval": {
+      "enabled": true,
+      "steps_per_epoch": 1563,
+      "epochs_total": 10,
+      "objectives": [],
+      "objective_mean": null,
+      "baseline_margins": [],
+      "baseline_violations": 10,
+      "better_than_baseline": false
+    },
+    "train_score_mean": 11.50365837097168,
+    "train_loss_mean": 1.003796594142914,
+    "pair_count": 31679975,
+    "early_eval": {
+      "enabled": true,
+      "steps": 100,
+      "baseline_validation_objective": 8.413204174804687,
+      "candidate_validation_objective": 8.515498635864258,
+      "early_stopped": true
+    },
+    "phases": {
+      "f1": {
+        "steps": 15630,
+        "train_score_mean": 11.50365837097168,
+        "train_loss_mean": 1.003796594142914,
+        "pair_count": 31679975
+      },
+      "f2": {
+        "steps": 0,
+        "train_score_mean": null,
+        "train_loss_mean": null,
+        "pair_count": 0
+      }
+    },
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 10,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 100,
+        "valid_problem_sizes": [
+          100
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 100,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:0",
+        "seed": 1234,
+        "num_validation_episodes": 10000,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 15630,
+        "f2_steps": 0,
+        "f3_enabled": false,
+        "baseline_epoch_violation_weight": 1.0
+      }
+    },
+    "loss_ir": {
+      "name": "AdaptiveClippedMarginLoss",
+      "intuition": "Mode: explore. This loss combines ideas from both parents while introducing a new coupling for stability and targeted learning. From both parents, it inherits the core Bradley-Terry structure with a margin derived from the cost gap (`-logsigmoid(delta_log_probs - margin)`). From Parent 1 (`HybridConfidenceModulatedMarginLoss`), it inherits the idea of modulating the margin itself based on model confidence, but simplifies the mechanism. Instead of a complex `exp(-beta * delta)` scaling, it uses a simpler `relu`-based adjustment that only increases the margin when the model is already confident (`delta > 0`). This prevents the margin from collapsing on hard examples where `delta` is negative. The new coupling idea is a dynamic clipping of the log-probability difference (`delta_log_probs`) before it enters the `logsigmoid`. This clipping is based on the cost gap, preventing extremely large negative deltas (model is very wrong) from generating huge, unstable gradients, focusing the model's learning on a more reasonable range of errors. It also prevents the model from becoming overconfident on easy examples by capping the positive delta.",
+      "hyperparams": {
+        "margin_scale": 1.0,
+        "confidence_scale": 0.1,
+        "clip_range": 5.0
+      },
+      "operators_used": [
+        "logsigmoid",
+        "tanh",
+        "softplus",
+        "relu",
+        "clamp"
+      ]
+    },
+    "novelty": 6.020592992638727
+  },
+  "novelty": 6.020592992638727
+}
