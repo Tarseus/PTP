@@ -21,6 +21,11 @@ Hard constraints:
 - When `cost(a) < cost(b)`, the loss should statistically encourage preferring `a` over `b`.
 - It must be numerically stable (avoid NaN/Inf).
 
+Implementation notes (to avoid gate failures):
+- `log_prob_w` must correspond to the lower-cost solution and `log_prob_l` to the higher-cost solution.
+- If you scale or weight `log_prob_w - log_prob_l` or a margin using cost gaps or normalizations, ensure the scale is non-negative (e.g., apply `softplus` or `clamp(min=0)`).
+- Only read from `batch` the keys `cost_a`, `cost_b`, `log_prob_w`, `log_prob_l`, and optional `weight`. Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
+
 **Output requirements:**
 - Output **must** be a single JSON object that is a repaired version of the candidate IR, with fields:
   - `name`

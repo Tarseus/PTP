@@ -10,6 +10,10 @@ Setting:
 - `cost(a)` and `cost(b)` are scalar objective values (lower is better).
 - The model produces log probabilities `logp(a)` and `logp(b)`.
 - You may use any differentiable tensor operations available in PyTorch (`torch`, `torch.nn.functional`). The following operators are particularly relevant and well-tested for this task (but not mandatory): `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
+Important implementation notes (to avoid gate failures):
+- `log_prob_w` must correspond to the lower-cost solution and `log_prob_l` to the higher-cost solution.
+- If you scale or weight `log_prob_w - log_prob_l` or a margin using cost gaps or normalizations, ensure the scale is non-negative (e.g., apply `softplus` or `clamp(min=0)`).
+- Only read from `batch` the keys `cost_a`, `cost_b`, `log_prob_w`, `log_prob_l`, and optional `weight`. Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
 
 The baseline preference loss used in our method is derived from an entropy-regularized RL objective and can be viewed as a Bradley–Terry / logistic-style loss on the log-probability difference `logp(a) - logp(b)` with a temperature parameter and a margin that depends on the cost gap. Your proposed loss should be **theoretically compatible** with this family, in the sense that:
 - It can be interpreted as optimizing a probabilistic preference model where the probability that `a` is preferred over `b` is a monotone function of `logp(a) - logp(b)` and the cost difference.

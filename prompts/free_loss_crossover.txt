@@ -38,6 +38,11 @@ Hard constraints:
 - It must be numerically stable (avoid NaN/Inf).
 - The child loss must remain **theoretically compatible** with a probabilistic preference model in which the probability that `a` is preferred over `b` is a monotone function of `logp(a) - logp(b)` and the cost gap, in the same spirit as Bradley–Terry / logistic-style objectives. Any new coupling you introduce (e.g., new margins or normalizations) must preserve the correct sign of the learning signal: when `cost(a) < cost(b)`, gradients should on average increase `logp(a) - logp(b)`.
 
+Implementation notes (to avoid gate failures):
+- `log_prob_w` must correspond to the lower-cost solution and `log_prob_l` to the higher-cost solution.
+- If you scale or weight `log_prob_w - log_prob_l` or a margin using cost gaps or normalizations, ensure the scale is non-negative (e.g., apply `softplus` or `clamp(min=0)`).
+- Only read from `batch` the keys `cost_a`, `cost_b`, `log_prob_w`, `log_prob_l`, and optional `weight`. Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
+
 **Output requirements:**
 - Output **must** be a single JSON object with fields:
   - `name`

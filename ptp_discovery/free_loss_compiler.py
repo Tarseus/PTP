@@ -164,15 +164,37 @@ def _validate_user_code(code_str: str) -> None:
     validator.visit(tree)
 
 
-def _safe_normalize(x: torch.Tensor, dim: int = -1, eps: float = 1e-8) -> torch.Tensor:
-    x = x - x.mean(dim=dim, keepdim=True)
-    std = x.std(dim=dim, keepdim=True)
+def _safe_normalize(
+    x: torch.Tensor,
+    dim: int = -1,
+    eps: float = 1e-8,
+    **kwargs: Any,
+) -> torch.Tensor:
+    if "epsilon" in kwargs and kwargs["epsilon"] is not None:
+        eps = float(kwargs["epsilon"])
+    if "eps" in kwargs and kwargs["eps"] is not None:
+        eps = float(kwargs["eps"])
+    if "dim" in kwargs and kwargs["dim"] is not None:
+        dim = int(kwargs["dim"])
+    keepdim = kwargs.get("keepdim", True)
+    x = x - x.mean(dim=dim, keepdim=bool(keepdim))
+    std = x.std(dim=dim, keepdim=bool(keepdim))
     return x / (std + eps)
 
 
-def _safe_zscore(x: torch.Tensor, eps: float = 1e-8) -> torch.Tensor:
-    mean = x.mean()
-    std = x.std()
+def _safe_zscore(x: torch.Tensor, eps: float = 1e-8, **kwargs: Any) -> torch.Tensor:
+    if "epsilon" in kwargs and kwargs["epsilon"] is not None:
+        eps = float(kwargs["epsilon"])
+    if "eps" in kwargs and kwargs["eps"] is not None:
+        eps = float(kwargs["eps"])
+    dim = kwargs.get("dim")
+    keepdim = kwargs.get("keepdim", True)
+    if dim is None:
+        mean = x.mean()
+        std = x.std()
+    else:
+        mean = x.mean(dim=dim, keepdim=bool(keepdim))
+        std = x.std(dim=dim, keepdim=bool(keepdim))
     return (x - mean) / (std + eps)
 
 
