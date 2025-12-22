@@ -1,0 +1,42 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 7.941937671508788,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_PREF_SEMANTIC",
+        "count": 96
+      },
+      {
+        "code": "E_FORWARD_ERROR",
+        "count": 3
+      },
+      {
+        "code": "E_MISSING_DEPENDENCY",
+        "count": 1
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 3,
+    "index": 2,
+    "name": "AdaptiveFocalLogsigmoid",
+    "theoretical_basis": "A dynamically modulated Bradley-Terry preference model. The core loss is logistic, operating on a log-probability difference that is normalized by the batch's log-probability range for stability. The novel contribution is an adaptive focal modulation where the focal strength (gamma) is determined by the entropy of the model's win prediction for each pair. This directs learning focus towards examples with high model uncertainty, automating the 'hard example mining' process without a fixed hyperparameter.",
+    "operators_used": [
+      "logsigmoid",
+      "sigmoid",
+      "log"
+    ],
+    "hyperparams": {
+      "gamma_max": 2.5,
+      "epsilon": 1e-06
+    },
+    "hf_like_score": 12.941285591506956,
+    "validation_objective": 7.893529098510742,
+    "generalization_penalty": 0.00015156097412116765,
+    "epoch_objective_mean": 7.941134030532835,
+    "epoch_baseline_violations": 5,
+    "pair_count": 4951575796
+  }
+}
