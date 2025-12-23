@@ -1221,6 +1221,11 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     elites: List[Dict[str, Any]] = []
 
     max_repair_rounds = int(cfg_yaml.get("max_repair_rounds", 0) or 0)
+    LOGGER.info(
+        "Gate retries: max_repair_rounds=%d (LLM repairs), max_resample_rounds=%d (drop+resample)",
+        max_repair_rounds,
+        max_resample_rounds,
+    )
 
     if burn_in_objectives_auto:
         burn_in_objectives.extend(_build_auto_seed_objectives())
@@ -1469,7 +1474,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                             resample_attempts += 1
                             LOGGER.warning(
                                 "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
-                                "dropping candidate and resampling (attempt=%d/%d)",
+                                "dropping candidate and resampling (resample_round=%d/%d)",
                                 gen,
                                 idx,
                                 ir.name,
@@ -1489,7 +1494,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                         if attempt < max_repair_rounds and repair_prompt:
                             LOGGER.warning(
                                 "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s, "
-                                "loss_value=%s, grad_norm=%s; attempting repair (attempt=%d/%d)",
+                                "loss_value=%s, grad_norm=%s; attempting repair (repair_round=%d/%d)",
                                 gen,
                                 idx,
                                 ir.name,
@@ -1562,7 +1567,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                             if attempt < max_repair_rounds and repair_prompt:
                                 LOGGER.warning(
                                     "Preference gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
-                                    "attempting repair (attempt=%d/%d)",
+                                    "attempting repair (repair_round=%d/%d)",
                                     gen,
                                     idx,
                                     ir.name,
@@ -1724,6 +1729,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             epoch_mean = fitness.get("epoch_objective_mean")
             epoch_mean_val = float(epoch_mean) if epoch_mean is not None else float("nan")
             epoch_violations = fitness.get("epoch_baseline_violations")
+            early_eval = fitness.get("early_eval") or {}
+            early_eval_steps = early_eval.get("steps")
+            early_stopped = early_eval.get("early_stopped")
             better_than_baseline = None
             if baseline_epoch_objectives is not None:
                 better_than_baseline = bool(epoch_violations == 0)
@@ -1733,13 +1741,16 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
             LOGGER.info(
                 "Gen %d cand %d: hf_like_score=%.6f, validation_objective=%.6f, "
-                "epoch_mean=%.6f, epoch_violations=%s, baseline=%.6f, better_than_baseline=%s",
+                "epoch_mean=%.6f, epoch_violations=%s, early_eval_steps=%s, early_stopped=%s, "
+                "baseline=%.6f, better_than_baseline=%s",
                 gen,
                 idx,
                 hf_like_score,
                 float(fitness["validation_objective"]),
                 epoch_mean_val,
                 str(epoch_violations),
+                str(early_eval_steps),
+                str(early_stopped),
                 float(baseline_hf_score) if baseline_hf_score is not None else float("nan"),
                 str(better_than_baseline),
             )
@@ -1763,6 +1774,8 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     "epoch_objective_mean": epoch_mean,
                     "epoch_baseline_violations": epoch_violations,
                     "epoch_better_than_baseline": fitness.get("epoch_better_than_baseline"),
+                    "early_eval_steps": early_eval_steps,
+                    "early_stopped": early_stopped,
                     "baseline_hf_score": baseline_hf_score,
                     "better_than_baseline": better_than_baseline,
                     "novelty": novelty,
