@@ -1,0 +1,45 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 5.727787498207094,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_PREF_SEMANTIC",
+        "count": 52
+      },
+      {
+        "code": "E_LOSS_OUT_OF_RANGE",
+        "count": 5
+      },
+      {
+        "code": "E_FORWARD_ERROR",
+        "count": 3
+      },
+      {
+        "code": "E_INPUT_MISMATCH",
+        "count": 2
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 9,
+    "index": 0,
+    "name": "AdaptiveSigmoidFocalLoss",
+    "theoretical_basis": "",
+    "operators_used": [
+      "logsigmoid",
+      "sigmoid"
+    ],
+    "hyperparams": {
+      "gamma": 2.0,
+      "eps": 1e-06
+    },
+    "hf_like_score": 6.714230744647979,
+    "validation_objective": 5.70591557006836,
+    "generalization_penalty": 0.0,
+    "epoch_objective_mean": 5.714230744647979,
+    "epoch_baseline_violations": 1,
+    "pair_count": 4897466912
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "generation": 9,
+  "index": 0,
+  "ir": {
+    "name": "AdaptiveSigmoidFocalLoss",
+    "intuition": "Repaired: The original loss failed the `E_PREF_SEMANTIC` check because the effective focal exponent `gamma_eff` was detached from the computation graph. This prevented the loss from correctly decreasing when `log_prob_w` increased, as the gradient path through `gamma_eff` was cut. The fix is to remove `torch.no_grad()` from the calculation of `model_confidence`, allowing `gamma_eff` to be a function of `delta` with a valid gradient. This ensures the loss correctly signals a preference for the lower-cost solution.",
+    "pseudocode": "1. Calculate the log-probability difference: delta = log_prob_w - log_prob_l.\n2. Calculate the cost gap: cost_gap = cost_l - cost_w.\n3. (Inherited from Parent 1) Compute a dynamic temperature `alpha` inversely proportional to the standard deviation of `delta` in the batch. Detach this from the computation graph. alpha = 1.0 / (std(delta) + eps).\n4. Compute the base Bradley-Terry loss with the adaptive temperature: bt_loss = -logsigmoid(alpha * delta).\n5. (New Coupling 1) Create a dynamic focal weight `w_focal` using a sigmoid function centered on the batch's mean cost gap. This applies the focal penalty more strongly to pairs with above-average cost gaps. w_focal = sigmoid(cost_gap - mean(cost_gap)).\n6. (New Coupling 2) Create a confidence-adaptive focal exponent `gamma_eff`. The base gamma is scaled down by the model's confidence in the correct answer. This reduces the penalty on easy examples. gamma_eff = gamma * sigmoid(delta).\n7. Compute the focal modulating factor using the adaptive exponent: modulating_factor = (1 - sigmoid(alpha * delta))^gamma_eff.\n8. Compute the final focal loss term: focal_term = modulating_factor * bt_loss.\n9. The final loss is a weighted average of the base loss and the focal term, using the dynamic focal weight: final_loss = (1 - w_focal) * bt_loss + w_focal * focal_term.\n10. Return the mean of the final loss.",
+    "hyperparams": {
+      "gamma": 2.0,
+      "eps": 1e-06
+    },
+    "operators_used": [
+      "logsigmoid",
+      "sigmoid"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "log_prob_w",
+        "log_prob_l"
+      ],
+      "returns": "scalar"
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    # Hyperparameters\n    gamma = extra.get('gamma', 2.0)\n    eps = extra.get('eps', 1e-6)\n\n    # Inputs from batch\n    cost_a = batch['cost_a']\n    cost_b = batch['cost_b']\n    log_prob_w = batch['log_prob_w']\n    log_prob_l = batch['log_prob_l']\n    weight = batch.get('weight')\n\n    cost_w = torch.min(cost_a, cost_b)\n    cost_l = torch.max(cost_a, cost_b)\n    \n    delta = log_prob_w - log_prob_l\n    cost_gap = cost_l - cost_w\n\n    # Inherited Idea: Dynamic Temperature Scaling from Parent 1\n    # Detach to treat alpha as a non-trainable batch-level hyperparameter.\n    with torch.no_grad():\n        delta_std = torch.std(delta)\n        alpha = 1.0 / (delta_std + eps)\n\n    # Core Bradley-Terry loss with adaptive temperature\n    bt_loss = -F.logsigmoid(alpha * delta)\n\n    # New Coupling 1: Curriculum-based Focal Weighting\n    # Phase in the focal penalty for pairs with an above-average cost gap.\n    with torch.no_grad():\n        cost_gap_mean = torch.mean(cost_gap)\n    w_focal = torch.sigmoid(cost_gap - cost_gap_mean)\n\n    # New Coupling 2: Confidence-Adaptive Focal Exponent\n    # Reduce focal gamma for high-confidence predictions to avoid over-correction.\n    model_confidence = torch.sigmoid(delta)\n    gamma_eff = gamma * model_confidence\n\n    # Inherited Idea: Focal Penalty\n    # Calculate a modulating factor to up-weight hard examples.\n    prob_w_preferred = torch.sigmoid(alpha * delta)\n    modulating_factor = (1.0 - prob_w_preferred).pow(gamma_eff)\n    focal_term = modulating_factor * bt_loss\n\n    # Combine base loss and focal term using the curriculum weight\n    final_loss = (1.0 - w_focal) * bt_loss + w_focal * focal_term\n\n    if weight is not None:\n        final_loss = final_loss * weight\n\n    return final_loss.mean()",
+    "theoretical_basis": ""
+  },
+  "fitness": {
+    "hf_like_score": 6.714230744647979,
+    "validation_objective": 5.70591557006836,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "50": 5.701693942260742
+    },
+    "epoch_objective_mean": 5.714230744647979,
+    "epoch_baseline_violations": 1,
+    "epoch_better_than_baseline": false,
+    "epoch_eval": {
+      "enabled": true,
+      "steps_per_epoch": 1563,
+      "epochs_total": 40,
+      "objectives": [
+        5.776930677032471,
+        5.7614695129394535,
+        5.751964852905274,
+        5.739026268005371,
+        5.735524342346191,
+        5.726755699157715,
+        5.727088815307617,
+        5.720239462280273,
+        5.718460321044922,
+        5.71376809463501,
+        5.714928326416016,
+        5.7128154655456544,
+        5.714173757171631,
+        5.712955146789551,
+        5.705462777709961,
+        5.710359304046631,
+        5.705351610565185,
+        5.709907086181641,
+        5.711954432678223,
+        5.708148307800293,
+        5.711865797424316,
+        5.708285481262207,
+        5.705410808563232,
+        5.703698277282715,
+        5.709240042877197,
+        5.704008303833008,
+        5.704067075347901,
+        5.702899459838867,
+        5.7035155220031735,
+        5.701002093505859,
+        5.702426362609863,
+        5.703722853088379,
+        5.70806760559082,
+        5.704497438049317,
+        5.702180374908448,
+        5.7042583503723145,
+        5.7028077018737795,
+        5.704196015930176,
+        5.700166873168945,
+        5.70562908782959
+      ],
+      "objective_mean": 5.714230744647979,
+      "baseline_margins": [
+        0.002014855194092391,
+        -0.002143141174316021,
+        -0.005756754302978173,
+        -0.013833049011230614,
+        -0.019796701049805243,
+        -0.013202644348144332,
+        -0.009574550628662415,
+        -0.019400907897949793,
+        -0.01865301361084004,
+        -0.022976596832275042,
+        -0.01705191192626998,
+        -0.01854276962280288,
+        -0.014844588470459108,
+        -0.015123953247069721,
+        -0.01975618209838892,
+        -0.013547510528564288,
+        -0.019602730560302817,
+        -0.015373572540283043,
+        -0.01572382278442408,
+        -0.01629765930175786,
+        -0.01325066452026391,
+        -0.014294029998779045,
+        -0.015161865997314727,
+        -0.016135033416747824,
+        -0.010422778320312354,
+        -0.013526966857910772,
+        -0.01289728927612277,
+        -0.01566277008056627,
+        -0.010537496185302864,
+        -0.011543991851807434,
+        -0.017124430847168526,
+        -0.012668902587891218,
+        -0.010767515563965269,
+        -0.012076937103270957,
+        -0.009693814849852878,
+        -0.011247695922851797,
+        -0.010593907928466706,
+        -0.01237579421997026,
+        -0.009438767242431645,
+        -0.013662284851074347
+      ],
+      "baseline_violations": 1,
+      "better_than_baseline": false
+    },
+    "train_score_mean": 5.822014474273872,
+    "train_loss_mean": 0.3041692329374019,
+    "pair_count": 4897466912,
+    "early_eval": {
+      "enabled": true,
+      "steps": 15630,
+      "baseline_validation_objective": 5.737830516815186,
+      "candidate_validation_objective": 5.714690323638916,
+      "early_stopped": false
+    },
+    "phases": {
+      "f1": {
+        "steps": 62520,
+        "train_score_mean": 5.822014474273872,
+        "train_loss_mean": 0.3041692329374019,
+        "pair_count": 4897466912
+      },
+      "f2": {
+        "steps": 0,
+        "train_score_mean": null,
+        "train_loss_mean": null,
+        "pair_count": 0
+      }
+    },
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 40,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 50,
+        "valid_problem_sizes": [
+          50
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 50,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:0",
+        "seed": 1234,
+        "num_validation_episodes": 10000,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 62520,
+        "f2_steps": 0,
+        "f3_enabled": false,
+        "baseline_epoch_violation_weight": 1.0
+      }
+    },
+    "loss_ir": {
+      "name": "AdaptiveSigmoidFocalLoss",
+      "intuition": "Repaired: The original loss failed the `E_PREF_SEMANTIC` check because the effective focal exponent `gamma_eff` was detached from the computation graph. This prevented the loss from correctly decreasing when `log_prob_w` increased, as the gradient path through `gamma_eff` was cut. The fix is to remove `torch.no_grad()` from the calculation of `model_confidence`, allowing `gamma_eff` to be a function of `delta` with a valid gradient. This ensures the loss correctly signals a preference for the lower-cost solution.",
+      "hyperparams": {
+        "gamma": 2.0,
+        "eps": 1e-06
+      },
+      "operators_used": [
+        "logsigmoid",
+        "sigmoid"
+      ]
+    },
+    "novelty": 5884255.75423224
+  },
+  "novelty": 5884255.75423224
+}
