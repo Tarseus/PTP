@@ -51,6 +51,8 @@ them with a short-run TSP training loop.
   - `gate_reports.jsonl`: static/dynamic gate outcomes and reasons
   - `fitness_scores.jsonl`: scalar fitness summaries
   - `best_candidate.json`: best loss IR and metrics from the run
+  - `baseline_po_loss.log`: baseline (po_loss) training curve + eval log
+  - `gen###_cand###.log`: per-candidate training curve logs
 
 The existing PTP-DSL discovery pipeline (`ptp_discovery.run_llm_search`) and
 baseline POMO training scripts remain unchanged, so you can continue to use

@@ -26,7 +26,7 @@ f2_steps: 0    # set >0 to enable F2
 f3_enabled: false
 # LLM repair retries when a candidate fails compile/dynamic/preference gates.
 # This controls the "attempting repair (repair_round=...)" log lines.
-max_repair_rounds: 2
+max_repair_rounds: 4
 
 # Early-eval horizon for baseline/candidates, expressed in epochs/instances.
 # If both are > 0, we compute:
@@ -51,7 +51,7 @@ device: cuda
 num_validation_episodes: 10000
 validation_batch_size: 64
 generalization_penalty_weight: 1.0
-baseline_epoch_violation_weight: 1.0
+baseline_epoch_violation_weight: 0.0
 pref_semantic_gate_enabled: true
 pref_semantic_trials: 6
 pref_semantic_batch_size: 128

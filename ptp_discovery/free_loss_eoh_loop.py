@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from contextlib import contextmanager
 import hashlib
 import json
 import math
@@ -9,7 +10,7 @@ import time
 import logging
 import multiprocessing as mp
 from dataclasses import asdict
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, Iterator, List, Sequence, Tuple
 
 import torch
 import torch.nn.functional as F
@@ -836,6 +837,23 @@ def _timestamp_dir(root: str) -> str:
     return path
 
 
+@contextmanager
+def _capture_logs_to_file(path: str) -> Iterator[None]:
+    root_logger = logging.getLogger()
+    fmt = logging.Formatter("[%(asctime)s] %(levelname)s:%(name)s: %(message)s")
+    handler = logging.FileHandler(path, mode="w", encoding="utf-8")
+    handler.setLevel(logging.INFO)
+    handler.setFormatter(fmt)
+    root_logger.addHandler(handler)
+    try:
+        yield
+    finally:
+        try:
+            root_logger.removeHandler(handler)
+        finally:
+            handler.close()
+
+
 def _dump_jsonl(path: str, records: List[Dict[str, Any]]) -> None:
     with open(path, "w", encoding="utf-8") as f:
         for rec in records:
@@ -1147,11 +1165,20 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     diverse_elites: List[Dict[str, Any]] = []
     seen_signatures: set[str] = set()
 
+    out_root = cfg_yaml.get("output_root", "runs/free_loss_discovery")
+    run_dir = _timestamp_dir(out_root)
+    LOGGER.info("Run directory: %s", os.path.abspath(run_dir))
+
     # Baseline: evaluate the original POMO po_loss once, using the same HF
     # configuration. This provides a reference score before searching over
     # free-form preference losses.
     try:
-        baseline = evaluate_po_baseline(hf_cfg, early_eval_steps=early_eval_steps)
+        baseline_log_path = os.path.join(run_dir, "baseline_po_loss.log")
+        with _capture_logs_to_file(baseline_log_path):
+            LOGGER.info(
+                "Saving baseline training log to %s", os.path.abspath(baseline_log_path)
+            )
+            baseline = evaluate_po_baseline(hf_cfg, early_eval_steps=early_eval_steps)
         baseline_hf_score = float(baseline.get("fitness_score", baseline["hf_score"]))
         baseline_early_valid = float(
             baseline.get("early_validation_objective", baseline["validation_objective"])
@@ -1209,10 +1236,6 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     novelty_hparam_weight = float(cfg_yaml.get("novelty_hparam_weight", 0.5))
     novelty_behavior_weight = float(cfg_yaml.get("novelty_behavior_weight", 1.0))
     diversity_archive_size = int(cfg_yaml.get("diversity_archive_size", 32))
-
-    out_root = cfg_yaml.get("output_root", "runs/free_loss_discovery")
-    run_dir = _timestamp_dir(out_root)
-    LOGGER.info("Run directory: %s", os.path.abspath(run_dir))
 
     candidates_log: List[Dict[str, Any]] = []
     gates_log: List[Dict[str, Any]] = []
