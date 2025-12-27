@@ -6,9 +6,11 @@ import hashlib
 import json
 import math
 import os
+import re
 import time
 import logging
 import multiprocessing as mp
+import random
 from dataclasses import asdict
 from typing import Any, Dict, Iterator, List, Sequence, Tuple
 
@@ -40,7 +42,10 @@ from ptp_discovery.free_loss_ir import FreeLossIR, ir_from_json
 from ptp_discovery.free_loss_llm_ops import (
     compile_free_loss_candidate,
     crossover_free_loss,
+    e2_free_loss,
     generate_free_loss_candidate,
+    m2_tune_hparams,
+    m3_simplify_loss,
     mutate_free_loss,
     repair_free_loss,
     repair_expects_with_prompt,
@@ -201,6 +206,76 @@ def _behavior_descriptor(
     return vec
 
 
+_THOUGHT_STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "by",
+    "for",
+    "from",
+    "in",
+    "is",
+    "it",
+    "its",
+    "of",
+    "on",
+    "or",
+    "that",
+    "the",
+    "this",
+    "to",
+    "with",
+    "we",
+    "you",
+    "your",
+    "our",
+    "their",
+    "not",
+    "only",
+    "must",
+    "should",
+    "can",
+    "may",
+    "use",
+    "using",
+    "used",
+    "loss",
+    "preference",
+    "preferences",
+    "logp",
+    "logprob",
+    "prob",
+    "probability",
+    "cost",
+    "gap",
+    "delta",
+}
+
+
+def _thought_tokens(ir: FreeLossIR, *, max_tokens: int = 32) -> List[str]:
+    text = " ".join(
+        [
+            str(ir.intuition or ""),
+            str(ir.pseudocode or ""),
+            str(getattr(ir, "theoretical_basis", "") or ""),
+        ]
+    ).lower()
+    raw = re.findall(r"[a-zA-Z][a-zA-Z0-9_+-]{1,}", text)
+    counts: Dict[str, int] = {}
+    for tok in raw:
+        if tok in _THOUGHT_STOPWORDS:
+            continue
+        if len(tok) < 3:
+            continue
+        counts[tok] = counts.get(tok, 0) + 1
+    ranked = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    return [t for t, _ in ranked[:max_tokens]]
+
+
 def _jaccard_distance(a: Sequence[str], b: Sequence[str]) -> float:
     set_a = set(a)
     set_b = set(b)
@@ -218,6 +293,7 @@ def _descriptor_distance(
     ops_weight: float,
     hparam_weight: float,
     behavior_weight: float,
+    thought_weight: float,
 ) -> float:
     beh_a = a.get("behavior") or []
     beh_b = b.get("behavior") or []
@@ -227,8 +303,14 @@ def _descriptor_distance(
 
     ops_dist = _jaccard_distance(a.get("ops", []), b.get("ops", []))
     hp_dist = _jaccard_distance(a.get("hyperparams", []), b.get("hyperparams", []))
+    thought_dist = _jaccard_distance(a.get("thought", []), b.get("thought", []))
 
-    return behavior_weight * beh_dist + ops_weight * ops_dist + hparam_weight * hp_dist
+    return (
+        behavior_weight * beh_dist
+        + ops_weight * ops_dist
+        + hparam_weight * hp_dist
+        + thought_weight * thought_dist
+    )
 
 
 def _novelty_score(
@@ -239,6 +321,7 @@ def _novelty_score(
     ops_weight: float,
     hparam_weight: float,
     behavior_weight: float,
+    thought_weight: float,
 ) -> float:
     if desc is None:
         return 0.0
@@ -251,6 +334,7 @@ def _novelty_score(
             ops_weight=ops_weight,
             hparam_weight=hparam_weight,
             behavior_weight=behavior_weight,
+            thought_weight=thought_weight,
         )
         for other in archive
     ]
@@ -1216,7 +1300,10 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     prompts = cfg_yaml.get("prompts", {}) or {}
     gen_prompt = prompts.get("generation")
     crossover_prompt = prompts.get("crossover")
+    e2_prompt = prompts.get("e2")
     mutation_prompt = prompts.get("mutation")
+    m2_prompt = prompts.get("m2")
+    m3_prompt = prompts.get("m3")
     repair_prompt = prompts.get("repair")
     expects_repair_prompt = prompts.get("expects_repair")
     max_resample_rounds = int(cfg_yaml.get("max_resample_rounds", 1) or 0)
@@ -1235,6 +1322,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     novelty_ops_weight = float(cfg_yaml.get("novelty_ops_weight", 1.0))
     novelty_hparam_weight = float(cfg_yaml.get("novelty_hparam_weight", 0.5))
     novelty_behavior_weight = float(cfg_yaml.get("novelty_behavior_weight", 1.0))
+    novelty_thought_weight = float(cfg_yaml.get("novelty_thought_weight", 0.25))
     diversity_archive_size = int(cfg_yaml.get("diversity_archive_size", 32))
 
     candidates_log: List[Dict[str, Any]] = []
@@ -1253,6 +1341,11 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     if burn_in_objectives_auto:
         burn_in_objectives.extend(_build_auto_seed_objectives())
 
+    rng = random.Random(seed)
+    best_hf_so_far = float("inf")
+    stalled_gens = 0
+    prev_dynamic_fail_rate = 0.0
+
     def _maybe_repair_expects(ir: FreeLossIR) -> FreeLossIR:
         if not expects_repair_prompt:
             return ir
@@ -1267,30 +1360,189 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             LOGGER.warning("Failed to repair expects via LLM: %s", exc)
             return ir
 
+    def _weighted_choice(options: List[Tuple[str, float]]) -> str:
+        total = sum(max(0.0, float(w)) for _, w in options)
+        if total <= 0.0:
+            return options[0][0]
+        r = rng.random() * total
+        acc = 0.0
+        for name, w in options:
+            acc += max(0.0, float(w))
+            if r <= acc:
+                return name
+        return options[-1][0]
+
+    def _rank_weighted_sample(entries: List[Dict[str, Any]], k: int) -> List[Dict[str, Any]]:
+        if not entries or k <= 0:
+            return []
+        k = min(k, len(entries))
+        ranks = _pareto_ranks(entries)
+        rank_bias = float(cfg_yaml.get("parent_sampling_rank_bias", 1.0))
+        weights = [1.0 / (float(r) + rank_bias) for r in ranks]
+        chosen: List[Dict[str, Any]] = []
+        available = list(range(len(entries)))
+        while available and len(chosen) < k:
+            total_w = sum(weights[i] for i in available)
+            if total_w <= 0.0:
+                idx = rng.choice(available)
+            else:
+                r = rng.random() * total_w
+                acc = 0.0
+                idx = available[-1]
+                for i in available:
+                    acc += weights[i]
+                    if r <= acc:
+                        idx = i
+                        break
+            chosen.append(entries[idx])
+            available.remove(idx)
+        return chosen
+
+    def _choose_llm_op(*, gen: int, parent_pool_size: int, global_feedback: Dict[str, Any]) -> str:
+        if gen == 0 or parent_pool_size <= 0:
+            return "E1_GENERATE"
+
+        early_cutoff = max(1, int(round(generations * 0.3)))
+        late_cutoff = max(1, int(round(generations * 0.7)))
+
+        if stalled_gens >= int(cfg_yaml.get("scheduler_stall_window", 2) or 2):
+            if e2_prompt and parent_pool_size >= 2:
+                return "E2"
+
+        if prev_dynamic_fail_rate >= float(cfg_yaml.get("scheduler_fail_rate_high", 0.6)) and m3_prompt:
+            return "M3"
+
+        suggested_mode = str(global_feedback.get("suggested_mode") or "explore").lower()
+        if gen < early_cutoff:
+            # Early: expand structural search space via E1/E2.
+            options: List[Tuple[str, float]] = [
+                ("E2", 0.65 if suggested_mode != "refine" else 0.45),
+                ("E1", 0.35),
+            ]
+        elif gen >= late_cutoff:
+            # Late: refine via M2/M1, with occasional recombination.
+            options = [
+                ("M2", 0.50 if suggested_mode == "refine" else 0.40),
+                ("M1", 0.30),
+                ("E2", 0.20),
+            ]
+        else:
+            # Mid: balance recombination and local refinement.
+            options = [
+                ("M2", 0.40 if suggested_mode == "refine" else 0.30),
+                ("M1", 0.35),
+                ("E2", 0.25),
+            ]
+
+        filtered: List[Tuple[str, float]] = []
+        for name, w in options:
+            if name == "E2" and (not e2_prompt or parent_pool_size < 2):
+                continue
+            if name == "E1" and (not crossover_prompt or parent_pool_size < 2):
+                continue
+            if name == "M1" and (not mutation_prompt or parent_pool_size < 1):
+                continue
+            if name == "M2" and (not m2_prompt or parent_pool_size < 1):
+                continue
+            if name == "M3" and (not m3_prompt or parent_pool_size < 1):
+                continue
+            filtered.append((name, w))
+
+        if not filtered:
+            if mutation_prompt and parent_pool_size >= 1:
+                return "M1"
+            if crossover_prompt and parent_pool_size >= 2:
+                return "E1"
+            return "E1_GENERATE"
+
+        return _weighted_choice(filtered)
+
     def _sample_candidate(
         *,
-        parent_irs: List[FreeLossIR],
-        parents: List[Dict[str, Any]],
+        gen: int,
+        parent_pool: List[Dict[str, Any]],
         global_feedback: Dict[str, Any],
-    ) -> FreeLossIR:
-        if len(parent_irs) >= 2 and crossover_prompt:
-            return crossover_free_loss(
-                crossover_prompt,
-                parent_irs[:2],
-                parents_fitness=[p["fitness"] for p in parents[:2]],
-                global_feedback=global_feedback,
+    ) -> Tuple[FreeLossIR, str]:
+        op = _choose_llm_op(gen=gen, parent_pool_size=len(parent_pool), global_feedback=global_feedback)
+
+        if op == "E2" and e2_prompt and len(parent_pool) >= 2:
+            parent_count = int(cfg_yaml.get("parent_count_e2", 5) or 5)
+            chosen = _rank_weighted_sample(parent_pool, min(parent_count, len(parent_pool)))
+            parent_irs = [p["ir"] for p in chosen]
+            return (
+                e2_free_loss(
+                    e2_prompt,
+                    parent_irs,
+                    parents_fitness=[p["fitness"] for p in chosen],
+                    global_feedback=global_feedback,
+                ),
+                op,
             )
-        if parent_irs and mutation_prompt:
-            return mutate_free_loss(
-                mutation_prompt,
-                parent_irs[0],
-                parent_fitness=parents[0]["fitness"],
-                global_feedback=global_feedback,
+
+        if op == "E1" and crossover_prompt and len(parent_pool) >= 2:
+            chosen = _rank_weighted_sample(parent_pool, 2)
+            parent_irs = [p["ir"] for p in chosen]
+            return (
+                crossover_free_loss(
+                    crossover_prompt,
+                    parent_irs,
+                    parents_fitness=[p["fitness"] for p in chosen],
+                    global_feedback=global_feedback,
+                ),
+                op,
             )
-        return generate_free_loss_candidate(
-            gen_prompt,
-            operator_whitelist=operator_whitelist,
-            global_feedback=global_feedback,
+
+        if op == "M2" and m2_prompt and parent_pool:
+            parent = _select_parents(parent_pool, 1)[0]
+            return (
+                m2_tune_hparams(
+                    m2_prompt,
+                    parent["ir"],
+                    parent_fitness=parent["fitness"],
+                    global_feedback=global_feedback,
+                ),
+                op,
+            )
+
+        if op == "M3" and m3_prompt and parent_pool:
+            parent = _select_parents(parent_pool, 1)[0]
+            failure_context = {
+                "stage": "scheduler",
+                "code": "E_HIGH_FAILURE_RATE" if prev_dynamic_fail_rate > 0 else "E_SCHEDULER_M3",
+                "message": "Simplify for stability and preference semantics.",
+                "extra": {
+                    "prev_dynamic_fail_rate": prev_dynamic_fail_rate,
+                },
+            }
+            return (
+                m3_simplify_loss(
+                    m3_prompt,
+                    parent["ir"],
+                    failure_context,
+                    global_feedback=global_feedback,
+                ),
+                op,
+            )
+
+        if op == "M1" and mutation_prompt and parent_pool:
+            parent = _select_parents(parent_pool, 1)[0]
+            return (
+                mutate_free_loss(
+                    mutation_prompt,
+                    parent["ir"],
+                    parent_fitness=parent["fitness"],
+                    global_feedback=global_feedback,
+                ),
+                op,
+            )
+
+        return (
+            generate_free_loss_candidate(
+                gen_prompt,
+                operator_whitelist=operator_whitelist,
+                global_feedback=global_feedback,
+            ),
+            "E1_GENERATE",
         )
 
     def _should_resample_dynamic(reason: str) -> bool:
@@ -1314,34 +1566,26 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             diversity_archive=diversity_archive,
         )
         population: List[FreeLossIR] = []
-        parents: List[Dict[str, Any]] = []
-        parent_irs: List[FreeLossIR] = []
+        sample_ops: List[str] = []
+        parent_pool: List[Dict[str, Any]] = []
         if gen == 0:
             LOGGER.info("Generating initial population with %d LLM candidates", init_llm)
             for _ in range(init_llm):
-                ir = _sample_candidate(
-                    parent_irs=parent_irs,
-                    parents=parents,
-                    global_feedback=global_feedback,
-                )
+                ir, op = _sample_candidate(gen=gen, parent_pool=parent_pool, global_feedback=global_feedback)
                 population.append(_maybe_repair_expects(ir))
+                sample_ops.append(op)
         else:
             parent_pool = diverse_elites if diverse_elites else elites
-            parents = _select_parents(parent_pool, elite_size)
-            parent_irs = [p["ir"] for p in parents]
             LOGGER.info(
-                "Generating population via crossover/mutation: size=%d, elite_size=%d, available_elites=%d",
+                "Generating population via E1/E2/M1/M2/M3: size=%d, elite_size=%d, parent_pool=%d",
                 population_size,
                 elite_size,
-                len(parent_irs),
+                len(parent_pool),
             )
             for _ in range(population_size):
-                ir = _sample_candidate(
-                    parent_irs=parent_irs,
-                    parents=parents,
-                    global_feedback=global_feedback,
-                )
+                ir, op = _sample_candidate(gen=gen, parent_pool=parent_pool, global_feedback=global_feedback)
                 population.append(_maybe_repair_expects(ir))
+                sample_ops.append(op)
 
         LOGGER.info("Population size for generation %d: %d", gen, len(population))
         gen_elites: List[Dict[str, Any]] = []
@@ -1371,6 +1615,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
         for idx, original_ir in enumerate(population):
             ir = original_ir
+            llm_op = sample_ops[idx] if idx < len(sample_ops) else ""
             resample_attempts = 0
             while True:
                 resampled = False
@@ -1386,6 +1631,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                         "generation": gen,
                         "index": idx,
                         "attempt": attempt,
+                        "llm_op": llm_op,
                         "ir": asdict(ir),
                         "static_ok": static_res.ok,
                         "static_reason": static_res.reason,
@@ -1505,16 +1751,15 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                 resample_attempts,
                                 max_resample_rounds,
                             )
-                            ir = _maybe_repair_expects(
-                                _sample_candidate(
-                                    parent_irs=parent_irs,
-                                    parents=parents,
-                                    global_feedback=global_feedback,
-                                )
+                            ir, llm_op = _sample_candidate(
+                                gen=gen,
+                                parent_pool=parent_pool,
+                                global_feedback=global_feedback,
                             )
+                            ir = _maybe_repair_expects(ir)
                             resampled = True
                             break
-                        if attempt < max_repair_rounds and repair_prompt:
+                        if attempt < max_repair_rounds and (repair_prompt or m3_prompt):
                             LOGGER.warning(
                                 "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s, "
                                 "loss_value=%s, grad_norm=%s; attempting repair (repair_round=%d/%d)",
@@ -1540,8 +1785,39 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                         "grad_norm": dyn_res.grad_norm,
                                     },
                                 )
-                                ir = repair_free_loss(repair_prompt, ir, failure_payload)
-                                continue
+
+                                m3_codes = {
+                                    "E_RUNTIME_NAN_LOSS",
+                                    "E_RUNTIME_NAN_GRAD",
+                                    "E_GRAD_EXPLODE",
+                                    "E_LOSS_OUT_OF_RANGE",
+                                    "E_BACKWARD_ERROR",
+                                    "E_FORWARD_ERROR",
+                                    "E_PREF_SEMANTIC",
+                                    "E_DYNAMIC_OTHER",
+                                }
+                                if m3_prompt and gate_entry.get("dynamic_error_code") in m3_codes:
+                                    try:
+                                        ir = m3_simplify_loss(
+                                            m3_prompt,
+                                            ir,
+                                            failure_payload,
+                                            global_feedback=global_feedback,
+                                        )
+                                        llm_op = "M3_REPAIR"
+                                        continue
+                                    except Exception as exc:  # noqa: BLE001
+                                        LOGGER.warning(
+                                            "Failed to simplify (M3) for gen=%d, idx=%d: %s",
+                                            gen,
+                                            idx,
+                                            exc,
+                                        )
+
+                                if repair_prompt:
+                                    ir = repair_free_loss(repair_prompt, ir, failure_payload)
+                                    llm_op = "REPAIR"
+                                    continue
                             except Exception as exc:  # noqa: BLE001
                                 LOGGER.warning(
                                     "Failed to repair dynamic gate error for gen=%d, idx=%d: %s",
@@ -1587,7 +1863,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                 pref_res.reason,
                             )
                             gates_log.append(gate_entry)
-                            if attempt < max_repair_rounds and repair_prompt:
+                            if attempt < max_repair_rounds and (repair_prompt or m3_prompt):
                                 LOGGER.warning(
                                     "Preference gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
                                     "attempting repair (repair_round=%d/%d)",
@@ -1612,8 +1888,29 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                             "gap_pass_rate": pref_res.gap_pass_rate,
                                         },
                                     )
-                                    ir = repair_free_loss(repair_prompt, ir, failure_payload)
-                                    continue
+
+                                    if m3_prompt:
+                                        try:
+                                            ir = m3_simplify_loss(
+                                                m3_prompt,
+                                                ir,
+                                                failure_payload,
+                                                global_feedback=global_feedback,
+                                            )
+                                            llm_op = "M3_REPAIR"
+                                            continue
+                                        except Exception as exc:  # noqa: BLE001
+                                            LOGGER.warning(
+                                                "Failed to simplify (M3) for gen=%d, idx=%d: %s",
+                                                gen,
+                                                idx,
+                                                exc,
+                                            )
+
+                                    if repair_prompt:
+                                        ir = repair_free_loss(repair_prompt, ir, failure_payload)
+                                        llm_op = "REPAIR"
+                                        continue
                                 except Exception as exc:  # noqa: BLE001
                                     LOGGER.warning(
                                         "Failed to repair preference gate error for gen=%d, idx=%d: %s",
@@ -1732,6 +2029,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                         "behavior": behavior,
                         "ops": list(ir.operators_used or []),
                         "hyperparams": list((ir.hyperparams or {}).keys()),
+                        "thought": _thought_tokens(ir),
                         "signature": _candidate_signature(ir),
                     }
                     novelty = _novelty_score(
@@ -1741,6 +2039,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                         ops_weight=novelty_ops_weight,
                         hparam_weight=novelty_hparam_weight,
                         behavior_weight=novelty_behavior_weight,
+                        thought_weight=novelty_thought_weight,
                     )
             except Exception:  # noqa: BLE001
                 descriptor = None
@@ -1853,6 +2152,16 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 diverse_pool,
                 min(diversity_archive_size, len(diverse_pool)),
             )
+
+        attempted = static_fail + dynamic_fail + evaluated
+        prev_dynamic_fail_rate = float(dynamic_fail) / float(max(1, attempted))
+        stall_eps = float(cfg_yaml.get("scheduler_stall_eps", 1e-4))
+        current_best = float(elites[0]["fitness"]["hf_like_score"]) if elites else float("inf")
+        if current_best < best_hf_so_far - stall_eps:
+            best_hf_so_far = current_best
+            stalled_gens = 0
+        else:
+            stalled_gens += 1
 
     _dump_jsonl(os.path.join(run_dir, "candidates.jsonl"), candidates_log)
     _dump_jsonl(os.path.join(run_dir, "gate_reports.jsonl"), gates_log)

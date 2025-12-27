@@ -74,6 +74,7 @@ novelty_k: 5
 novelty_ops_weight: 1.0
 novelty_hparam_weight: 0.5
 novelty_behavior_weight: 1.0
+novelty_thought_weight: 0.25
 diversity_archive_size: 32
 burn_in_objectives_auto: true
 
@@ -95,7 +96,10 @@ operator_whitelist:
 prompts:
   generation: prompts/free_loss_generation.txt
   crossover: prompts/free_loss_crossover.txt
+  e2: prompts/free_loss_e2.txt
   mutation: prompts/free_loss_mutation.txt
+  m2: prompts/free_loss_m2.txt
+  m3: prompts/free_loss_m3.txt
   repair: prompts/free_loss_repair.txt
   expects_repair: prompts/free_loss_expects_repair.txt
 
