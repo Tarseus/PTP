@@ -1,0 +1,51 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 5.727433732051849,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_PREF_SEMANTIC",
+        "count": 25
+      },
+      {
+        "code": "E_DUPLICATE",
+        "count": 2
+      },
+      {
+        "code": "E_LOSS_OUT_OF_RANGE",
+        "count": 1
+      },
+      {
+        "code": "E_FORWARD_ERROR",
+        "count": 1
+      },
+      {
+        "code": "E_COMPILE_ERROR",
+        "count": 1
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 7,
+    "index": 2,
+    "name": "AdaptiveEntropyScaledLoss",
+    "theoretical_basis": "A dynamically scaled Bradley-Terry model with entropy-regularization. The preference probability is sigmoid(beta * delta), where beta is adaptive. Beta is modulated by two signals: (1) a cost-sensitive term `softplus(zscore(cost_gap))` which increases learning pressure on pairs with larger cost differences, and (2) a novel confidence-penalty term `exp(-abs(zscore(delta)))` that down-weights the contribution of pairs the model is already confident about, focusing updates on harder examples and preventing overfitting.",
+    "operators_used": [
+      "logsigmoid",
+      "zscore",
+      "exp",
+      "softplus"
+    ],
+    "hyperparams": {
+      "beta_0": 0.1,
+      "confidence_scale": 0.5
+    },
+    "hf_like_score": 5.724747607955932,
+    "validation_objective": 5.7153970184326175,
+    "generalization_penalty": 0.0,
+    "epoch_objective_mean": 5.724747607955932,
+    "epoch_baseline_violations": 9,
+    "pair_count": 4900289189
+  }
+}

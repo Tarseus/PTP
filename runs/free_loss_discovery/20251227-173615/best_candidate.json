@@ -1,0 +1,203 @@
+{
+  "generation": 7,
+  "index": 2,
+  "ir": {
+    "name": "AdaptiveEntropyScaledLoss",
+    "intuition": "Mode: explore. This loss function inherits the core Bradley-Terry structure (`-logsigmoid`) and the concept of a dynamic, cost-sensitive beta from both parents. It also inherits the use of `zscore` on both the log-probability difference and the cost gap to ensure batch-relative stability, a common feature in recent successful losses. The first new coupling is to use the `zscore` of the log-probability difference itself as a component in the dynamic beta. This creates an 'entropy-aware' scaling: pairs where the model is already very confident (large `|delta|`) will have their beta scaled down, preventing overfitting on easy examples and focusing learning on more ambiguous pairs. This is implemented by applying `exp(-abs(zscored_delta))` which maps high-confidence predictions towards a scaling factor of 0 and low-confidence ones towards 1. The second new coupling is a simplified `softplus` scaling on the `zscored_cost_gap` instead of `tanh`. This provides an unbounded but non-negative signal that increases monotonically with the cost gap, emphasizing learning on pairs with larger cost differences without the saturation effect of tanh.",
+    "pseudocode": "1. Calculate the log-probability difference: delta = log_prob_w - log_prob_l.\n2. Calculate the cost gap: cost_gap = cost_l - cost_w.\n3. Inherit z-score normalization on both delta and cost_gap for batch-aware stability: zscored_delta = zscore(delta), zscored_cost_gap = zscore(cost_gap).\n4. New Coupling 1 (Entropy-aware scaling): Calculate a confidence penalty factor from the z-scored delta. This factor is close to 1 for low-confidence pairs (delta near zero) and approaches 0 for high-confidence pairs (large |delta|). confidence_penalty = exp(-abs(zscored_delta) * confidence_scale).\n5. New Coupling 2 (Cost-based scaling): Calculate a cost-based scaling factor using softplus on the normalized cost gap. This ensures the factor is non-negative and grows with the cost difference: cost_based_scale = softplus(zscored_cost_gap).\n6. Combine the scaling factors and a base beta: dynamic_beta = beta_0 + confidence_penalty * cost_based_scale.\n7. Scale the log-probability difference: scaled_delta = dynamic_beta * delta. (Note: using raw delta here, as zscored_delta is already used in the beta calculation).\n8. Compute the final loss using the Bradley-Terry framework: loss = -logsigmoid(scaled_delta).\n9. Return the mean loss.",
+    "hyperparams": {
+      "beta_0": 0.1,
+      "confidence_scale": 0.5
+    },
+    "operators_used": [
+      "logsigmoid",
+      "zscore",
+      "exp",
+      "softplus"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "log_prob_w",
+        "log_prob_l"
+      ],
+      "returns": "scalar"
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    # Hyperparameters\n    beta_0 = extra.get('beta_0', 0.1)\n    confidence_scale = extra.get('confidence_scale', 0.5)\n\n    # Unpack batch data\n    cost_w = torch.min(batch['cost_a'], batch['cost_b'])\n    cost_l = torch.max(batch['cost_a'], batch['cost_b'])\n    log_prob_w = batch['log_prob_w']\n    log_prob_l = batch['log_prob_l']\n    weight = batch.get('weight')\n\n    # 1. Calculate log-probability difference and cost gap\n    delta_log_probs = log_prob_w - log_prob_l\n    cost_gap = cost_l - cost_w\n\n    # 2. Inherit z-score normalization for stability\n    zscored_delta = ops.zscore(delta_log_probs)\n    zscored_cost_gap = ops.zscore(cost_gap)\n\n    # 3. New Coupling 1: Confidence-based penalty (entropy-aware scaling)\n    # This factor is near 1 for uncertain pairs (zscored_delta ~ 0) and decays to 0 for confident pairs.\n    confidence_penalty = torch.exp(-torch.abs(zscored_delta) * confidence_scale)\n\n    # 4. New Coupling 2: Unbounded cost-based scaling using softplus\n    # This ensures the scaling is non-negative and grows with the cost gap.\n    cost_based_scale = F.softplus(zscored_cost_gap)\n\n    # 5. Combine to form the dynamic beta\n    # beta_0 provides a small minimum beta. The final beta is highest for pairs with large cost gaps and low model confidence.\n    dynamic_beta = beta_0 + confidence_penalty * cost_based_scale\n\n    # 6. Scale the original log-probability difference\n    # We use the raw delta here as zscored_delta was used to calculate the beta.\n    scaled_delta = dynamic_beta * delta_log_probs\n\n    # 7. Inherit Bradley-Terry loss structure\n    loss = -F.logsigmoid(scaled_delta)\n\n    # Apply optional instance weights\n    if weight is not None:\n        loss = loss * weight\n\n    return loss.mean()",
+    "theoretical_basis": "A dynamically scaled Bradley-Terry model with entropy-regularization. The preference probability is sigmoid(beta * delta), where beta is adaptive. Beta is modulated by two signals: (1) a cost-sensitive term `softplus(zscore(cost_gap))` which increases learning pressure on pairs with larger cost differences, and (2) a novel confidence-penalty term `exp(-abs(zscore(delta)))` that down-weights the contribution of pairs the model is already confident about, focusing updates on harder examples and preventing overfitting."
+  },
+  "fitness": {
+    "hf_like_score": 5.724747607955932,
+    "validation_objective": 5.7153970184326175,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "50": 5.711541540527343
+    },
+    "epoch_objective_mean": 5.724747607955932,
+    "epoch_baseline_violations": 9,
+    "epoch_better_than_baseline": false,
+    "epoch_eval": {
+      "enabled": true,
+      "steps_per_epoch": 1563,
+      "epochs_total": 40,
+      "objectives": [
+        5.81626328125,
+        5.7850167861938475,
+        5.767075524902344,
+        5.760379002380371,
+        5.755551921081543,
+        5.743666370391845,
+        5.740060397338867,
+        5.733741033172607,
+        5.733786737060547,
+        5.725093748474121,
+        5.72584259185791,
+        5.722462513732911,
+        5.724514480590821,
+        5.720591448974609,
+        5.71368173828125,
+        5.71711169052124,
+        5.712871394348144,
+        5.717647770690918,
+        5.716639915466309,
+        5.713326029968262,
+        5.715725338745117,
+        5.715476675415039,
+        5.71092378540039,
+        5.71012606048584,
+        5.714047793579102,
+        5.708232954406738,
+        5.709982115173339,
+        5.711235009002685,
+        5.709731911468506,
+        5.7092956466674805,
+        5.711562533569336,
+        5.711879922485352,
+        5.7165531623840335,
+        5.711786169433593,
+        5.712077906799316,
+        5.712414776611328,
+        5.7122592483520505,
+        5.71532873840332,
+        5.710859645080566,
+        5.715080548095703
+      ],
+      "objective_mean": 5.724747607955932,
+      "baseline_margins": [
+        0.0347953201293949,
+        0.023508824157715047,
+        0.006745858001709237,
+        0.006847575378417403,
+        0.002409739685059087,
+        -0.0006716789245606591,
+        0.0007979965209958806,
+        -0.0008838569641120841,
+        -0.004427585601806783,
+        -0.0010606849670411478,
+        -0.005531175231933361,
+        -0.007958419036865116,
+        -0.005843639373779297,
+        -0.007798300933838043,
+        -0.008443266296387364,
+        -0.008738940429687148,
+        -0.005805631256103894,
+        -0.013981550598145098,
+        -0.012952809906005669,
+        -0.007059136962890733,
+        -0.007410386657714874,
+        -0.006804997253417433,
+        -0.0066392486572270926,
+        -0.004896684265136564,
+        -0.008271128082275148,
+        -0.010618475341797051,
+        -0.008291820526123317,
+        -0.0081694206237799,
+        -0.006860318756103823,
+        -0.004131534576416129,
+        -0.0022507049560545056,
+        -0.005903424072265295,
+        -0.005140408325194912,
+        -0.0028771713256841025,
+        0.0011736801147463893,
+        -0.002832821655273321,
+        -0.001170182037354195,
+        0.0006991699218747982,
+        0.0027233558654780055,
+        -0.003721080017089484
+      ],
+      "baseline_violations": 9,
+      "better_than_baseline": false
+    },
+    "train_score_mean": 6.186925204198328,
+    "train_loss_mean": 0.2212078592956295,
+    "pair_count": 4900289189,
+    "early_eval": {
+      "enabled": true,
+      "steps": 15630,
+      "baseline_validation_objective": 5.728306777191162,
+      "candidate_validation_objective": 5.726202919006347,
+      "early_stopped": false
+    },
+    "phases": {
+      "f1": {
+        "steps": 62520,
+        "train_score_mean": 6.186925204198328,
+        "train_loss_mean": 0.2212078592956295,
+        "pair_count": 4900289189
+      },
+      "f2": {
+        "steps": 0,
+        "train_score_mean": null,
+        "train_loss_mean": null,
+        "pair_count": 0
+      }
+    },
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 40,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 50,
+        "valid_problem_sizes": [
+          50
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 50,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:2",
+        "seed": 1234,
+        "num_validation_episodes": 10000,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 62520,
+        "f2_steps": 0,
+        "f3_enabled": false,
+        "baseline_epoch_violation_weight": 0.0
+      }
+    },
+    "loss_ir": {
+      "name": "AdaptiveEntropyScaledLoss",
+      "intuition": "Mode: explore. This loss function inherits the core Bradley-Terry structure (`-logsigmoid`) and the concept of a dynamic, cost-sensitive beta from both parents. It also inherits the use of `zscore` on both the log-probability difference and the cost gap to ensure batch-relative stability, a common feature in recent successful losses. The first new coupling is to use the `zscore` of the log-probability difference itself as a component in the dynamic beta. This creates an 'entropy-aware' scaling: pairs where the model is already very confident (large `|delta|`) will have their beta scaled down, preventing overfitting on easy examples and focusing learning on more ambiguous pairs. This is implemented by applying `exp(-abs(zscored_delta))` which maps high-confidence predictions towards a scaling factor of 0 and low-confidence ones towards 1. The second new coupling is a simplified `softplus` scaling on the `zscored_cost_gap` instead of `tanh`. This provides an unbounded but non-negative signal that increases monotonically with the cost gap, emphasizing learning on pairs with larger cost differences without the saturation effect of tanh.",
+      "hyperparams": {
+        "beta_0": 0.1,
+        "confidence_scale": 0.5
+      },
+      "operators_used": [
+        "logsigmoid",
+        "zscore",
+        "exp",
+        "softplus"
+      ]
+    },
+    "novelty": 478.64753806042273
+  },
+  "novelty": 478.64753806042273
+}
