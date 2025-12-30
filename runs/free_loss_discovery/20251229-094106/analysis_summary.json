@@ -1,0 +1,33 @@
+{
+  "generations": 10,
+  "population_size": 8,
+  "baseline_hf_score": 5.737515271110534,
+  "gate_failure_stats": {
+    "by_code": [
+      {
+        "code": "E_PREF_SEMANTIC",
+        "count": 45
+      }
+    ]
+  },
+  "best_candidate": {
+    "generation": 3,
+    "index": 6,
+    "name": "AdaptiveTanhMarginSoftplusLoss",
+    "theoretical_basis": "A margin-based preference loss that extends the smooth hinge loss (softplus) framework. The required margin is a bounded function of the cost gap, `tanh(beta * cost_gap)`, ensuring stability. The key innovation is the introduction of a dynamic, confidence-based adjustment to this margin, `-softplus(gamma * log_prob_diff)`. This adaptive term effectively creates a 'moving target' for the log-probability difference: for correctly classified pairs, the target is lowered, reducing the loss and focusing on harder examples. For misclassified pairs, the adaptive term is near zero, and the model is penalized based on the full cost-derived margin. This combines the stability of bounded margins with the efficiency of adaptive, confidence-aware learning.",
+    "operators_used": [
+      "tanh",
+      "softplus"
+    ],
+    "hyperparams": {
+      "beta": 1.0,
+      "gamma": 0.5
+    },
+    "hf_like_score": 5.731268315734864,
+    "validation_objective": 5.716029623413086,
+    "generalization_penalty": 0.0,
+    "epoch_objective_mean": 5.731268315734864,
+    "epoch_baseline_violations": 2,
+    "pair_count": 2445466534
+  }
+}

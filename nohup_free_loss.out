@@ -1,536 +1,498 @@
-[2025-12-22 20:37:17,858] INFO:ptp_discovery.free_loss_eoh: Starting free loss EoH search with config=configs/free_loss_discovery.yaml
-[2025-12-22 20:37:20,851] INFO:ptp_discovery.free_loss_eoh: Baseline PO training: steps=62520, train_problem_size=50, pomo_size=50, batch_size=64, device=cuda, init_time=1.782s
-[2025-12-22 20:37:22,225] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 1/62520: score=23.942719 (avg=23.942719), loss=0.346570 (avg=0.346570)
-[2025-12-22 20:42:01,564] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 20:42:10,890] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 1/40: validation_objective=5.774916
-[2025-12-22 20:46:49,414] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 3126/62520: score=5.751467 (avg=5.834210), loss=0.327433 (avg=0.323647)
-[2025-12-22 20:46:49,415] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 20:46:58,884] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 2/40: validation_objective=5.763613
-[2025-12-22 20:51:39,954] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 20:51:49,789] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 3/40: validation_objective=5.757722
-[2025-12-22 20:56:24,895] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 6252/62520: score=5.828248 (avg=5.799170), loss=0.329846 (avg=0.325312)
-[2025-12-22 20:56:24,896] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 20:56:34,440] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 4/40: validation_objective=5.752859
-[2025-12-22 21:01:15,515] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:01:25,143] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 5/40: validation_objective=5.755321
-[2025-12-22 21:06:03,138] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 9378/62520: score=5.724226 (avg=5.782919), loss=0.331609 (avg=0.327172)
-[2025-12-22 21:06:03,139] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:06:12,549] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 6/40: validation_objective=5.739958
-[2025-12-22 21:10:50,932] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:11:00,317] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 7/40: validation_objective=5.736663
-[2025-12-22 21:15:42,778] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 12504/62520: score=5.728451 (avg=5.772307), loss=0.329508 (avg=0.328200)
-[2025-12-22 21:15:42,778] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:15:52,248] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 8/40: validation_objective=5.739640
-[2025-12-22 21:20:27,676] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:20:37,230] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 9/40: validation_objective=5.737113
-[2025-12-22 21:25:17,758] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 15630/62520: score=5.814812 (avg=5.764753), loss=0.328815 (avg=0.328575)
-[2025-12-22 21:25:17,759] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:25:27,253] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 10/40: validation_objective=5.736745
-[2025-12-22 21:25:27,253] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:30:09,860] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:30:19,331] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 11/40: validation_objective=5.731980
-[2025-12-22 21:34:55,942] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 18756/62520: score=5.692513 (avg=5.759145), loss=0.325712 (avg=0.328576)
-[2025-12-22 21:34:55,943] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:35:05,319] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 12/40: validation_objective=5.731358
-[2025-12-22 21:39:42,884] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:39:52,508] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 13/40: validation_objective=5.729018
-[2025-12-22 21:44:33,477] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 21882/62520: score=5.645971 (avg=5.754741), loss=0.324079 (avg=0.328356)
-[2025-12-22 21:44:33,478] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:44:42,716] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 14/40: validation_objective=5.728079
-[2025-12-22 21:49:26,086] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:49:35,601] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 15/40: validation_objective=5.725219
-[2025-12-22 21:54:10,080] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 25008/62520: score=5.800242 (avg=5.751180), loss=0.324035 (avg=0.327990)
-[2025-12-22 21:54:10,081] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:54:19,513] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 16/40: validation_objective=5.723907
-[2025-12-22 21:58:53,187] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 21:59:02,799] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 17/40: validation_objective=5.724954
-[2025-12-22 22:03:38,708] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 28134/62520: score=5.696333 (avg=5.748333), loss=0.321679 (avg=0.327565)
-[2025-12-22 22:03:38,709] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:03:48,359] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 18/40: validation_objective=5.725281
-[2025-12-22 22:08:22,890] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:08:32,525] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 19/40: validation_objective=5.727678
-[2025-12-22 22:13:06,017] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 31260/62520: score=5.646581 (avg=5.745846), loss=0.316760 (avg=0.327077)
-[2025-12-22 22:13:06,018] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:13:15,472] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 20/40: validation_objective=5.724446
-[2025-12-22 22:17:50,710] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:18:00,199] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 21/40: validation_objective=5.725116
-[2025-12-22 22:22:34,167] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 34386/62520: score=5.723313 (avg=5.743644), loss=0.320165 (avg=0.326550)
-[2025-12-22 22:22:34,167] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:22:43,847] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 22/40: validation_objective=5.722580
-[2025-12-22 22:27:25,180] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:27:34,782] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 23/40: validation_objective=5.720573
-[2025-12-22 22:32:06,279] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 37512/62520: score=5.733363 (avg=5.741667), loss=0.319739 (avg=0.326003)
-[2025-12-22 22:32:06,280] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:32:15,679] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 24/40: validation_objective=5.719833
-[2025-12-22 22:36:47,809] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:36:57,355] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 25/40: validation_objective=5.719663
-[2025-12-22 22:41:36,785] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 40638/62520: score=5.751184 (avg=5.739917), loss=0.314403 (avg=0.325431)
-[2025-12-22 22:41:36,786] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:41:46,235] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 26/40: validation_objective=5.717535
-[2025-12-22 22:46:24,227] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:46:33,725] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 27/40: validation_objective=5.716964
-[2025-12-22 22:51:09,035] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 43764/62520: score=5.723119 (avg=5.738324), loss=0.321148 (avg=0.324850)
-[2025-12-22 22:51:09,036] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:51:18,597] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 28/40: validation_objective=5.718562
-[2025-12-22 22:55:51,776] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 22:56:01,169] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 29/40: validation_objective=5.714053
-[2025-12-22 23:00:38,261] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 46890/62520: score=5.720171 (avg=5.736950), loss=0.323282 (avg=0.324277)
-[2025-12-22 23:00:38,262] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:00:47,816] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 30/40: validation_objective=5.712546
-[2025-12-22 23:05:24,396] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:05:34,018] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 31/40: validation_objective=5.719551
-[2025-12-22 23:10:14,210] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 50016/62520: score=5.716077 (avg=5.735643), loss=0.313349 (avg=0.323703)
-[2025-12-22 23:10:14,211] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:10:23,759] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 32/40: validation_objective=5.716392
-[2025-12-22 23:15:04,385] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:15:13,894] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 33/40: validation_objective=5.718835
-[2025-12-22 23:19:53,744] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 53142/62520: score=5.642806 (avg=5.734535), loss=0.310861 (avg=0.323136)
-[2025-12-22 23:19:53,745] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:20:03,281] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 34/40: validation_objective=5.716574
-[2025-12-22 23:24:42,610] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:24:52,258] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 35/40: validation_objective=5.711874
-[2025-12-22 23:29:24,599] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 56268/62520: score=5.680861 (avg=5.733487), loss=0.316396 (avg=0.322567)
-[2025-12-22 23:29:24,600] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:29:33,918] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 36/40: validation_objective=5.715506
-[2025-12-22 23:34:02,941] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:34:12,614] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 37/40: validation_objective=5.713402
-[2025-12-22 23:38:51,762] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 59394/62520: score=5.719825 (avg=5.732500), loss=0.311596 (avg=0.322022)
-[2025-12-22 23:38:51,763] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:39:01,224] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 38/40: validation_objective=5.716572
-[2025-12-22 23:43:41,872] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:43:51,367] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 39/40: validation_objective=5.709606
-[2025-12-22 23:48:31,523] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 62520/62520: score=5.746597 (avg=5.731546), loss=0.305146 (avg=0.321478)
-[2025-12-22 23:48:31,524] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:48:41,029] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 40/40: validation_objective=5.719291
-[2025-12-22 23:48:41,029] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:48:50,580] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
-[2025-12-22 23:49:00,126] INFO:ptp_discovery.free_loss_eoh: Baseline PO timing: init=1.782s, train=11480.178s, eval=19.097s
-[2025-12-22 23:49:00,128] INFO:ptp_discovery.free_loss_eoh: Baseline po_loss: hf_score=5.719115, fitness_score=5.727787, validation_objective=5.719115, gen_penalty=0.000000
-[2025-12-22 23:49:00,128] INFO:ptp_discovery.free_loss_eoh: Run directory: /data1/gushengda/PTP/runs/free_loss_discovery/20251222-234900
-[2025-12-22 23:49:00,128] INFO:ptp_discovery.free_loss_eoh: === Generation 0/9 ===
-[2025-12-22 23:49:00,128] INFO:ptp_discovery.free_loss_eoh: Generating initial population with 8 LLM candidates
-[2025-12-22 23:49:12,596] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:49:21,853] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:49:32,751] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:49:41,459] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:49:52,036] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:50:00,217] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:50:12,203] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:50:22,038] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:50:35,309] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:50:47,567] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:51:00,255] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:51:10,605] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:51:24,226] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:51:34,512] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:51:44,909] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:51:53,515] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:51:53,517] INFO:ptp_discovery.free_loss_eoh: Population size for generation 0: 8
-[2025-12-22 23:51:53,558] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=3, name=AdaptiveMarginHingeLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-22 23:52:04,226] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:52:04,242] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=3, name=AdaptiveMarginHingeLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-22 23:52:13,737] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-22 23:52:13,836] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=0, idx=7, name=QuantileAdaptiveMarginLoss: reason=forward_error: _rank_gap() missing 1 required positional argument: 'cost_b', loss_value=None, grad_norm=None; attempting repair (attempt=1/2)
-[2025-12-22 23:52:22,300] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[free_loss_eoh][device_worker] pid=195955 device=cuda:0 jobs=[(0, 0), (0, 4)]
-[free_loss_eoh][device_worker] pid=195957 device=cuda:2 jobs=[(0, 2), (0, 6)]
-[free_loss_eoh][device_worker] pid=195956 device=cuda:1 jobs=[(0, 1), (0, 5)]
-[free_loss_eoh][device_worker] pid=195958 device=cuda:3 jobs=[(0, 3), (0, 7)]
-[2025-12-23 01:29:19,184] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 0: hf_like_score=30.828431, validation_objective=24.863940, epoch_mean=20.789454, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 01:29:19,190] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 1: hf_like_score=33.739297, validation_objective=24.864291, epoch_mean=23.698097, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 01:29:19,193] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 2: hf_like_score=19.784587, validation_objective=5.921618, epoch_mean=9.784587, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 01:29:19,196] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 3: hf_like_score=34.533100, validation_objective=24.838086, epoch_mean=24.490053, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 01:29:19,204] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 4: hf_like_score=34.477816, validation_objective=24.858761, epoch_mean=24.432114, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 01:29:19,209] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 5: hf_like_score=31.743654, validation_objective=24.467814, epoch_mean=21.714367, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 01:29:19,214] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 6: hf_like_score=34.269983, validation_objective=24.827241, epoch_mean=24.232861, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 01:29:19,218] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 7: hf_like_score=34.355191, validation_objective=24.823580, epoch_mean=24.317068, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 01:29:19,218] INFO:ptp_discovery.free_loss_eoh: Generation 0 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
-[2025-12-23 01:29:19,218] INFO:ptp_discovery.free_loss_eoh: === Generation 1/9 ===
-[2025-12-23 01:29:19,218] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-23 01:29:32,373] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:29:41,991] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:29:54,679] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:30:04,329] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:30:17,759] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:30:28,211] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:30:41,710] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:30:52,266] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:31:05,782] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:31:16,494] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:31:30,385] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:31:40,362] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:31:54,270] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:32:04,718] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:32:17,954] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:32:28,056] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:32:28,058] INFO:ptp_discovery.free_loss_eoh: Population size for generation 1: 8
-[2025-12-23 01:32:28,129] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=5, name=FocalHingeLossWithBatchNormalizedMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 01:32:39,519] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:32:39,538] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=5, name=FocalHingeLossWithBatchNormalizedMargin: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 01:32:48,805] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 01:32:48,826] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=5, name=FocalHingeLossWithBatchNormalizedMargin: reason=pref_semantic_violation
-[2025-12-23 01:32:48,849] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=7, name=FocalHingeLossWithBatchNormalizedMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 01:32:59,707] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[free_loss_eoh][device_worker] pid=249347 device=cuda:1 jobs=[(1, 1), (1, 6)]
-[free_loss_eoh][device_worker] pid=249348 device=cuda:2 jobs=[(1, 2), (1, 7)]
-[free_loss_eoh][device_worker] pid=249349 device=cuda:3 jobs=[(1, 3)]
-[free_loss_eoh][device_worker] pid=249346 device=cuda:0 jobs=[(1, 0), (1, 4)]
-[2025-12-23 03:09:00,792] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 0: hf_like_score=19.072682, validation_objective=6.498362, epoch_mean=9.072682, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 03:09:00,799] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 1: hf_like_score=20.050902, validation_objective=10.711913, epoch_mean=10.034209, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 03:09:00,803] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 2: hf_like_score=32.857536, validation_objective=20.370880, epoch_mean=22.825487, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 03:09:00,807] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 3: hf_like_score=33.429639, validation_objective=24.035128, epoch_mean=23.402792, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 03:09:00,811] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 4: hf_like_score=29.326078, validation_objective=24.211845, epoch_mean=19.281007, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 03:09:00,817] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 6: hf_like_score=34.918078, validation_objective=24.851378, epoch_mean=24.877114, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 03:09:00,821] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 7: hf_like_score=34.153061, validation_objective=24.829756, epoch_mean=24.109028, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 03:09:00,821] INFO:ptp_discovery.free_loss_eoh: Generation 1 summary: static_fail=0, dynamic_fail=1, evaluated=7, new_elites=7
-[2025-12-23 03:09:00,822] INFO:ptp_discovery.free_loss_eoh: === Generation 2/9 ===
-[2025-12-23 03:09:00,822] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-23 03:09:15,317] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:09:26,765] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:09:42,932] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:09:55,454] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:10:08,439] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:10:20,361] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:10:34,592] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:10:45,512] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:10:58,401] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:11:09,736] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:11:24,940] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:11:36,543] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:11:49,300] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:11:59,057] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:12:13,072] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:12:23,681] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:12:23,683] INFO:ptp_discovery.free_loss_eoh: Population size for generation 2: 8
-[2025-12-23 03:12:23,712] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=0, name=FocalLogLossWithAdaptiveMarginAndCostRankCoupling: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 03:12:34,174] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:12:34,208] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=0, name=FocalLogLossWithAdaptiveMarginAndCostRankCoupling: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 03:12:44,991] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:12:45,019] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=0, name=FocalLogLossWithAdaptiveMarginAndCostRankCoupling: reason=pref_semantic_violation
-[2025-12-23 03:12:45,082] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=4, name=ProgressiveBradleyTerryFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 03:12:55,936] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 03:12:55,963] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=4, name=ProgressiveBradleyTerryFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 03:13:07,369] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[free_loss_eoh][device_worker] pid=40432 device=cuda:0 jobs=[(2, 1), (2, 5)]
-[free_loss_eoh][device_worker] pid=40433 device=cuda:1 jobs=[(2, 2), (2, 6)]
-[free_loss_eoh][device_worker] pid=40435 device=cuda:3 jobs=[(2, 4)]
-[free_loss_eoh][device_worker] pid=40434 device=cuda:2 jobs=[(2, 3), (2, 7)]
-[2025-12-23 04:50:01,924] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 1: hf_like_score=32.803376, validation_objective=20.861743, epoch_mean=22.789599, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 04:50:01,931] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 2: hf_like_score=32.595608, validation_objective=22.309483, epoch_mean=22.560596, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 04:50:01,937] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 3: hf_like_score=32.876502, validation_objective=24.268404, epoch_mean=22.839918, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 04:50:01,944] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 4: hf_like_score=32.258568, validation_objective=24.861028, epoch_mean=22.216138, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 04:50:01,951] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 5: hf_like_score=15.784113, validation_objective=5.764721, epoch_mean=5.784113, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 04:50:01,958] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 6: hf_like_score=28.643292, validation_objective=23.427051, epoch_mean=18.625293, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 04:50:01,964] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 7: hf_like_score=21.041723, validation_objective=6.031802, epoch_mean=11.041723, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 04:50:01,964] INFO:ptp_discovery.free_loss_eoh: Generation 2 summary: static_fail=0, dynamic_fail=1, evaluated=7, new_elites=7
-[2025-12-23 04:50:01,965] INFO:ptp_discovery.free_loss_eoh: === Generation 3/9 ===
-[2025-12-23 04:50:01,965] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-23 04:50:15,662] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:50:26,087] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:50:40,457] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:50:51,517] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:51:05,935] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:51:17,254] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:51:31,767] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:51:42,986] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:51:57,583] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:52:09,957] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:52:24,920] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:52:36,168] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:52:50,587] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:53:01,511] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:53:14,907] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:53:25,238] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:53:25,241] INFO:ptp_discovery.free_loss_eoh: Population size for generation 3: 8
-[2025-12-23 04:53:25,286] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=1, name=BradleyTerryFocalLossWithAdaptiveMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 04:53:37,716] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:53:37,861] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=4, name=ProgressiveFocalBTWithNormalizedMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 04:53:49,377] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:53:49,390] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=4, name=ProgressiveFocalBTWithNormalizedMargin: reason=missing_batch_key: 'cost_w'; dropping candidate and resampling (attempt=1/4)
-[2025-12-23 04:54:04,492] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:54:16,237] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:54:16,295] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=5, name=ProgressiveFocalHingeLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 04:54:28,106] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:54:28,146] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=6, name=ProgressiveFocalBT_With_ZScoreNormalization: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 04:54:39,799] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:54:39,811] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=3, idx=6, name=ProgressiveFocalBT_With_ZScoreNormalization: reason=missing_batch_key: 'cost_w'; dropping candidate and resampling (attempt=1/4)
-[2025-12-23 04:54:52,887] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 04:55:03,172] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[free_loss_eoh][device_worker] pid=91553 device=cuda:3 jobs=[(3, 3), (3, 7)]
-[free_loss_eoh][device_worker] pid=91550 device=cuda:0 jobs=[(3, 0), (3, 4)]
-[free_loss_eoh][device_worker] pid=91551 device=cuda:1 jobs=[(3, 1), (3, 5)]
-[free_loss_eoh][device_worker] pid=91552 device=cuda:2 jobs=[(3, 2), (3, 6)]
-[2025-12-23 06:31:57,122] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 0: hf_like_score=26.532737, validation_objective=15.431486, epoch_mean=16.513052, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 06:31:57,134] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 1: hf_like_score=21.507961, validation_objective=6.071068, epoch_mean=11.507961, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 06:31:57,140] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 2: hf_like_score=34.113112, validation_objective=24.839073, epoch_mean=24.073891, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 06:31:57,147] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 3: hf_like_score=27.077854, validation_objective=16.113365, epoch_mean=17.077748, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 06:31:57,155] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 4: hf_like_score=32.597691, validation_objective=24.260451, epoch_mean=22.576716, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 06:31:57,162] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 5: hf_like_score=18.747957, validation_objective=5.910737, epoch_mean=8.747957, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 06:31:57,169] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 6: hf_like_score=23.225153, validation_objective=6.223547, epoch_mean=13.225153, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 06:31:57,176] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 7: hf_like_score=16.554089, validation_objective=5.818384, epoch_mean=6.554089, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 06:31:57,176] INFO:ptp_discovery.free_loss_eoh: Generation 3 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
-[2025-12-23 06:31:57,177] INFO:ptp_discovery.free_loss_eoh: === Generation 4/9 ===
-[2025-12-23 06:31:57,178] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-23 06:32:11,547] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:32:22,578] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:32:36,789] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:32:47,560] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:33:00,412] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:33:09,438] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:33:23,688] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:33:33,962] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:33:47,438] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:33:58,247] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:34:11,962] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:34:22,770] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:34:37,220] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:34:48,467] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:35:01,254] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:35:12,046] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:35:12,048] INFO:ptp_discovery.free_loss_eoh: Population size for generation 4: 8
-[2025-12-23 06:35:12,109] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=2, name=BradleyTerryWithFocalMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 06:35:21,268] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:35:21,310] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=2, name=BradleyTerryWithFocalMargin: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 06:35:30,119] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 06:35:30,156] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=2, name=BradleyTerryWithFocalMargin: reason=pref_semantic_violation
-[free_loss_eoh][device_worker] pid=143661 device=cuda:1 jobs=[(4, 1), (4, 6)]
-[free_loss_eoh][device_worker] pid=143662 device=cuda:2 jobs=[(4, 3), (4, 7)]
-[free_loss_eoh][device_worker] pid=143663 device=cuda:3 jobs=[(4, 4)]
-[free_loss_eoh][device_worker] pid=143660 device=cuda:0 jobs=[(4, 0), (4, 5)]
-[2025-12-23 09:46:05,603] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 0: hf_like_score=33.220577, validation_objective=24.637688, epoch_mean=23.178661, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 09:46:05,611] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 1: hf_like_score=16.836215, validation_objective=5.802095, epoch_mean=6.836215, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 09:46:05,617] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 3: hf_like_score=16.604929, validation_objective=5.899525, epoch_mean=6.604929, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 09:46:05,624] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 4: hf_like_score=7.723068, validation_objective=5.713533, epoch_mean=5.723068, epoch_violations=2, baseline=5.727787, better_than_baseline=False
-[2025-12-23 09:46:05,633] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 5: hf_like_score=16.505786, validation_objective=5.808096, epoch_mean=6.505786, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 09:46:05,640] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 6: hf_like_score=32.537891, validation_objective=24.859333, epoch_mean=22.494540, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 09:46:05,646] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 7: hf_like_score=17.553587, validation_objective=6.138725, epoch_mean=7.553587, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 09:46:05,646] INFO:ptp_discovery.free_loss_eoh: Generation 4 summary: static_fail=0, dynamic_fail=1, evaluated=7, new_elites=7
-[2025-12-23 09:46:05,647] INFO:ptp_discovery.free_loss_eoh: === Generation 5/9 ===
-[2025-12-23 09:46:05,648] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-23 09:46:20,164] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:46:31,550] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:46:45,977] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:46:57,587] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:47:11,738] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:47:22,709] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:47:35,469] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:47:45,155] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:48:00,431] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:48:12,464] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:48:27,210] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:48:39,665] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:48:54,813] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:49:06,512] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:49:21,929] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:49:33,664] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:49:33,666] INFO:ptp_discovery.free_loss_eoh: Population size for generation 5: 8
-[2025-12-23 09:49:33,698] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=0, name=ProgressiveLogsigFocalWithAdaptiveStrength: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 09:49:45,560] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:49:45,593] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=0, name=ProgressiveLogsigFocalWithAdaptiveStrength: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 09:49:56,565] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:49:56,595] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=0, name=ProgressiveLogsigFocalWithAdaptiveStrength: reason=pref_semantic_violation
-[2025-12-23 09:49:56,661] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=4, name=ProgressiveFocalLossWithAdaptiveMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 09:50:09,414] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:50:09,492] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=5, name=ProgressiveFocalLossWithDynamicBeta: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 09:50:21,673] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:50:21,741] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=7, name=ProgressiveFocalLossWithAdaptiveMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 09:50:34,528] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 09:50:34,545] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=5, idx=7, name=ProgressiveFocalLossWithAdaptiveMargin: reason=loss 15514424.0000 outside soft range [-5.0, 5.0], loss_value=15514424.0, grad_norm=0.0; attempting repair (attempt=2/2)
-[2025-12-23 09:50:45,573] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[free_loss_eoh][device_worker] pid=249702 device=cuda:1 jobs=[(5, 2), (5, 6)]
-[free_loss_eoh][device_worker] pid=249704 device=cuda:3 jobs=[(5, 4)]
-[free_loss_eoh][device_worker] pid=249701 device=cuda:0 jobs=[(5, 1), (5, 5)]
-[free_loss_eoh][device_worker] pid=249703 device=cuda:2 jobs=[(5, 3), (5, 7)]
-[2025-12-23 11:27:30,549] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 1: hf_like_score=16.145886, validation_objective=5.809755, epoch_mean=6.145886, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 11:27:30,556] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 2: hf_like_score=33.373181, validation_objective=23.313640, epoch_mean=23.356603, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 11:27:30,562] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 3: hf_like_score=33.167352, validation_objective=24.873737, epoch_mean=23.130135, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 11:27:30,572] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 4: hf_like_score=33.315698, validation_objective=22.993704, epoch_mean=23.315698, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 11:27:30,579] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 5: hf_like_score=15.952721, validation_objective=5.809473, epoch_mean=5.952721, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 11:27:30,587] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 6: hf_like_score=16.041591, validation_objective=5.809357, epoch_mean=6.041591, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 11:27:30,594] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 7: hf_like_score=31.239151, validation_objective=24.171136, epoch_mean=21.209757, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 11:27:30,594] INFO:ptp_discovery.free_loss_eoh: Generation 5 summary: static_fail=0, dynamic_fail=1, evaluated=7, new_elites=7
-[2025-12-23 11:27:30,595] INFO:ptp_discovery.free_loss_eoh: === Generation 6/9 ===
-[2025-12-23 11:27:30,595] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-23 11:27:45,834] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:27:57,879] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:28:12,867] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:28:27,949] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:29:08,852] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:29:35,773] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:30:39,771] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:30:56,265] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:31:45,908] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:31:57,681] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:32:55,089] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:33:11,842] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:34:01,645] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:34:16,475] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:34:53,120] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:35:08,360] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:35:08,363] INFO:ptp_discovery.free_loss_eoh: Population size for generation 6: 8
-[2025-12-23 11:35:08,393] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=0, name=BradleyTerryWithFocalMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 11:38:49,607] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:38:49,634] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=0, name=BradleyTerryWithFocalMargin: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 11:41:39,700] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:41:39,733] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=0, name=BradleyTerryWithSymmetricMargin: reason=pref_semantic_violation
-[2025-12-23 11:41:39,755] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=2, name=RankAdaptiveFocalBradleyTerry: reason=forward_error: _rank_gap() missing 1 required positional argument: 'cost_b', loss_value=None, grad_norm=None; attempting repair (attempt=1/2)
-[2025-12-23 11:42:07,464] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:42:07,492] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=2, name=RankAdaptiveFocalBradleyTerry: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 11:44:00,652] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:44:00,681] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=2, name=RankAdaptiveFocalBradleyTerry: reason=pref_semantic_violation
-[2025-12-23 11:44:00,697] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=3, name=GatedBradleyTerryWithDynamicBeta: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 11:44:49,954] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:44:49,983] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=3, name=GatedBradleyTerryWithDynamicBeta: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 11:45:39,475] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:45:39,532] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=4, name=RankFocalBradleyTerry: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 11:48:06,989] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:48:07,004] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=6, idx=4, name=RankFocalBradleyTerry: reason=forward_error: _rank_gap() missing 1 required positional argument: 'cost_b', loss_value=None, grad_norm=None; attempting repair (attempt=2/2)
-[2025-12-23 11:48:36,002] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:48:36,029] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=4, name=RankFocalBradleyTerry: reason=pref_semantic_violation
-[2025-12-23 11:48:36,065] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=6, name=AdaptiveMarginFocalBradleyTerry: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 11:50:19,662] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:50:19,683] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=6, name=AdaptiveMarginFocalBradleyTerry: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 11:52:28,966] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 11:52:29,015] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=7, name=DualModulatedFocalBradleyTerry: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 11:53:41,597] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[free_loss_eoh][device_worker] pid=56638 device=cuda:2 jobs=[(6, 5)]
-[free_loss_eoh][device_worker] pid=56637 device=cuda:1 jobs=[(6, 3)]
-[free_loss_eoh][device_worker] pid=56636 device=cuda:0 jobs=[(6, 1), (6, 7)]
-[free_loss_eoh][device_worker] pid=56639 device=cuda:3 jobs=[(6, 6)]
-[2025-12-23 13:30:23,053] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 1: hf_like_score=16.893761, validation_objective=5.837816, epoch_mean=6.893761, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 13:30:23,062] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 3: hf_like_score=16.998484, validation_objective=6.003813, epoch_mean=6.998484, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 13:30:23,070] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 5: hf_like_score=19.543535, validation_objective=13.067836, epoch_mean=9.535447, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 13:30:23,078] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 6: hf_like_score=29.934106, validation_objective=19.961116, epoch_mean=19.915963, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 13:30:23,085] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 7: hf_like_score=17.175425, validation_objective=5.891280, epoch_mean=7.175425, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 13:30:23,085] INFO:ptp_discovery.free_loss_eoh: Generation 6 summary: static_fail=0, dynamic_fail=3, evaluated=5, new_elites=5
-[2025-12-23 13:30:23,087] INFO:ptp_discovery.free_loss_eoh: === Generation 7/9 ===
-[2025-12-23 13:30:23,088] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-23 13:31:04,853] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:31:22,802] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:32:04,031] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:32:20,468] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:33:13,312] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:33:26,171] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:34:08,132] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:34:26,582] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:35:28,709] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:35:45,933] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:36:40,814] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:36:55,014] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:37:57,561] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:38:11,488] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:38:52,164] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:39:04,939] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:39:04,941] INFO:ptp_discovery.free_loss_eoh: Population size for generation 7: 8
-[2025-12-23 13:39:04,972] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=0, name=RankModulatedProgressiveBT: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 13:40:43,256] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:40:43,359] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=4, name=DualNormalizationFocalBradleyTerry: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 13:43:41,033] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:43:41,069] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=4, name=DualNormalizationFocalBradleyTerry: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 13:44:38,866] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 13:44:38,897] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=4, name=DualNormalizationFocalBradleyTerry: reason=pref_semantic_violation
-[2025-12-23 13:44:38,942] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=7, name=RankAdaptiveBradleyTerryFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 13:45:32,384] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[free_loss_eoh][device_worker] pid=114609 device=cuda:3 jobs=[(7, 3)]
-[free_loss_eoh][device_worker] pid=114608 device=cuda:2 jobs=[(7, 2), (7, 7)]
-[free_loss_eoh][device_worker] pid=114606 device=cuda:0 jobs=[(7, 0), (7, 5)]
-[free_loss_eoh][device_worker] pid=114607 device=cuda:1 jobs=[(7, 1), (7, 6)]
-[2025-12-23 17:46:20,020] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 0: hf_like_score=22.087098, validation_objective=14.547026, epoch_mean=12.067822, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 17:46:20,031] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 1: hf_like_score=11.721480, validation_objective=5.713871, epoch_mean=5.721480, epoch_violations=6, baseline=5.727787, better_than_baseline=False
-[2025-12-23 17:46:20,037] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 2: hf_like_score=17.572112, validation_objective=6.099131, epoch_mean=7.572112, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 17:46:20,046] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 3: hf_like_score=30.129687, validation_objective=19.921953, epoch_mean=20.129687, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 17:46:20,053] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 5: hf_like_score=28.433937, validation_objective=15.619954, epoch_mean=18.428758, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 17:46:20,059] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 6: hf_like_score=32.385708, validation_objective=24.847044, epoch_mean=22.350131, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 17:46:20,065] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 7: hf_like_score=33.907420, validation_objective=25.131133, epoch_mean=23.869690, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-23 17:46:20,065] INFO:ptp_discovery.free_loss_eoh: Generation 7 summary: static_fail=0, dynamic_fail=1, evaluated=7, new_elites=7
-[2025-12-23 17:46:20,067] INFO:ptp_discovery.free_loss_eoh: === Generation 8/9 ===
-[2025-12-23 17:46:20,068] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-23 17:46:55,839] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:47:08,013] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:47:22,202] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:47:33,667] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:47:48,302] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:48:01,127] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:48:15,158] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:48:27,213] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:48:41,915] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:48:55,348] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:49:11,395] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:49:24,791] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:49:43,847] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:49:58,905] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:50:15,305] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:50:28,550] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:50:28,552] INFO:ptp_discovery.free_loss_eoh: Population size for generation 8: 8
-[2025-12-23 17:50:28,591] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=0, name=AdaptiveSigmoidFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 17:50:40,083] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:50:40,146] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=1, name=FocalBradleyTerryWithAdaptiveTemperatureAndMargin: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 17:50:49,617] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:50:49,677] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=2, name=AdaptiveConfidencePenaltyBT: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 17:51:01,557] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:51:01,592] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=2, name=AdaptiveConfidencePenaltyBT: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-23 17:51:10,757] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-23 17:51:10,858] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=4, name=SoftmaxNormalizedFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-23 17:51:21,428] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[free_loss_eoh][device_worker] pid=15564 device=cuda:1 jobs=[(8, 1), (8, 5)]
-[free_loss_eoh][device_worker] pid=15566 device=cuda:3 jobs=[(8, 3), (8, 7)]
-[free_loss_eoh][device_worker] pid=15565 device=cuda:2 jobs=[(8, 2), (8, 6)]
-[free_loss_eoh][device_worker] pid=15563 device=cuda:0 jobs=[(8, 0), (8, 4)]
-[2025-12-24 00:18:10,272] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 0: hf_like_score=33.503687, validation_objective=24.845216, epoch_mean=23.466056, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-24 00:18:10,279] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 1: hf_like_score=6.718532, validation_objective=5.713394, epoch_mean=5.718532, epoch_violations=1, baseline=5.727787, better_than_baseline=False
-[2025-12-24 00:18:10,285] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 2: hf_like_score=20.727088, validation_objective=5.718492, epoch_mean=5.727088, epoch_violations=15, baseline=5.727787, better_than_baseline=False
-[2025-12-24 00:18:10,292] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 3: hf_like_score=15.965302, validation_objective=5.945451, epoch_mean=5.965302, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-24 00:18:10,299] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 4: hf_like_score=30.307355, validation_objective=20.411298, epoch_mean=20.301966, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-24 00:18:10,307] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 5: hf_like_score=11.721987, validation_objective=5.716135, epoch_mean=5.721987, epoch_violations=6, baseline=5.727787, better_than_baseline=False
-[2025-12-24 00:18:10,315] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 6: hf_like_score=31.724156, validation_objective=24.852048, epoch_mean=21.686345, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-24 00:18:10,323] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 7: hf_like_score=31.911891, validation_objective=24.334212, epoch_mean=21.865149, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-24 00:18:10,324] INFO:ptp_discovery.free_loss_eoh: Generation 8 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
-[2025-12-24 00:18:10,325] INFO:ptp_discovery.free_loss_eoh: === Generation 9/9 ===
-[2025-12-24 00:18:10,326] INFO:ptp_discovery.free_loss_eoh: Generating population via crossover/mutation: size=8, elite_size=4, available_elites=4
-[2025-12-24 00:18:25,559] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:18:38,451] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:18:55,732] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:19:08,992] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:19:25,484] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:19:38,164] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:19:53,515] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:20:06,155] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:20:22,951] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:20:36,557] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:20:50,244] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:21:00,954] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:21:17,896] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:21:32,987] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:21:48,570] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:21:58,991] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:21:58,994] INFO:ptp_discovery.free_loss_eoh: Population size for generation 9: 8
-[2025-12-24 00:21:59,020] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=0, name=AdaptiveSigmoidFocalLoss: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-24 00:22:10,212] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:22:10,252] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=1, name=SelfCorrectingRankAdaptiveBradleyTerry: reason=loss 543055.8125 outside soft range [-5.0, 5.0], loss_value=543055.8125, grad_norm=0.0; attempting repair (attempt=1/2)
-[2025-12-24 00:22:22,955] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:22:23,218] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=3, name=RankAdaptiveBradleyTerryWithClippedTemperature: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-24 00:22:36,364] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:22:36,406] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=4, name=AdaptiveFocalLossWithDynamicMarginClipping: reason=loss 1250000.0000 outside soft range [-5.0, 5.0], loss_value=1250000.0, grad_norm=0.0; attempting repair (attempt=1/2)
-[2025-12-24 00:22:51,126] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:22:51,142] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=4, name=AdaptiveFocalLossWithDynamicMarginClipping: reason=loss 12.5001 outside soft range [-5.0, 5.0], loss_value=12.500057220458984, grad_norm=0.0; attempting repair (attempt=2/2)
-[2025-12-24 00:23:01,574] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:23:01,617] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=4, name=AdaptiveFocalLossWithDynamicMarginClipping: reason=pref_semantic_violation
-[2025-12-24 00:23:01,624] WARNING:ptp_discovery.free_loss_eoh: Dynamic gates failed for gen=9, idx=5, name=AdaptiveTemperatureFocalMarginLoss: reason=loss 250000.0000 outside soft range [-5.0, 5.0], loss_value=250000.0, grad_norm=0.0; attempting repair (attempt=1/2)
-[2025-12-24 00:23:12,765] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:23:12,838] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=6, name=AdaptiveFocalBradleyTerryWithSymmetricPenalty: reason=pref_semantic_violation; attempting repair (attempt=1/2)
-[2025-12-24 00:23:26,263] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:23:26,295] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=6, name=AdaptiveFocalBradleyTerryWithSymmetricPenalty: reason=pref_semantic_violation; attempting repair (attempt=2/2)
-[2025-12-24 00:23:38,613] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
-[2025-12-24 00:23:38,667] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=6, name=AdaptiveFocalBradleyTerryWithSymmetricPenalty: reason=pref_semantic_violation
-[free_loss_eoh][device_worker] pid=110431 device=cuda:0 jobs=[(9, 0), (9, 5)]
-[free_loss_eoh][device_worker] pid=110433 device=cuda:2 jobs=[(9, 2)]
-[free_loss_eoh][device_worker] pid=110432 device=cuda:1 jobs=[(9, 1), (9, 7)]
-[free_loss_eoh][device_worker] pid=110434 device=cuda:3 jobs=[(9, 3)]
-[2025-12-24 07:00:45,637] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 0: hf_like_score=6.714231, validation_objective=5.705916, epoch_mean=5.714231, epoch_violations=1, baseline=5.727787, better_than_baseline=False
-[2025-12-24 07:00:45,660] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 1: hf_like_score=7.714893, validation_objective=5.705562, epoch_mean=5.714893, epoch_violations=2, baseline=5.727787, better_than_baseline=False
-[2025-12-24 07:00:45,677] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 2: hf_like_score=6.717217, validation_objective=5.711808, epoch_mean=5.717217, epoch_violations=1, baseline=5.727787, better_than_baseline=False
-[2025-12-24 07:00:45,694] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 3: hf_like_score=27.795410, validation_objective=15.600769, epoch_mean=17.795410, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-24 07:00:45,709] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 5: hf_like_score=11.721771, validation_objective=5.716911, epoch_mean=5.721771, epoch_violations=6, baseline=5.727787, better_than_baseline=False
-[2025-12-24 07:00:45,716] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 7: hf_like_score=34.466090, validation_objective=24.867472, epoch_mean=24.426141, epoch_violations=10, baseline=5.727787, better_than_baseline=False
-[2025-12-24 07:00:45,716] INFO:ptp_discovery.free_loss_eoh: Generation 9 summary: static_fail=0, dynamic_fail=2, evaluated=6, new_elites=6
-[2025-12-24 07:00:45,752] INFO:ptp_discovery.free_loss_eoh: Search complete. Best hf_like_score=6.714231 (generation=9, index=0)
+[2025-12-29 09:41:05,424] INFO:ptp_discovery.free_loss_eoh: Starting free loss EoH search with config=configs/free_loss_discovery.yaml
+[2025-12-29 09:41:06,058] INFO:ptp_discovery.free_loss_eoh: Run directory: /data1/gushengda/PTP/runs/free_loss_discovery/20251229-094106
+[2025-12-29 09:41:06,058] INFO:ptp_discovery.free_loss_eoh: Saving baseline training log to /data1/gushengda/PTP/runs/free_loss_discovery/20251229-094106/baseline_po_loss.log
+[2025-12-29 09:41:06,852] INFO:ptp_discovery.free_loss_eoh: Baseline PO training: steps=31260, train_problem_size=50, pomo_size=50, batch_size=64, device=cuda, init_time=0.794s
+[2025-12-29 09:41:07,313] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 1/31260: score=23.942719 (avg=23.942719), loss=0.346570 (avg=0.346570)
+[2025-12-29 09:45:19,932] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 1563/31260: score=5.822533 (avg=5.886433), loss=0.325298 (avg=0.322168)
+[2025-12-29 09:45:19,933] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 09:45:28,785] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 1/20: validation_objective=5.776538
+[2025-12-29 09:49:40,654] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 3126/31260: score=5.740517 (avg=5.837530), loss=0.324749 (avg=0.323686)
+[2025-12-29 09:49:40,655] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 09:49:49,506] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 2/20: validation_objective=5.764054
+[2025-12-29 09:54:01,709] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 4689/31260: score=5.749709 (avg=5.816122), loss=0.328249 (avg=0.324615)
+[2025-12-29 09:54:01,710] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 09:54:10,573] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 3/20: validation_objective=5.760115
+[2025-12-29 09:58:23,386] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 6252/31260: score=5.837885 (avg=5.802801), loss=0.329140 (avg=0.325385)
+[2025-12-29 09:58:23,387] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 09:58:32,254] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 4/20: validation_objective=5.752422
+[2025-12-29 10:02:46,821] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 7815/31260: score=5.734041 (avg=5.793502), loss=0.330461 (avg=0.326322)
+[2025-12-29 10:02:46,821] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:02:55,689] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 5/20: validation_objective=5.756444
+[2025-12-29 10:02:55,689] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:07:19,173] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 9378/31260: score=5.725487 (avg=5.785886), loss=0.330017 (avg=0.327177)
+[2025-12-29 10:07:19,173] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:07:28,033] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 6/20: validation_objective=5.744536
+[2025-12-29 10:11:42,695] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 10941/31260: score=5.738243 (avg=5.779687), loss=0.330701 (avg=0.327758)
+[2025-12-29 10:11:42,696] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:11:51,529] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 7/20: validation_objective=5.738947
+[2025-12-29 10:16:06,342] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 12504/31260: score=5.717866 (avg=5.774768), loss=0.330849 (avg=0.328102)
+[2025-12-29 10:16:06,343] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:16:15,206] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 8/20: validation_objective=5.732447
+[2025-12-29 10:20:30,370] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 14067/31260: score=5.688937 (avg=5.770467), loss=0.331685 (avg=0.328267)
+[2025-12-29 10:20:30,370] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:20:39,242] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 9/20: validation_objective=5.736667
+[2025-12-29 10:24:54,217] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 15630/31260: score=5.723520 (avg=5.766763), loss=0.330411 (avg=0.328313)
+[2025-12-29 10:24:54,217] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:25:03,074] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 10/20: validation_objective=5.726606
+[2025-12-29 10:29:18,094] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 17193/31260: score=5.791628 (avg=5.763595), loss=0.326634 (avg=0.328279)
+[2025-12-29 10:29:18,095] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:29:26,970] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 11/20: validation_objective=5.731171
+[2025-12-29 10:33:42,110] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 18756/31260: score=5.688587 (avg=5.760833), loss=0.326906 (avg=0.328169)
+[2025-12-29 10:33:42,110] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:33:50,964] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 12/20: validation_objective=5.729935
+[2025-12-29 10:38:06,082] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 20319/31260: score=5.741993 (avg=5.758351), loss=0.327097 (avg=0.328021)
+[2025-12-29 10:38:06,083] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:38:14,949] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 13/20: validation_objective=5.727609
+[2025-12-29 10:42:30,158] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 21882/31260: score=5.649283 (avg=5.756156), loss=0.324366 (avg=0.327838)
+[2025-12-29 10:42:30,159] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:42:39,002] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 14/20: validation_objective=5.729766
+[2025-12-29 10:46:54,145] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 23445/31260: score=5.750447 (avg=5.754163), loss=0.322604 (avg=0.327615)
+[2025-12-29 10:46:54,146] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:47:03,007] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 15/20: validation_objective=5.723850
+[2025-12-29 10:51:18,298] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 25008/31260: score=5.794408 (avg=5.752404), loss=0.323064 (avg=0.327378)
+[2025-12-29 10:51:18,298] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:51:27,155] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 16/20: validation_objective=5.723951
+[2025-12-29 10:55:42,359] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 26571/31260: score=5.672667 (avg=5.750761), loss=0.325129 (avg=0.327122)
+[2025-12-29 10:55:42,360] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 10:55:51,230] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 17/20: validation_objective=5.719609
+[2025-12-29 11:00:06,493] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 28134/31260: score=5.699251 (avg=5.749403), loss=0.321356 (avg=0.326852)
+[2025-12-29 11:00:06,493] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 11:00:15,349] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 18/20: validation_objective=5.725365
+[2025-12-29 11:04:30,623] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 29697/31260: score=5.721034 (avg=5.748047), loss=0.325728 (avg=0.326577)
+[2025-12-29 11:04:30,624] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 11:04:39,487] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 19/20: validation_objective=5.725104
+[2025-12-29 11:08:54,600] INFO:ptp_discovery.free_loss_eoh: Baseline PO step 31260/31260: score=5.652854 (avg=5.746800), loss=0.319730 (avg=0.326278)
+[2025-12-29 11:08:54,601] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 11:09:03,451] INFO:ptp_discovery.free_loss_eoh: Baseline PO epoch 20/20: validation_objective=5.725169
+[2025-12-29 11:09:03,452] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 11:09:12,316] INFO:fitness.ptp_high_fidelity: Evaluating TSP model: problem_size=50, pomo_size=50, episodes=10000, batch_size=64
+[2025-12-29 11:09:21,182] INFO:ptp_discovery.free_loss_eoh: Baseline PO timing: init=0.794s, train=5276.599s, eval=17.730s
+[2025-12-29 11:09:21,183] INFO:ptp_discovery.free_loss_eoh: Baseline po_loss: hf_score=5.729246, fitness_score=5.737515, validation_objective=5.729246, gen_penalty=0.000000
+[2025-12-29 11:09:21,183] INFO:ptp_discovery.free_loss_eoh: Gate retries: max_repair_rounds=4 (LLM repairs), max_resample_rounds=4 (drop+resample)
+[2025-12-29 11:09:21,184] INFO:ptp_discovery.free_loss_eoh: === Generation 0/9 ===
+[2025-12-29 11:09:21,184] INFO:ptp_discovery.free_loss_eoh: Generating initial population with 8 LLM candidates
+[2025-12-29 11:09:35,069] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:09:45,422] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:09:55,726] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:10:04,290] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:10:15,939] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:10:25,796] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:10:34,946] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:10:42,499] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:10:52,729] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:11:01,163] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:11:12,950] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:11:22,956] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:11:33,708] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:11:42,470] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:11:54,367] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:12:04,152] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:12:04,155] INFO:ptp_discovery.free_loss_eoh: Population size for generation 0: 8
+[2025-12-29 11:12:04,242] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=4, name=AdaptiveHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 11:12:12,973] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:12:13,004] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=6, name=AdaptiveHingeLossWithCostGapNormalizer: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 11:12:22,572] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:12:22,588] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=6, name=SimplifiedHingeWithCostGapMargin: reason=pref_semantic_violation; attempting repair (repair_round=2/4)
+[2025-12-29 11:12:32,535] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:12:32,549] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=6, name=SigmoidHingeWithCostGapMargin: reason=pref_semantic_violation; attempting repair (repair_round=3/4)
+[2025-12-29 11:12:43,594] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:12:43,622] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=6, name=CostScaledLogSigmoid: reason=pref_semantic_violation; attempting repair (repair_round=4/4)
+[2025-12-29 11:12:54,514] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:12:54,540] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=6, name=SimplifiedCostScaledLogSigmoid: reason=pref_semantic_violation
+[2025-12-29 11:12:54,549] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=7, name=AdaptiveHingeLossWithCostGapNormalization: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 11:13:04,821] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:13:12,921] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:13:12,937] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=7, name=SimplifiedCostHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=3/4)
+[2025-12-29 11:13:23,854] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:13:31,682] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:13:31,697] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=0, idx=7, name=SimplifiedCostHingeLoss: reason=pref_semantic_violation
+[free_loss_eoh][device_worker] pid=108468 device=cuda:0 jobs=[(0, 0), (0, 4)]
+[free_loss_eoh][device_worker] pid=108470 device=cuda:2 jobs=[(0, 2)]
+[free_loss_eoh][device_worker] pid=108469 device=cuda:1 jobs=[(0, 1), (0, 5)]
+[free_loss_eoh][device_worker] pid=108471 device=cuda:3 jobs=[(0, 3)]
+[2025-12-29 11:59:17,910] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 0: hf_like_score=24.819787, validation_objective=24.766356, epoch_mean=24.805484, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 11:59:17,913] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 1: hf_like_score=21.530285, validation_objective=24.712795, epoch_mean=21.507946, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 11:59:17,918] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 2: hf_like_score=23.720079, validation_objective=26.150919, epoch_mean=23.720079, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 11:59:17,921] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 3: hf_like_score=16.291230, validation_objective=7.299683, epoch_mean=16.278490, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 11:59:17,924] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 4: hf_like_score=22.223059, validation_objective=21.811834, epoch_mean=22.223059, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 11:59:17,927] INFO:ptp_discovery.free_loss_eoh: Gen 0 cand 5: hf_like_score=24.396434, validation_objective=24.467066, epoch_mean=24.362435, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 11:59:17,927] INFO:ptp_discovery.free_loss_eoh: Generation 0 summary: static_fail=0, dynamic_fail=2, evaluated=6, new_elites=6
+[2025-12-29 11:59:17,928] INFO:ptp_discovery.free_loss_eoh: === Generation 1/9 ===
+[2025-12-29 11:59:17,928] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=6
+[2025-12-29 11:59:31,529] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:59:41,961] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 11:59:55,480] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:00:06,065] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:00:19,186] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:00:28,473] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:00:40,491] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:00:50,469] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:01:03,193] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:01:13,511] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:01:27,300] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:01:36,717] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:01:46,968] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:01:55,892] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:02:07,992] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:02:17,220] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:02:17,223] INFO:ptp_discovery.free_loss_eoh: Population size for generation 1: 8
+[2025-12-29 12:02:17,276] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=0, name=AdaptiveSigmoidHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 12:02:28,648] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:02:28,695] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=1, name=AdaptiveFocalHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 12:02:39,207] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:02:39,224] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=1, name=SimplifiedFocalHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=2/4)
+[2025-12-29 12:02:49,626] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:02:49,695] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=3, name=SmoothClippedMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 12:02:59,613] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:02:59,635] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=3, name=SimplifiedTanhMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=2/4)
+[2025-12-29 12:03:10,850] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:03:10,923] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=5, name=AdaptiveFocalHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 12:03:21,731] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:03:21,754] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=6, name=SigmoidScaledHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 12:03:32,165] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:03:32,224] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=6, name=CostScaledLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=2/4)
+[2025-12-29 12:03:44,110] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:03:51,488] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:03:51,546] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=1, idx=6, name=SymmetricCostScaledLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=4/4)
+[2025-12-29 12:04:01,678] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=110427 device=cuda:1 jobs=[(1, 1), (1, 5)]
+[free_loss_eoh][device_worker] pid=110429 device=cuda:3 jobs=[(1, 3), (1, 7)]
+[free_loss_eoh][device_worker] pid=110426 device=cuda:0 jobs=[(1, 0), (1, 4)]
+[free_loss_eoh][device_worker] pid=110428 device=cuda:2 jobs=[(1, 2), (1, 6)]
+[2025-12-29 12:49:24,512] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 0: hf_like_score=6.370915, validation_objective=5.843368, epoch_mean=6.363366, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 12:49:24,515] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 1: hf_like_score=6.251244, validation_objective=5.848759, epoch_mean=6.243734, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 12:49:24,521] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 2: hf_like_score=21.056463, validation_objective=21.063519, epoch_mean=21.025192, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 12:49:24,525] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 3: hf_like_score=20.679059, validation_objective=23.232803, epoch_mean=20.648352, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 12:49:24,531] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 4: hf_like_score=23.641895, validation_objective=24.326370, epoch_mean=23.641895, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 12:49:24,535] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 5: hf_like_score=13.481771, validation_objective=6.274875, epoch_mean=13.476388, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 12:49:24,539] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 6: hf_like_score=24.072978, validation_objective=24.891676, epoch_mean=24.057333, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 12:49:24,545] INFO:ptp_discovery.free_loss_eoh: Gen 1 cand 7: hf_like_score=6.263179, validation_objective=5.775029, epoch_mean=6.258468, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 12:49:24,545] INFO:ptp_discovery.free_loss_eoh: Generation 1 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
+[2025-12-29 12:49:24,545] INFO:ptp_discovery.free_loss_eoh: === Generation 2/9 ===
+[2025-12-29 12:49:24,546] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=14
+[2025-12-29 12:49:35,676] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:49:44,319] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:49:55,290] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:50:03,744] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:50:14,342] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:50:23,252] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:50:36,481] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:50:46,476] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:51:00,367] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:51:11,162] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:51:22,688] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:51:31,219] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:51:42,611] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:51:51,228] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:52:03,052] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:52:12,226] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:52:12,230] INFO:ptp_discovery.free_loss_eoh: Population size for generation 2: 8
+[2025-12-29 12:52:12,246] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=2, idx=0, name=LinearlyScaledMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 12:52:22,855] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:52:29,392] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:52:38,903] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 12:52:47,856] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=113020 device=cuda:3 jobs=[(2, 3), (2, 7)]
+[free_loss_eoh][device_worker] pid=113019 device=cuda:2 jobs=[(2, 2), (2, 6)]
+[free_loss_eoh][device_worker] pid=113018 device=cuda:1 jobs=[(2, 1), (2, 5)]
+[free_loss_eoh][device_worker] pid=113017 device=cuda:0 jobs=[(2, 0), (2, 4)]
+[2025-12-29 13:38:43,384] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 0: hf_like_score=6.258993, validation_objective=5.858087, epoch_mean=6.249007, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 13:38:43,420] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 1: hf_like_score=19.514298, validation_objective=19.632603, epoch_mean=19.494311, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 13:38:43,425] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 2: hf_like_score=15.527538, validation_objective=13.615105, epoch_mean=15.512920, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 13:38:43,430] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 3: hf_like_score=37.227054, validation_objective=37.297655, epoch_mean=37.227054, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 13:38:43,435] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 4: hf_like_score=23.200024, validation_objective=24.873713, epoch_mean=23.181499, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 13:38:43,440] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 5: hf_like_score=23.662886, validation_objective=24.886049, epoch_mean=23.645580, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 13:38:43,445] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 6: hf_like_score=23.847632, validation_objective=24.852329, epoch_mean=23.828365, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 13:38:43,449] INFO:ptp_discovery.free_loss_eoh: Gen 2 cand 7: hf_like_score=8.509832, validation_objective=5.935177, epoch_mean=8.503981, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 13:38:43,449] INFO:ptp_discovery.free_loss_eoh: Generation 2 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
+[2025-12-29 13:38:43,449] INFO:ptp_discovery.free_loss_eoh: === Generation 3/9 ===
+[2025-12-29 13:38:43,450] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=22
+[2025-12-29 13:38:55,407] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:39:04,673] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:39:17,544] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:39:27,914] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:39:39,313] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:39:49,007] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:40:03,139] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:40:13,211] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:40:25,135] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:40:34,853] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:40:47,795] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:40:57,201] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:41:10,255] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:41:20,243] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:41:32,409] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:41:42,373] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:41:42,377] INFO:ptp_discovery.free_loss_eoh: Population size for generation 3: 8
+[2025-12-29 13:41:42,478] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=4, name=ClippedMarginLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 13:41:54,225] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:42:04,921] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:42:04,939] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=4, name=ClippedMarginExpLoss: reason=pref_semantic_violation; attempting repair (repair_round=3/4)
+[2025-12-29 13:42:17,719] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:42:17,734] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=4, name=SoftplusMarginExpLoss: reason=pref_semantic_violation; attempting repair (repair_round=4/4)
+[2025-12-29 13:42:30,851] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:42:30,866] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=4, name=CostScaledHingeLoss: reason=pref_semantic_violation
+[2025-12-29 13:42:30,888] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=3, idx=5, name=AdaptiveTanhMarginLossV2: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 13:42:45,434] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 13:42:55,150] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=113772 device=cuda:1 jobs=[(3, 1), (3, 6)]
+[free_loss_eoh][device_worker] pid=113771 device=cuda:0 jobs=[(3, 0), (3, 5)]
+[free_loss_eoh][device_worker] pid=113773 device=cuda:2 jobs=[(3, 2), (3, 7)]
+[free_loss_eoh][device_worker] pid=113774 device=cuda:3 jobs=[(3, 3)]
+[2025-12-29 15:29:09,625] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 0: hf_like_score=19.024492, validation_objective=18.734407, epoch_mean=19.003049, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 15:29:09,643] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 1: hf_like_score=27.801428, validation_objective=27.894185, epoch_mean=27.782084, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 15:29:09,647] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 2: hf_like_score=22.075479, validation_objective=24.877584, epoch_mean=22.062052, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 15:29:09,652] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 3: hf_like_score=19.532986, validation_objective=24.032656, epoch_mean=19.532986, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 15:29:09,656] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 5: hf_like_score=37.164840, validation_objective=37.221309, epoch_mean=37.164840, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 15:29:09,660] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 6: hf_like_score=5.731268, validation_objective=5.716030, epoch_mean=5.731268, epoch_violations=2, early_eval_steps=7815, early_stopped=False, baseline=5.737515, better_than_baseline=False
+[2025-12-29 15:29:09,664] INFO:ptp_discovery.free_loss_eoh: Gen 3 cand 7: hf_like_score=18.694058, validation_objective=18.055353, epoch_mean=18.656409, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 15:29:09,664] INFO:ptp_discovery.free_loss_eoh: Generation 3 summary: static_fail=0, dynamic_fail=1, evaluated=7, new_elites=7
+[2025-12-29 15:29:09,664] INFO:ptp_discovery.free_loss_eoh: === Generation 4/9 ===
+[2025-12-29 15:29:09,665] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=29
+[2025-12-29 15:29:23,728] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:29:36,588] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:29:51,572] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:30:04,249] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:30:20,124] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:30:33,971] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:30:48,132] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:31:00,637] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:31:15,350] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:31:26,651] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:31:40,606] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:31:52,932] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:32:06,792] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:32:18,321] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:32:31,021] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:32:42,646] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:32:42,649] INFO:ptp_discovery.free_loss_eoh: Population size for generation 4: 8
+[2025-12-29 15:32:42,666] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=0, name=CostSensitiveAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 15:32:57,147] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:32:57,164] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=0, name=SimplifiedAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=2/4)
+[2025-12-29 15:33:10,726] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:33:10,746] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=0, name=CostSensitiveHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=3/4)
+[2025-12-29 15:33:25,092] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:33:37,553] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:33:37,572] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=0, name=CorrectedCostSensitiveHingeLoss: reason=pref_semantic_violation
+[2025-12-29 15:33:49,708] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:33:49,738] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=1, name=AdaptiveTanhMarginLossV2: reason=pref_semantic_violation; attempting repair (repair_round=2/4)
+[2025-12-29 15:34:03,311] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:34:03,337] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=1, name=CostGapScaledLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=3/4)
+[2025-12-29 15:34:19,380] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:34:32,831] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:34:45,882] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:34:45,912] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=4, name=SigmoidWeightedAdaptiveTanhMarginLossV2: reason=pref_semantic_violation; attempting repair (repair_round=2/4)
+[2025-12-29 15:34:59,451] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:35:11,004] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:35:11,035] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=4, name=SimplifiedTanhMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=4/4)
+[2025-12-29 15:35:24,033] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 15:35:24,308] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=4, idx=4, name=CostGapTanhMarginLoss: reason=pref_semantic_violation
+[2025-12-29 15:35:36,314] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=115802 device=cuda:3 jobs=[(4, 5)]
+[free_loss_eoh][device_worker] pid=115799 device=cuda:0 jobs=[(4, 1), (4, 6)]
+[free_loss_eoh][device_worker] pid=115801 device=cuda:2 jobs=[(4, 3)]
+[free_loss_eoh][device_worker] pid=115800 device=cuda:1 jobs=[(4, 2), (4, 7)]
+[2025-12-29 16:23:29,331] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 1: hf_like_score=5.780836, validation_objective=5.764997, epoch_mean=5.775162, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 16:23:29,339] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 2: hf_like_score=20.899407, validation_objective=18.651398, epoch_mean=20.802242, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 16:23:29,347] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 3: hf_like_score=27.791756, validation_objective=29.163132, epoch_mean=27.791756, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 16:23:29,355] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 5: hf_like_score=27.528026, validation_objective=27.355578, epoch_mean=27.528026, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 16:23:29,362] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 6: hf_like_score=20.155271, validation_objective=19.999776, epoch_mean=20.126437, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 16:23:29,370] INFO:ptp_discovery.free_loss_eoh: Gen 4 cand 7: hf_like_score=24.661021, validation_objective=24.836763, epoch_mean=24.654130, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 16:23:29,370] INFO:ptp_discovery.free_loss_eoh: Generation 4 summary: static_fail=0, dynamic_fail=2, evaluated=6, new_elites=6
+[2025-12-29 16:23:29,371] INFO:ptp_discovery.free_loss_eoh: === Generation 5/9 ===
+[2025-12-29 16:23:29,371] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=32
+[2025-12-29 16:23:42,025] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:23:51,222] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:24:04,497] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:24:15,277] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:24:29,410] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:24:40,243] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:24:53,083] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:25:03,347] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:25:15,726] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:25:24,556] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:25:38,145] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:25:47,406] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:26:00,247] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:26:09,078] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:26:22,509] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:26:32,846] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:26:32,850] INFO:ptp_discovery.free_loss_eoh: Population size for generation 5: 8
+[2025-12-29 16:26:42,638] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:26:51,757] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:27:01,417] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:27:12,175] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:27:12,258] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=7, name=AdaptiveLogSigmoidMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 16:27:24,452] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:27:24,516] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=5, idx=7, name=AdaptiveLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=2/4)
+[2025-12-29 16:27:36,315] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 16:27:44,800] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=143388 device=cuda:0 jobs=[(5, 0), (5, 4)]
+[free_loss_eoh][device_worker] pid=143389 device=cuda:1 jobs=[(5, 1), (5, 5)]
+[free_loss_eoh][device_worker] pid=143391 device=cuda:3 jobs=[(5, 3), (5, 7)]
+[free_loss_eoh][device_worker] pid=143390 device=cuda:2 jobs=[(5, 2), (5, 6)]
+[2025-12-29 17:14:55,729] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 0: hf_like_score=23.963437, validation_objective=24.866482, epoch_mean=23.950592, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 17:14:55,737] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 1: hf_like_score=37.074772, validation_objective=37.352910, epoch_mean=37.074772, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 17:14:55,754] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 2: hf_like_score=27.360409, validation_objective=28.689389, epoch_mean=27.360409, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 17:14:55,760] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 3: hf_like_score=21.024134, validation_objective=20.476392, epoch_mean=20.995451, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 17:14:55,768] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 4: hf_like_score=20.936670, validation_objective=20.240858, epoch_mean=20.904932, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 17:14:55,772] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 5: hf_like_score=12.118398, validation_objective=15.036009, epoch_mean=12.109081, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 17:14:55,784] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 6: hf_like_score=37.267790, validation_objective=37.335944, epoch_mean=37.267790, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 17:14:55,791] INFO:ptp_discovery.free_loss_eoh: Gen 5 cand 7: hf_like_score=11.899450, validation_objective=6.493502, epoch_mean=11.895642, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 17:14:55,791] INFO:ptp_discovery.free_loss_eoh: Generation 5 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
+[2025-12-29 17:14:55,792] INFO:ptp_discovery.free_loss_eoh: === Generation 6/9 ===
+[2025-12-29 17:14:55,792] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=32
+[2025-12-29 17:15:08,532] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:15:18,244] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:15:31,291] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:15:41,790] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:15:52,950] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:16:02,003] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:16:15,368] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:16:25,421] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:16:39,493] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:16:50,004] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:17:03,497] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:17:13,935] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:17:24,922] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:17:33,618] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:17:47,157] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:17:57,616] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:17:57,620] INFO:ptp_discovery.free_loss_eoh: Population size for generation 6: 8
+[2025-12-29 17:17:57,663] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=6, idx=2, name=AdaptiveTanhMarginLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 17:18:07,459] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:18:16,572] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 17:18:24,820] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=212975 device=cuda:3 jobs=[(6, 3), (6, 7)]
+[free_loss_eoh][device_worker] pid=212973 device=cuda:1 jobs=[(6, 1), (6, 5)]
+[free_loss_eoh][device_worker] pid=212972 device=cuda:0 jobs=[(6, 0), (6, 4)]
+[free_loss_eoh][device_worker] pid=212974 device=cuda:2 jobs=[(6, 2), (6, 6)]
+[2025-12-29 18:05:23,932] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 0: hf_like_score=16.705418, validation_objective=16.495195, epoch_mean=16.705418, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:05:23,937] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 1: hf_like_score=24.105492, validation_objective=24.892824, epoch_mean=24.095741, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:05:23,945] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 2: hf_like_score=17.292778, validation_objective=19.015165, epoch_mean=17.267667, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:05:23,949] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 3: hf_like_score=22.302138, validation_objective=22.856841, epoch_mean=22.288126, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:05:23,955] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 4: hf_like_score=11.416525, validation_objective=6.597436, epoch_mean=11.412584, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:05:23,959] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 5: hf_like_score=10.592525, validation_objective=6.134028, epoch_mean=10.588604, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:05:23,963] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 6: hf_like_score=15.607130, validation_objective=14.991937, epoch_mean=15.601703, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:05:23,968] INFO:ptp_discovery.free_loss_eoh: Gen 6 cand 7: hf_like_score=6.091961, validation_objective=5.899529, epoch_mean=6.083988, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:05:23,968] INFO:ptp_discovery.free_loss_eoh: Generation 6 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
+[2025-12-29 18:05:23,969] INFO:ptp_discovery.free_loss_eoh: === Generation 7/9 ===
+[2025-12-29 18:05:23,969] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=32
+[2025-12-29 18:05:36,650] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:05:45,926] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:06:00,103] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:06:10,920] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:06:22,818] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:06:32,130] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:06:46,221] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:06:57,162] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:07:10,809] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:07:21,366] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:07:34,313] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:07:43,515] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:07:56,792] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:08:07,615] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:08:20,137] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:08:29,877] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:08:29,881] INFO:ptp_discovery.free_loss_eoh: Population size for generation 7: 8
+[2025-12-29 18:08:29,935] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=7, idx=3, name=ConfidenceAdaptiveHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 18:08:40,867] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=213850 device=cuda:0 jobs=[(7, 0), (7, 4)]
+[free_loss_eoh][device_worker] pid=213853 device=cuda:3 jobs=[(7, 3), (7, 7)]
+[free_loss_eoh][device_worker] pid=213852 device=cuda:2 jobs=[(7, 2), (7, 6)]
+[free_loss_eoh][device_worker] pid=213851 device=cuda:1 jobs=[(7, 1), (7, 5)]
+[2025-12-29 18:55:28,029] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 0: hf_like_score=6.165272, validation_objective=5.900320, epoch_mean=6.158091, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:55:28,036] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 1: hf_like_score=20.037083, validation_objective=19.710981, epoch_mean=20.000937, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:55:28,045] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 2: hf_like_score=6.144484, validation_objective=6.051188, epoch_mean=6.135527, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:55:28,049] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 3: hf_like_score=22.947829, validation_objective=24.615469, epoch_mean=22.921199, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:55:28,055] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 4: hf_like_score=26.239095, validation_objective=25.060279, epoch_mean=26.239095, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:55:28,058] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 5: hf_like_score=6.816967, validation_objective=5.904516, epoch_mean=6.809484, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:55:28,063] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 6: hf_like_score=23.365710, validation_objective=24.858975, epoch_mean=23.352841, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:55:28,066] INFO:ptp_discovery.free_loss_eoh: Gen 7 cand 7: hf_like_score=24.176737, validation_objective=24.895605, epoch_mean=24.164947, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 18:55:28,067] INFO:ptp_discovery.free_loss_eoh: Generation 7 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
+[2025-12-29 18:55:28,068] INFO:ptp_discovery.free_loss_eoh: === Generation 8/9 ===
+[2025-12-29 18:55:28,068] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=32
+[2025-12-29 18:55:41,002] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:55:51,086] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:56:05,278] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:56:17,646] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:56:31,982] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:56:42,918] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:56:57,033] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:57:07,201] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:57:21,136] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:57:31,549] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:57:44,842] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:57:54,858] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:58:08,036] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:58:17,799] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:58:31,553] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:58:41,577] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:58:41,581] INFO:ptp_discovery.free_loss_eoh: Population size for generation 8: 8
+[2025-12-29 18:58:41,597] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=0, name=CostWeightedTanhHingeLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 18:58:54,057] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:59:02,583] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:59:02,623] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=1, name=AdaptiveFocalWeightedTanhMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 18:59:13,897] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:59:21,000] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:59:21,040] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=2, name=AdaptiveMarginWeightedLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 18:59:34,620] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:59:43,875] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 18:59:43,936] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=4, name=AdaptiveTanhMarginLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 18:59:54,328] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 19:00:01,467] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 19:00:01,498] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=4, name=SimplifiedAdaptiveTanhMarginLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=3/4)
+[2025-12-29 19:00:14,036] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 19:00:14,071] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=4, name=CostScaledLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=4/4)
+[2025-12-29 19:00:24,734] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 19:00:24,816] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=8, idx=7, name=SmoothAdaptiveMarginLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 19:00:35,884] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=214456 device=cuda:3 jobs=[(8, 3), (8, 7)]
+[free_loss_eoh][device_worker] pid=214454 device=cuda:1 jobs=[(8, 1), (8, 5)]
+[free_loss_eoh][device_worker] pid=214453 device=cuda:0 jobs=[(8, 0), (8, 4)]
+[free_loss_eoh][device_worker] pid=214455 device=cuda:2 jobs=[(8, 2), (8, 6)]
+[2025-12-29 20:54:52,823] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 0: hf_like_score=5.731426, validation_objective=5.718433, epoch_mean=5.731426, epoch_violations=3, early_eval_steps=7815, early_stopped=False, baseline=5.737515, better_than_baseline=False
+[2025-12-29 20:54:52,827] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 1: hf_like_score=6.124147, validation_objective=5.848386, epoch_mean=6.115687, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 20:54:52,832] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 2: hf_like_score=6.169276, validation_objective=6.069189, epoch_mean=6.161514, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 20:54:52,838] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 3: hf_like_score=28.825562, validation_objective=28.418242, epoch_mean=28.804451, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 20:54:52,843] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 4: hf_like_score=23.582019, validation_objective=24.348918, epoch_mean=23.571242, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 20:54:52,848] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 5: hf_like_score=6.089318, validation_objective=5.872501, epoch_mean=6.083992, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 20:54:52,852] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 6: hf_like_score=23.755551, validation_objective=24.894180, epoch_mean=23.743602, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 20:54:52,856] INFO:ptp_discovery.free_loss_eoh: Gen 8 cand 7: hf_like_score=20.243743, validation_objective=21.768786, epoch_mean=20.240273, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 20:54:52,856] INFO:ptp_discovery.free_loss_eoh: Generation 8 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
+[2025-12-29 20:54:52,857] INFO:ptp_discovery.free_loss_eoh: === Generation 9/9 ===
+[2025-12-29 20:54:52,858] INFO:ptp_discovery.free_loss_eoh: Generating population via E1/E2/M1/M2/M3: size=8, elite_size=4, parent_pool=32
+[2025-12-29 20:55:07,610] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:55:18,321] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:55:32,434] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:55:42,553] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:55:55,200] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:56:06,296] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:56:21,103] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:56:31,741] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:56:45,911] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:56:55,430] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:57:11,305] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:57:20,760] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:57:33,861] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:57:44,384] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:57:58,561] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:58:08,949] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:58:08,952] INFO:ptp_discovery.free_loss_eoh: Population size for generation 9: 8
+[2025-12-29 20:58:09,049] WARNING:ptp_discovery.free_loss_eoh: Preference gates failed for gen=9, idx=7, name=AdaptiveMarginLogSigmoidLoss: reason=pref_semantic_violation; attempting repair (repair_round=1/4)
+[2025-12-29 20:58:19,821] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[2025-12-29 20:58:26,401] INFO:httpx: HTTP Request: POST https://api.bltcy.ai/v1/chat/completions "HTTP/1.1 200 OK"
+[free_loss_eoh][device_worker] pid=215952 device=cuda:3 jobs=[(9, 3), (9, 7)]
+[free_loss_eoh][device_worker] pid=215949 device=cuda:0 jobs=[(9, 0), (9, 4)]
+[free_loss_eoh][device_worker] pid=215950 device=cuda:1 jobs=[(9, 1), (9, 5)]
+[free_loss_eoh][device_worker] pid=215951 device=cuda:2 jobs=[(9, 2), (9, 6)]
+[2025-12-29 21:45:19,727] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 0: hf_like_score=7.362589, validation_objective=5.868760, epoch_mean=7.355778, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 21:45:19,733] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 1: hf_like_score=25.464226, validation_objective=27.815081, epoch_mean=25.425240, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 21:45:19,737] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 2: hf_like_score=5.832033, validation_objective=5.789726, epoch_mean=5.826619, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 21:45:19,745] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 3: hf_like_score=21.727690, validation_objective=24.855992, epoch_mean=21.712417, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 21:45:19,749] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 4: hf_like_score=7.977718, validation_objective=5.896506, epoch_mean=7.969276, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 21:45:19,754] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 5: hf_like_score=18.158832, validation_objective=19.180480, epoch_mean=18.146730, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 21:45:19,758] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 6: hf_like_score=6.096823, validation_objective=5.851556, epoch_mean=6.089980, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 21:45:19,762] INFO:ptp_discovery.free_loss_eoh: Gen 9 cand 7: hf_like_score=19.888748, validation_objective=20.443911, epoch_mean=19.853906, epoch_violations=5, early_eval_steps=7815, early_stopped=True, baseline=5.737515, better_than_baseline=False
+[2025-12-29 21:45:19,762] INFO:ptp_discovery.free_loss_eoh: Generation 9 summary: static_fail=0, dynamic_fail=0, evaluated=8, new_elites=8
+[2025-12-29 21:45:19,780] INFO:ptp_discovery.free_loss_eoh: Search complete. Best hf_like_score=5.731268 (generation=3, index=6)

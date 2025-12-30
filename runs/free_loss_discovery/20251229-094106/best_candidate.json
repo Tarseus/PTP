@@ -1,0 +1,159 @@
+{
+  "generation": 3,
+  "index": 6,
+  "ir": {
+    "name": "AdaptiveTanhMarginSoftplusLoss",
+    "intuition": "Common idea: All parents use a margin that is a monotonic function of the cost gap, combined with a smooth loss function like `logsigmoid` or `softplus`. The child loss synthesizes these ideas by using a bounded `tanh(cost_gap)` margin and a smooth `softplus` hinge function, but introduces a novel adaptive term that subtracts a fraction of the log-probability difference itself from the margin. This adaptive mechanism reduces the loss for correctly classified pairs (where `log_prob_diff` is large and positive), focusing the training on harder or misclassified examples, while the `tanh` and `softplus` operators ensure robustness to extreme cost gaps and logit values. Mode: combine",
+    "pseudocode": "1. Calculate the log-probability difference: log_prob_diff = log_prob_w - log_prob_l.\n2. Calculate the cost gap: cost_gap = cost_l - cost_w.\n3. Create a bounded, cost-sensitive margin using tanh: margin = torch.tanh(beta * cost_gap).\n4. Create an adaptive term that reduces the margin for correctly classified pairs: adaptive_term = F.softplus(gamma * log_prob_diff).\n5. Compute the core loss argument by subtracting the adaptive term from the margin: hinge_arg = margin - adaptive_term.\n6. The final loss is a smooth hinge loss applied to this argument: loss = softplus(hinge_arg).\n7. Return the mean loss over the batch.",
+    "hyperparams": {
+      "beta": 1.0,
+      "gamma": 0.5
+    },
+    "operators_used": [
+      "tanh",
+      "softplus"
+    ],
+    "implementation_hint": {
+      "expects": [
+        "cost_a",
+        "cost_b",
+        "log_prob_w",
+        "log_prob_l"
+      ],
+      "returns": "scalar"
+    },
+    "code": "def generated_loss(batch, model_output, extra):\n    \"\"\"\n    Combines a tanh-based cost margin with an adaptive softplus term inside a softplus hinge loss.\n    The margin adapts based on model confidence, focusing on harder examples.\n    \"\"\"\n    # Hyperparameters\n    beta = extra.get('beta', 1.0)\n    gamma = extra.get('gamma', 0.5)\n\n    # Inputs from batch\n    cost_a = batch['cost_a']\n    cost_b = batch['cost_b']\n    log_prob_w = batch['log_prob_w']\n    log_prob_l = batch['log_prob_l']\n\n    # Determine winner/loser costs based on min/max\n    cost_w, cost_l = torch.min(cost_a, cost_b), torch.max(cost_a, cost_b)\n\n    # Calculate the cost gap (guaranteed non-negative)\n    cost_gap = cost_l - cost_w\n\n    # Create a bounded, non-linear margin from the cost gap.\n    # tanh ensures the margin is in [0, 1] for beta > 0, preventing explosion.\n    margin = torch.tanh(beta * cost_gap)\n\n    # Calculate the log probability difference\n    log_prob_diff = log_prob_w - log_prob_l\n\n    # Create an adaptive term that increases with model confidence for correct predictions.\n    # softplus is a smooth approximation of ReLU.\n    adaptive_term = F.softplus(gamma * log_prob_diff)\n\n    # The argument to the hinge loss is the margin, adjusted by the model's confidence.\n    # For correctly ranked pairs (log_prob_diff > 0), this reduces the margin,\n    # lowering the loss and focusing on harder examples.\n    # For incorrectly ranked pairs (log_prob_diff < 0), adaptive_term is close to 0,\n    # so the full margin is used as the target.\n    hinge_argument = margin - adaptive_term\n\n    # Use softplus for a smooth hinge loss.\n    loss = F.softplus(hinge_argument)\n\n    # Apply optional instance weights\n    if 'weight' in batch and batch['weight'] is not None:\n        loss = loss * batch['weight']\n\n    return loss.mean()",
+    "theoretical_basis": "A margin-based preference loss that extends the smooth hinge loss (softplus) framework. The required margin is a bounded function of the cost gap, `tanh(beta * cost_gap)`, ensuring stability. The key innovation is the introduction of a dynamic, confidence-based adjustment to this margin, `-softplus(gamma * log_prob_diff)`. This adaptive term effectively creates a 'moving target' for the log-probability difference: for correctly classified pairs, the target is lowered, reducing the loss and focusing on harder examples. For misclassified pairs, the adaptive term is near zero, and the model is penalized based on the full cost-derived margin. This combines the stability of bounded margins with the efficiency of adaptive, confidence-aware learning."
+  },
+  "fitness": {
+    "hf_like_score": 5.731268315734864,
+    "validation_objective": 5.716029623413086,
+    "generalization_penalty": 0.0,
+    "generalization_objectives": {
+      "50": 5.713568530273437
+    },
+    "epoch_objective_mean": 5.731268315734864,
+    "epoch_baseline_violations": 2,
+    "epoch_better_than_baseline": false,
+    "epoch_eval": {
+      "enabled": true,
+      "steps_per_epoch": 1563,
+      "epochs_total": 20,
+      "objectives": [
+        5.783543524169922,
+        5.76290986328125,
+        5.760930585479736,
+        5.7464276275634765,
+        5.743143083190918,
+        5.7369124114990235,
+        5.7312347610473635,
+        5.729269778442383,
+        5.730856781005859,
+        5.720631301879883,
+        5.720457342529297,
+        5.721251069641113,
+        5.725004641723633,
+        5.7206466812133785,
+        5.713116650390625,
+        5.717787983703613,
+        5.712175010681152,
+        5.718224423217773,
+        5.71803138885498,
+        5.712811405181885
+      ],
+      "objective_mean": 5.731268315734864,
+      "baseline_margins": [
+        0.0070050628662103875,
+        -0.0011440666198732075,
+        0.0008151115417476262,
+        -0.005993891906737936,
+        -0.013300637054443065,
+        -0.007623760986327888,
+        -0.007712334442138591,
+        -0.0031771270751947966,
+        -0.005810363769531257,
+        -0.005974391937256129,
+        -0.010713414001465082,
+        -0.0086842079162599,
+        -0.0026047271728515398,
+        -0.009119020080566642,
+        -0.01073312225341816,
+        -0.006162989807129371,
+        -0.007434305572510347,
+        -0.007141022491455651,
+        -0.00707229766845785,
+        -0.012357601165771115
+      ],
+      "baseline_violations": 2,
+      "better_than_baseline": false
+    },
+    "train_score_mean": 5.750743024469719,
+    "train_loss_mean": 0.1584333105829097,
+    "pair_count": 2445466534,
+    "early_eval": {
+      "enabled": true,
+      "steps": 7815,
+      "baseline_validation_objective": 5.749606314849854,
+      "candidate_validation_objective": 5.737219572448731,
+      "early_stopped": false
+    },
+    "phases": {
+      "f1": {
+        "steps": 31260,
+        "train_score_mean": 5.750743024469719,
+        "train_loss_mean": 0.1584333105829097,
+        "pair_count": 2445466534
+      },
+      "f2": {
+        "steps": 0,
+        "train_score_mean": null,
+        "train_loss_mean": null,
+        "pair_count": 0
+      }
+    },
+    "config": {
+      "hf": {
+        "problem": "tsp",
+        "hf_steps": 0,
+        "hf_epochs": 20,
+        "hf_instances_per_epoch": 100000,
+        "train_problem_size": 50,
+        "valid_problem_sizes": [
+          50
+        ],
+        "train_batch_size": 64,
+        "pomo_size": 50,
+        "learning_rate": 0.0003,
+        "weight_decay": 1e-06,
+        "alpha": 0.05,
+        "device": "cuda:1",
+        "seed": 1234,
+        "num_validation_episodes": 10000,
+        "validation_batch_size": 64,
+        "generalization_penalty_weight": 1.0,
+        "pool_version": "v0"
+      },
+      "free_loss": {
+        "f1_steps": 0,
+        "total_train_steps": 31260,
+        "f2_steps": 0,
+        "f3_enabled": false,
+        "baseline_epoch_violation_weight": 0.0
+      }
+    },
+    "loss_ir": {
+      "name": "AdaptiveTanhMarginSoftplusLoss",
+      "intuition": "Common idea: All parents use a margin that is a monotonic function of the cost gap, combined with a smooth loss function like `logsigmoid` or `softplus`. The child loss synthesizes these ideas by using a bounded `tanh(cost_gap)` margin and a smooth `softplus` hinge function, but introduces a novel adaptive term that subtracts a fraction of the log-probability difference itself from the margin. This adaptive mechanism reduces the loss for correctly classified pairs (where `log_prob_diff` is large and positive), focusing the training on harder or misclassified examples, while the `tanh` and `softplus` operators ensure robustness to extreme cost gaps and logit values. Mode: combine",
+      "hyperparams": {
+        "beta": 1.0,
+        "gamma": 0.5
+      },
+      "operators_used": [
+        "tanh",
+        "softplus"
+      ]
+    },
+    "novelty": 4.473890524032263
+  },
+  "novelty": 4.473890524032263
+}
