@@ -1,13 +1,23 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+import random
 import re
+import time
 from dataclasses import asdict
 from typing import Any, Mapping, Sequence
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import (
+    APIConnectionError,
+    APITimeoutError,
+    BadRequestError,
+    InternalServerError,
+    OpenAI,
+    RateLimitError,
+)
 
 from .free_loss_compiler import (
     CompiledFreeLoss,
@@ -17,16 +27,46 @@ from .free_loss_compiler import (
 from .free_loss_ir import FreeLossIR
 
 
+LOGGER = logging.getLogger(__name__)
+_OPENAI_CLIENT: OpenAI | None = None
+_ENV_LOADED = False
+
+
 def _load_env() -> None:
+    global _ENV_LOADED
+    if _ENV_LOADED:
+        return
     load_dotenv()
     if not os.getenv("OPENAI_API_KEY"):
         raise RuntimeError("OPENAI_API_KEY is required for free-loss discovery.")
+    _ENV_LOADED = True
 
 
 def _make_openai_client() -> OpenAI:
+    timeout_s = float(os.getenv("OPENAI_TIMEOUT_S", "60") or 60)
+    max_retries = int(os.getenv("OPENAI_MAX_RETRIES", "2") or 2)
     api_key = os.environ["OPENAI_API_KEY"]
     base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-    return OpenAI(api_key=api_key, base_url=base_url)
+    return OpenAI(api_key=api_key, base_url=base_url, timeout=timeout_s, max_retries=max_retries)
+
+
+def _get_openai_client() -> OpenAI:
+    global _OPENAI_CLIENT
+    _load_env()
+    if _OPENAI_CLIENT is None:
+        _OPENAI_CLIENT = _make_openai_client()
+    return _OPENAI_CLIENT
+
+
+def _should_retry_llm_error(exc: Exception) -> bool:
+    # Treat transient transport/service issues as retryable. Some providers/proxies
+    # return "get_token_error" as a 500; this is usually transient as well.
+    retryable_types = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError)
+    if isinstance(exc, retryable_types):
+        return True
+    if isinstance(exc, BadRequestError) and "get_token_error" in str(exc):
+        return True
+    return False
 
 
 def _read_prompt(path: str) -> str:
@@ -96,15 +136,44 @@ def _extract_json_object(text: str) -> str:
 
 
 def _call_llm(prompt: str) -> str:
-    _load_env()
-    client = _make_openai_client()
+    client = _get_openai_client()
     model_name = os.getenv("OPENAI_MODEL", "gpt-4.1")
-    resp = client.chat.completions.create(
-        model=model_name,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-    )
-    return resp.choices[0].message.content.strip()
+
+    max_attempts = int(os.getenv("OPENAI_CALL_MAX_ATTEMPTS", "6") or 6)
+    base_backoff_s = float(os.getenv("OPENAI_CALL_BACKOFF_S", "1") or 1)
+    max_backoff_s = float(os.getenv("OPENAI_CALL_BACKOFF_MAX_S", "30") or 30)
+
+    last_exc: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            resp = client.chat.completions.create(
+                model=model_name,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+            )
+            content = resp.choices[0].message.content
+            if not content:
+                raise RuntimeError("LLM returned empty content.")
+            return content.strip()
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            if attempt >= max_attempts or not _should_retry_llm_error(exc):
+                raise
+
+            sleep_s = min(max_backoff_s, base_backoff_s * (2 ** (attempt - 1)))
+            sleep_s = sleep_s * (0.5 + random.random())  # jitter
+            LOGGER.warning(
+                "LLM call failed (attempt %d/%d, model=%s): %s; retrying in %.1fs",
+                attempt,
+                max_attempts,
+                model_name,
+                str(exc),
+                sleep_s,
+            )
+            time.sleep(sleep_s)
+
+    # Should be unreachable, but keeps types happy.
+    raise RuntimeError("LLM call failed after retries.") from last_exc
 
 
 def generate_free_loss_candidate(
