@@ -61,7 +61,9 @@ class HighFidelityConfig:
     train_problem_size: int = 20
     valid_problem_sizes: Sequence[int] = (100,)
     train_batch_size: int = 64
-    pomo_size: int = 64
+    # If None, align POMO rollout count to the current problem size for all
+    # training/evaluation calls. If set, the value overrides across sizes.
+    pomo_size: int | None = 64
     learning_rate: float = 3e-4
     weight_decay: float = 1e-6
     alpha: float = 0.05  # preference sharpness
@@ -73,6 +75,23 @@ class HighFidelityConfig:
     size_aggregation: str = "cvar"  # one of: legacy, mean, cvar, worst
     size_cvar_alpha: float = 0.2
     pool_version: str = "v0"
+
+
+def resolve_pomo_size(pomo_size: int | None, problem_size: int) -> int:
+    """Return the effective pomo_size for a given problem_size.
+
+    If pomo_size is not provided (None), align it to problem_size.
+    """
+
+    if pomo_size is None:
+        return int(problem_size)
+    value = int(pomo_size)
+    if value <= 0:
+        logger.warning(
+            "Invalid pomo_size=%s; falling back to problem_size=%d", pomo_size, problem_size
+        )
+        return int(problem_size)
+    return value
 
 
 def aggregate_objectives_by_size(
@@ -430,9 +449,10 @@ def evaluate_ptp_dsl_high_fidelity(
         "eval_type": "argmax",
     }
 
+    train_pomo_size = resolve_pomo_size(config.pomo_size, config.train_problem_size)
     env = TSPEnv(
         problem_size=config.train_problem_size,
-        pomo_size=config.pomo_size,
+        pomo_size=train_pomo_size,
         device=str(device),
     )
 
@@ -453,7 +473,7 @@ def evaluate_ptp_dsl_high_fidelity(
         "batch_size=%d, device=%s",
         total_steps,
         config.train_problem_size,
-        config.pomo_size,
+        train_pomo_size,
         config.train_batch_size,
         str(device),
     )
@@ -487,7 +507,7 @@ def evaluate_ptp_dsl_high_fidelity(
     main_valid_obj = _evaluate_tsp_model(
         model=model,
         problem_size=config.train_problem_size,
-        pomo_size=config.pomo_size,
+        pomo_size=resolve_pomo_size(config.pomo_size, config.train_problem_size),
         device=device,
         num_episodes=config.num_validation_episodes,
         batch_size=config.validation_batch_size,
@@ -501,7 +521,7 @@ def evaluate_ptp_dsl_high_fidelity(
         size_objectives[size_int] = _evaluate_tsp_model(
             model=model,
             problem_size=size_int,
-            pomo_size=config.pomo_size,
+            pomo_size=resolve_pomo_size(config.pomo_size, size_int),
             device=device,
             num_episodes=config.num_validation_episodes,
             batch_size=config.validation_batch_size,
@@ -603,6 +623,15 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="Problem sizes used for generalization validation.",
     )
     parser.add_argument(
+        "--pomo_size",
+        type=int,
+        default=None,
+        help=(
+            "Number of POMO rollouts. If omitted, aligns to each problem_size "
+            "(train size and every validation size)."
+        ),
+    )
+    parser.add_argument(
         "--device",
         type=str,
         default="cuda",
@@ -636,6 +665,7 @@ def main_cli() -> None:
         hf_instances_per_epoch=args.hf_instances_per_epoch,
         train_problem_size=args.train_problem_size,
         valid_problem_sizes=tuple(args.valid_problem_sizes),
+        pomo_size=args.pomo_size,
         device=args.device,
         seed=args.seed,
     )

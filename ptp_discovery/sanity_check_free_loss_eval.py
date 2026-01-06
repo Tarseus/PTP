@@ -21,6 +21,7 @@ from fitness.free_loss_fidelity import (  # noqa: E402
     evaluate_free_loss_candidate,
 )
 from fitness.ptp_high_fidelity import HighFidelityConfig  # noqa: E402
+from fitness.ptp_high_fidelity import resolve_pomo_size  # noqa: E402
 from ptp_discovery.free_loss_compiler import (  # noqa: E402
     CompiledFreeLoss,
     compile_free_loss,
@@ -51,6 +52,7 @@ def _build_hf_configs_from_yaml(
 
     hf_epochs = int(cfg_yaml.get("hf_epochs", 0) or 0)
     hf_instances_per_epoch = int(cfg_yaml.get("hf_instances_per_epoch", 0) or 0)
+    pomo_size_yaml = cfg_yaml.get("pomo_size", None)
 
     hf_cfg = HighFidelityConfig(
         problem=cfg_yaml.get("problem", "tsp"),
@@ -60,7 +62,7 @@ def _build_hf_configs_from_yaml(
         train_problem_size=int(cfg_yaml.get("train_problem_size", 20)),
         valid_problem_sizes=tuple(int(v) for v in cfg_yaml.get("valid_problem_sizes", [100])),
         train_batch_size=int(cfg_yaml.get("train_batch_size", 64)),
-        pomo_size=int(cfg_yaml.get("pomo_size", 64)),
+        pomo_size=int(pomo_size_yaml) if pomo_size_yaml is not None else None,
         learning_rate=float(cfg_yaml.get("learning_rate", 3e-4)),
         weight_decay=float(cfg_yaml.get("weight_decay", 1e-6)),
         alpha=float(cfg_yaml.get("alpha", 0.05)),
@@ -162,6 +164,7 @@ def _run_sequential_sanity_check(
             baseline_epoch_violation_weight=free_cfg.baseline_epoch_violation_weight,
         )
 
+        train_pomo_size = resolve_pomo_size(hf_local.pomo_size, hf_local.train_problem_size)
         LOGGER.info(
             "Running candidate %d/%d on device=%s (train_problem_size=%d, batch_size=%d, pomo_size=%d)",
             i + 1,
@@ -169,7 +172,7 @@ def _run_sequential_sanity_check(
             device_str,
             hf_local.train_problem_size,
             hf_local.train_batch_size,
-            hf_local.pomo_size,
+            train_pomo_size,
         )
 
         try:

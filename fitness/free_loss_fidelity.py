@@ -12,6 +12,7 @@ from .ptp_high_fidelity import (
     HighFidelityConfig,
     _set_seed,
     _evaluate_tsp_model,
+    resolve_pomo_size,
     aggregate_objectives_by_size,
     get_hf_epoch_plan,
     get_total_hf_train_steps,
@@ -168,9 +169,10 @@ def evaluate_free_loss_candidate(
     import time as _time  # local alias to avoid confusion
     t_init_start = _time.perf_counter()
 
+    train_pomo_size = resolve_pomo_size(cfg.hf.pomo_size, cfg.hf.train_problem_size)
     env = TSPEnv(
         problem_size=cfg.hf.train_problem_size,
-        pomo_size=cfg.hf.pomo_size,
+        pomo_size=train_pomo_size,
         device=str(device),
     )
 
@@ -207,7 +209,7 @@ def evaluate_free_loss_candidate(
         steps_f2,
         steps,
         cfg.hf.train_problem_size,
-        cfg.hf.pomo_size,
+        train_pomo_size,
         cfg.hf.train_batch_size,
         str(device),
     )
@@ -258,7 +260,7 @@ def evaluate_free_loss_candidate(
                 epoch_valid_obj = _evaluate_tsp_model(
                     model=model,
                     problem_size=cfg.hf.train_problem_size,
-                    pomo_size=cfg.hf.pomo_size,
+                    pomo_size=train_pomo_size,
                     device=device,
                     num_episodes=cfg.hf.num_validation_episodes,
                     batch_size=cfg.hf.validation_batch_size,
@@ -279,7 +281,7 @@ def evaluate_free_loss_candidate(
             early_validation_objective = _evaluate_tsp_model(
                 model=model,
                 problem_size=cfg.hf.train_problem_size,
-                pomo_size=cfg.hf.pomo_size,
+                pomo_size=train_pomo_size,
                 device=device,
                 num_episodes=cfg.hf.num_validation_episodes,
                 batch_size=cfg.hf.validation_batch_size,
@@ -302,7 +304,7 @@ def evaluate_free_loss_candidate(
         main_valid_obj = _evaluate_tsp_model(
             model=model,
             problem_size=cfg.hf.train_problem_size,
-            pomo_size=cfg.hf.pomo_size,
+            pomo_size=train_pomo_size,
             device=device,
             num_episodes=cfg.hf.num_validation_episodes,
             batch_size=cfg.hf.validation_batch_size,
@@ -316,7 +318,7 @@ def evaluate_free_loss_candidate(
         size_objectives[size_int] = _evaluate_tsp_model(
             model=model,
             problem_size=size_int,
-            pomo_size=cfg.hf.pomo_size,
+            pomo_size=resolve_pomo_size(cfg.hf.pomo_size, size_int),
             device=device,
             num_episodes=cfg.hf.num_validation_episodes,
             batch_size=cfg.hf.validation_batch_size,

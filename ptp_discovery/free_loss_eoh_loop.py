@@ -26,6 +26,7 @@ from fitness.ptp_high_fidelity import (
     HighFidelityConfig,
     _set_seed,
     _evaluate_tsp_model,
+    resolve_pomo_size,
     get_hf_epoch_plan,
     get_total_hf_train_steps,
 )
@@ -1038,9 +1039,10 @@ def evaluate_po_baseline(
     }
 
     t_init_start = time.perf_counter()
+    train_pomo_size = resolve_pomo_size(cfg.pomo_size, cfg.train_problem_size)
     env = TSPEnv(
         problem_size=cfg.train_problem_size,
-        pomo_size=cfg.pomo_size,
+        pomo_size=train_pomo_size,
         device=str(device),
     )
 
@@ -1068,7 +1070,7 @@ def evaluate_po_baseline(
           "batch_size=%d, device=%s, init_time=%.3fs",
         total_steps,
         cfg.train_problem_size,
-        cfg.pomo_size,
+        train_pomo_size,
         cfg.train_batch_size,
         str(device),
         t_init_end - t_init_start,
@@ -1097,7 +1099,7 @@ def evaluate_po_baseline(
             epoch_valid_obj = _evaluate_tsp_model(
                 model=model,
                 problem_size=cfg.train_problem_size,
-                pomo_size=cfg.pomo_size,
+                pomo_size=train_pomo_size,
                 device=device,
                 num_episodes=cfg.num_validation_episodes,
                 batch_size=cfg.validation_batch_size,
@@ -1114,7 +1116,7 @@ def evaluate_po_baseline(
             early_validation_objective = _evaluate_tsp_model(
                 model=model,
                 problem_size=cfg.train_problem_size,
-                pomo_size=cfg.pomo_size,
+                pomo_size=train_pomo_size,
                 device=device,
                 num_episodes=cfg.num_validation_episodes,
                 batch_size=cfg.validation_batch_size,
@@ -1125,7 +1127,7 @@ def evaluate_po_baseline(
     main_valid_obj = _evaluate_tsp_model(
         model=model,
         problem_size=cfg.train_problem_size,
-        pomo_size=cfg.pomo_size,
+        pomo_size=train_pomo_size,
         device=device,
         num_episodes=cfg.num_validation_episodes,
         batch_size=cfg.validation_batch_size,
@@ -1137,7 +1139,7 @@ def evaluate_po_baseline(
         gen_obj = _evaluate_tsp_model(
             model=model,
             problem_size=size_int,
-            pomo_size=cfg.pomo_size,
+            pomo_size=resolve_pomo_size(cfg.pomo_size, size_int),
             device=device,
             num_episodes=cfg.num_validation_episodes,
             batch_size=cfg.validation_batch_size,
@@ -1225,6 +1227,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
     hf_epochs = int(cfg_yaml.get("hf_epochs", 0) or 0)
     hf_instances_per_epoch = int(cfg_yaml.get("hf_instances_per_epoch", 0) or 0)
+    pomo_size_yaml = cfg_yaml.get("pomo_size", None)
 
     hf_cfg = HighFidelityConfig(
         problem=cfg_yaml.get("problem", "tsp"),
@@ -1234,7 +1237,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         train_problem_size=int(cfg_yaml.get("train_problem_size", 20)),
         valid_problem_sizes=tuple(int(v) for v in cfg_yaml.get("valid_problem_sizes", [100])),
         train_batch_size=int(cfg_yaml.get("train_batch_size", 64)),
-        pomo_size=int(cfg_yaml.get("pomo_size", 64)),
+        pomo_size=int(pomo_size_yaml) if pomo_size_yaml is not None else None,
         learning_rate=float(cfg_yaml.get("learning_rate", 3e-4)),
         weight_decay=float(cfg_yaml.get("weight_decay", 1e-6)),
         alpha=float(cfg_yaml.get("alpha", 0.05)),
