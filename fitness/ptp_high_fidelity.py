@@ -70,7 +70,35 @@ class HighFidelityConfig:
     num_validation_episodes: int = 128
     validation_batch_size: int = 64
     generalization_penalty_weight: float = 1.0
+    size_aggregation: str = "cvar"  # one of: legacy, mean, cvar, worst
+    size_cvar_alpha: float = 0.2
     pool_version: str = "v0"
+
+
+def aggregate_objectives_by_size(
+    size_objectives: Mapping[int, float],
+    *,
+    method: str = "cvar",
+    cvar_alpha: float = 0.2,
+) -> float:
+    values = [float(v) for v in size_objectives.values()]
+    if not values:
+        return float("inf")
+
+    m = str(method or "cvar").strip().lower()
+    if m in {"legacy", "mean"}:
+        return float(sum(values) / len(values))
+    if m in {"worst", "max"}:
+        return float(max(values))
+    if m == "cvar":
+        alpha = float(cvar_alpha)
+        if not (0.0 < alpha <= 1.0):
+            alpha = 0.2
+        values_sorted = sorted(values, reverse=True)  # worst objectives first
+        k = max(1, int(math.ceil(alpha * len(values_sorted))))
+        return float(sum(values_sorted[:k]) / k)
+
+    raise ValueError(f"Unknown size aggregation method: {method}")
 
 
 def get_total_hf_train_steps(config: HighFidelityConfig) -> int:
@@ -455,7 +483,7 @@ def evaluate_ptp_dsl_high_fidelity(
                 float(loss_meter.avg),
             )
 
-    # Validation on the training scale.
+    # Evaluate on training and validation sizes.
     main_valid_obj = _evaluate_tsp_model(
         model=model,
         problem_size=config.train_problem_size,
@@ -465,11 +493,12 @@ def evaluate_ptp_dsl_high_fidelity(
         batch_size=config.validation_batch_size,
     )
 
-    # Generalization to larger problem sizes.
-    gen_objectives: Dict[int, float] = {}
+    size_objectives: Dict[int, float] = {int(config.train_problem_size): float(main_valid_obj)}
     for size in config.valid_problem_sizes:
         size_int = int(size)
-        gen_obj = _evaluate_tsp_model(
+        if size_int in size_objectives:
+            continue
+        size_objectives[size_int] = _evaluate_tsp_model(
             model=model,
             problem_size=size_int,
             pomo_size=config.pomo_size,
@@ -477,12 +506,20 @@ def evaluate_ptp_dsl_high_fidelity(
             num_episodes=config.num_validation_episodes,
             batch_size=config.validation_batch_size,
         )
-        gen_objectives[size_int] = gen_obj
 
+    gen_objectives = {k: v for k, v in size_objectives.items() if k != int(config.train_problem_size)}
     max_gen_obj = max(gen_objectives.values()) if gen_objectives else main_valid_obj
-    generalization_penalty = max(0.0, max_gen_obj - main_valid_obj)
+    generalization_penalty = max(0.0, float(max_gen_obj) - float(main_valid_obj))
 
-    hf_score = main_valid_obj + config.generalization_penalty_weight * generalization_penalty
+    agg_method = str(config.size_aggregation or "legacy").strip().lower()
+    if agg_method == "legacy":
+        hf_score = float(main_valid_obj) + config.generalization_penalty_weight * generalization_penalty
+    else:
+        hf_score = aggregate_objectives_by_size(
+            size_objectives,
+            method=agg_method,
+            cvar_alpha=float(config.size_cvar_alpha),
+        )
 
     logger.info(
         "HF evaluation complete: train_size=%d, valid_sizes=%s, "
@@ -499,6 +536,9 @@ def evaluate_ptp_dsl_high_fidelity(
         "validation_objective": main_valid_obj,
         "generalization_penalty": generalization_penalty,
         "generalization_objectives": gen_objectives,
+        "size_objectives": size_objectives,
+        "size_aggregation": agg_method,
+        "size_cvar_alpha": float(config.size_cvar_alpha),
         "train_score_mean": float(score_meter.avg),
         "train_loss_mean": float(loss_meter.avg),
         "config": asdict(config),

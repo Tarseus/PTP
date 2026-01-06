@@ -44,7 +44,10 @@ Optional exploration hint (do not treat as a hard constraint): you may decide wh
 Implementation notes (to avoid gate failures):
 - `log_prob_w` must correspond to the lower-cost solution and `log_prob_l` to the higher-cost solution.
 - If you scale or weight `log_prob_w - log_prob_l` or a margin using cost gaps or normalizations, ensure the scale is non-negative (e.g., apply `softplus` or `clamp(min=0)`).
-- Only read from `batch` the keys `cost_a`, `cost_b`, `log_prob_w`, `log_prob_l`, and optional `weight`. Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
+- Use only the declared inputs in `implementation_hint.expects`.
+  - If `implementation_hint.mode == "pairwise"`, read from `batch` only.
+  - If `implementation_hint.mode == "setwise"`, read from `model_output` only.
+  - Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
 
 **Output requirements:**
 - Output **must** be a single JSON object with fields:
@@ -57,8 +60,16 @@ Implementation notes (to avoid gate failures):
   - `implementation_hint` (with `expects` and `returns`)
   - `code` (Python implementation of the mutated loss function)
 - For `implementation_hint`:
-  - `expects` **must** be a JSON array of short input names **only**, and **must** be exactly: `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`.
-    Do **not** write descriptions or full sentences here. Do **not** use a single string or an object.
+  - It must include `mode` which is exactly one of: `"pairwise"` or `"setwise"`.
+  - `expects` must be a JSON array of short input names only.
+  - If `mode == "pairwise"`:
+    - `expects` must include `log_prob_w` and `log_prob_l`
+    - and must include at least one objective signal from: `delta_z`, `delta_rank`, `delta_regret`, `cost_a`, `cost_b`
+    - and must be a subset of: `["log_prob_w","log_prob_l","delta_z","delta_rank","delta_regret","cost_a","cost_b","weight"]`
+  - If `mode == "setwise"`:
+    - `expects` must include `log_prob`
+    - and must include at least one objective signal from: `obj_z`, `rank`, `regret`, `objective`
+    - and must be a subset of: `["objective","log_prob","obj_z","rank","regret"]`
   - `returns` **must** be exactly the string `"scalar"`.
 - For `code`:
   - It **must** define a function with the exact signature:
@@ -66,10 +77,8 @@ Implementation notes (to avoid gate failures):
     `def generated_loss(batch, model_output, extra):`
 
   - The function must:
-    - Read tensors from `batch`:
-      * `cost_a`, `cost_b` (shape [N])
-      * `log_prob_w`, `log_prob_l` (shape [N])
-      * optional `weight` (shape [N]) which may be None.
+    - If `mode == "pairwise"`, read tensors from `batch` (shape [N]) using `implementation_hint.expects`.
+    - If `mode == "setwise"`, read tensors from `model_output` (shape [B,K]) using `implementation_hint.expects`.
     - Optionally read hyperparameters from `hyperparams` and/or `extra`.
     - Use only PyTorch (`torch`), `torch.nn.functional as F`, and the whitelisted operators listed above.
     - Return a scalar tensor representing the mean loss over the batch.

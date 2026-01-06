@@ -28,7 +28,9 @@ Hard constraints:
 Implementation notes (to avoid gate failures):
 - `log_prob_w` corresponds to the lower-cost solution and `log_prob_l` to the higher-cost solution.
 - If you scale or weight `log_prob_w - log_prob_l` or margins using cost gaps, ensure the scale is non-negative.
-- Only read from `batch` the keys `cost_a`, `cost_b`, `log_prob_w`, `log_prob_l`, and optional `weight`.
+- Use only the declared inputs in `implementation_hint.expects`.
+  - If `implementation_hint.mode == "pairwise"`, read from `batch` only.
+  - If `implementation_hint.mode == "setwise"`, read from `model_output` only.
 
 In `intuition`, start with a single sentence prefixed exactly as:
 - `Common idea:` (one sentence)
@@ -44,9 +46,10 @@ Then add a short description of the child and include `Mode: combine` / `Mode: r
   - `theoretical_basis` (string, English only)
   - `implementation_hint` (object with `expects` and `returns`)
   - `code` (string: valid Python source for `generated_loss`)
-- `implementation_hint.expects` must be exactly: `["cost_a","cost_b","log_prob_w","log_prob_l"]`
+- `implementation_hint` must include `mode` which is one of `"pairwise"` or `"setwise"`, and `expects` must follow that mode's contract:
+  - Pairwise expects subset: `["log_prob_w","log_prob_l","delta_z","delta_rank","delta_regret","cost_a","cost_b","weight"]`
+  - Setwise expects subset: `["objective","log_prob","obj_z","rank","regret"]`
 - `implementation_hint.returns` must be exactly: `"scalar"`
 - `code` must define: `def generated_loss(batch, model_output, extra):` and return a scalar mean loss tensor.
 - Do not wrap code in Markdown fences; encode as a normal JSON string with escaped newlines (`\\n`).
 - Return only the JSON object, with no extra text.
-

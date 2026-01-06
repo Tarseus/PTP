@@ -12,6 +12,7 @@ LOGGER = logging.getLogger("ptp_discovery.free_loss_ir")
 class FreeLossImplementationHint:
     expects: Sequence[str]
     returns: str
+    mode: str = "pairwise"
 
 
 @dataclass
@@ -87,10 +88,15 @@ def ir_from_json(obj: Mapping[str, Any]) -> FreeLossIR:
         expects = [str(expects_raw)]
 
     returns = str(impl_raw.get("returns", "")).strip()
+    mode_raw = str(impl_raw.get("mode", "")).strip().lower()
+    if mode_raw not in {"", "pairwise", "setwise"}:
+        LOGGER.debug("implementation_hint.mode invalid; raw=%r", mode_raw)
+        mode_raw = ""
 
     impl = FreeLossImplementationHint(
         expects=expects,
         returns=returns or "scalar",
+        mode=mode_raw or "pairwise",
     )
 
     return FreeLossIR(

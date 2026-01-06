@@ -24,7 +24,10 @@ Hard constraints:
 Implementation notes (to avoid gate failures):
 - `log_prob_w` must correspond to the lower-cost solution and `log_prob_l` to the higher-cost solution.
 - If you scale or weight `log_prob_w - log_prob_l` or a margin using cost gaps or normalizations, ensure the scale is non-negative (e.g., apply `softplus` or `clamp(min=0)`).
-- Only read from `batch` the keys `cost_a`, `cost_b`, `log_prob_w`, `log_prob_l`, and optional `weight`. Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
+- Use only the declared inputs in `implementation_hint.expects`.
+  - If `implementation_hint.mode == "pairwise"`, read from `batch` only.
+  - If `implementation_hint.mode == "setwise"`, read from `model_output` only.
+  - Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
 
 **Output requirements:**
 - Output **must** be a single JSON object that is a repaired version of the candidate IR, with fields:
@@ -36,8 +39,9 @@ Implementation notes (to avoid gate failures):
   - `implementation_hint` (with `expects` and `returns`)
   - `code` (Python implementation of the repaired loss function)
 - For `implementation_hint`:
-  - `expects` **must** be a JSON array of short input names **only**, and **must** be exactly: `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`.
-    Do **not** write descriptions or full sentences here. Do **not** use a single string or an object.
+  - It must include `mode` which is exactly one of: `"pairwise"` or `"setwise"`.
+  - `expects` must be a JSON array of short input names only.
+  - If the failure is about missing/invalid inputs, you may adjust `mode`/`expects` minimally to match the code and satisfy gates.
   - `returns` **must** be exactly the string `"scalar"`.
 - All text fields must be in **English only**.
 

@@ -32,9 +32,13 @@ from fitness.ptp_high_fidelity import (
 from ptp_discovery.free_loss_compiler import CompileError
 from ptp_discovery.free_loss_gates import (
     DynamicGateResult,
+    AffineInvarianceGateResult,
+    ObjectiveSensitivityGateResult,
     PreferenceSemanticGateResult,
     StaticGateResult,
+    run_affine_invariance_gate,
     run_dynamic_gates,
+    run_objective_sensitivity_gate,
     run_preference_semantic_gates,
     run_static_gates,
 )
@@ -58,7 +62,6 @@ from torch.optim import Adam
 
 
 LOGGER = logging.getLogger("ptp_discovery.free_loss_eoh")
-_REQUIRED_BATCH_KEYS = ("cost_a", "cost_b", "log_prob_w", "log_prob_l")
 
 
 def _classify_failure(stage: str, reason: str) -> str:
@@ -108,6 +111,10 @@ def _classify_failure(stage: str, reason: str) -> str:
             return "E_PREF_SEMANTIC"
         if "pref_" in msg:
             return "E_PREF_SEMANTIC"
+        if "insensitive_to_objective" in msg:
+            return "E_CO_SENSITIVITY"
+        if "affine_invariance_violation" in msg:
+            return "E_CO_INVARIANCE"
         if "loss is not finite" in msg:
             return "E_RUNTIME_NAN_LOSS"
         if "nan/inf in gradients" in msg:
@@ -1138,8 +1145,12 @@ def evaluate_po_baseline(
         gen_objectives[size_int] = gen_obj
     t_eval_end = time.perf_counter()
 
+    size_objectives: Dict[int, float] = {int(cfg.train_problem_size): float(main_valid_obj)}
+    for size_int, obj in gen_objectives.items():
+        size_objectives[int(size_int)] = float(obj)
+
     max_gen_obj = max(gen_objectives.values()) if gen_objectives else main_valid_obj
-    generalization_penalty = max(0.0, max_gen_obj - main_valid_obj)
+    generalization_penalty = max(0.0, float(max_gen_obj) - float(main_valid_obj))
 
     epoch_objective_mean: float | None = None
     if epoch_validation_objectives:
@@ -1147,11 +1158,20 @@ def evaluate_po_baseline(
             sum(epoch_validation_objectives) / len(epoch_validation_objectives)
         )
 
-    base_objective = (
-        epoch_objective_mean if epoch_objective_mean is not None else main_valid_obj
-    )
-    hf_score = main_valid_obj + cfg.generalization_penalty_weight * generalization_penalty
-    fitness_score = base_objective + cfg.generalization_penalty_weight * generalization_penalty
+    agg_method = str(getattr(cfg, "size_aggregation", "legacy") or "legacy").strip().lower()
+    base_objective = epoch_objective_mean if epoch_objective_mean is not None else float(main_valid_obj)
+    if agg_method == "legacy":
+        hf_score = float(main_valid_obj) + cfg.generalization_penalty_weight * generalization_penalty
+        fitness_score = base_objective + cfg.generalization_penalty_weight * generalization_penalty
+    else:
+        from fitness.ptp_high_fidelity import aggregate_objectives_by_size  # local import to avoid circularity
+
+        hf_score = aggregate_objectives_by_size(
+            size_objectives,
+            method=agg_method,
+            cvar_alpha=float(getattr(cfg, "size_cvar_alpha", 0.2)),
+        )
+        fitness_score = float(hf_score)
 
     LOGGER.info(
         "Baseline PO timing: init=%.3fs, train=%.3fs, eval=%.3fs",
@@ -1166,6 +1186,9 @@ def evaluate_po_baseline(
         "validation_objective": main_valid_obj,
         "generalization_penalty": generalization_penalty,
         "generalization_objectives": gen_objectives,
+        "size_objectives": size_objectives,
+        "size_aggregation": agg_method,
+        "size_cvar_alpha": float(getattr(cfg, "size_cvar_alpha", 0.2)),
         "train_score_mean": float(score_meter.avg),
         "train_loss_mean": float(loss_meter.avg),
         "early_validation_objective": early_validation_objective,
@@ -1220,7 +1243,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         num_validation_episodes=int(cfg_yaml.get("num_validation_episodes", 128)),
         validation_batch_size=int(cfg_yaml.get("validation_batch_size", 64)),
         generalization_penalty_weight=float(cfg_yaml.get("generalization_penalty_weight", 1.0)),
-        pool_version="v0",
+        size_aggregation=str(cfg_yaml.get("size_aggregation", "cvar")),
+        size_cvar_alpha=float(cfg_yaml.get("size_cvar_alpha", 0.2)),
+        pool_version=str(cfg_yaml.get("pool_version", "v0")),
     )
 
     free_cfg = FreeLossFidelityConfig(
@@ -1708,19 +1733,38 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                         eval_type="argmax",
                     )
 
-                    dummy_batch = {
-                        "cost_a": torch.zeros(16),
-                        "cost_b": torch.ones(16),
-                        "log_prob_w": torch.zeros(16),
-                        "log_prob_l": torch.zeros(16),
-                    }
+                    mode = str(getattr(ir.implementation_hint, "mode", "pairwise") or "pairwise").strip().lower()
+                    expects = [str(x) for x in (ir.implementation_hint.expects or [])]
+
+                    dummy_model_output: Dict[str, torch.Tensor] = {}
+                    dummy_batch: Dict[str, torch.Tensor] = {}
+                    if mode == "setwise":
+                        from fitness.co_features import build_model_output  # local import to keep gates lightweight
+
+                        objective = torch.rand(4, 8)
+                        log_prob = torch.rand(4, 8) * -8.0
+                        dummy_model_output, _ = build_model_output(objective=objective, log_prob=log_prob)
+                    else:
+                        full_dummy = {
+                            "cost_a": torch.zeros(16),
+                            "cost_b": torch.ones(16),
+                            "log_prob_w": torch.zeros(16),
+                            "log_prob_l": torch.zeros(16),
+                            "delta_z": torch.ones(16),
+                            "delta_rank": torch.ones(16),
+                            "delta_regret": torch.ones(16),
+                            "weight": torch.ones(16),
+                        }
+                        dummy_batch = {k: full_dummy[k] for k in expects if k in full_dummy}
+                        if not dummy_batch:
+                            dummy_batch = dict(full_dummy)
 
                     dyn_res: DynamicGateResult
                     dyn_res = run_dynamic_gates(
                         compiled,
                         batch=dummy_batch,
+                        model_output=dummy_model_output,
                         model=model,
-                        required_batch_keys=_REQUIRED_BATCH_KEYS,
                         grad_norm_max=float(cfg_yaml.get("grad_norm_max", 10.0)),
                         loss_soft_min=float(cfg_yaml.get("loss_soft_min", -5.0)),
                         loss_soft_max=float(cfg_yaml.get("loss_soft_max", 5.0)),
@@ -1837,6 +1881,104 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                             str(dyn_res.grad_norm),
                         )
                         break
+
+                    co_gate_enabled = bool(cfg_yaml.get("co_gate_enabled", True))
+                    if co_gate_enabled:
+                        sens_res: ObjectiveSensitivityGateResult = run_objective_sensitivity_gate(
+                            compiled,
+                            min_abs_delta=float(cfg_yaml.get("co_sensitivity_min_abs_delta", 1e-3)),
+                            min_rel_delta=float(cfg_yaml.get("co_sensitivity_min_rel_delta", 1e-2)),
+                        )
+                        inv_res: AffineInvarianceGateResult = run_affine_invariance_gate(
+                            compiled,
+                            max_abs_delta=float(cfg_yaml.get("co_invariance_max_abs_delta", 1e-3)),
+                            max_rel_delta=float(cfg_yaml.get("co_invariance_max_rel_delta", 1e-2)),
+                        )
+                        gate_entry.update(
+                            {
+                                "co_enabled": True,
+                                "co_sensitivity_ok": sens_res.ok,
+                                "co_sensitivity_reason": sens_res.reason,
+                                "co_sensitivity_abs_delta": sens_res.abs_delta,
+                                "co_sensitivity_rel_delta": sens_res.rel_delta,
+                                "co_invariance_ok": inv_res.ok,
+                                "co_invariance_reason": inv_res.reason,
+                                "co_invariance_abs_delta": inv_res.abs_delta,
+                                "co_invariance_rel_delta": inv_res.rel_delta,
+                            }
+                        )
+                        if not sens_res.ok or not inv_res.ok:
+                            reason = sens_res.reason if not sens_res.ok else inv_res.reason
+                            gate_entry["dynamic_ok"] = False
+                            gate_entry["dynamic_reason"] = reason
+                            gate_entry["dynamic_error_code"] = _classify_failure("dynamic", reason)
+                            gates_log.append(gate_entry)
+                            if attempt < max_repair_rounds and (repair_prompt or m3_prompt):
+                                LOGGER.warning(
+                                    "CO gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
+                                    "attempting repair (repair_round=%d/%d)",
+                                    gen,
+                                    idx,
+                                    ir.name,
+                                    reason,
+                                    attempt + 1,
+                                    max_repair_rounds,
+                                )
+                                try:
+                                    failure_payload = _build_failure_payload(
+                                        generation=gen,
+                                        index=idx,
+                                        attempt=attempt,
+                                        stage="dynamic_gate",
+                                        code=gate_entry.get("dynamic_error_code", "E_DYNAMIC_OTHER"),
+                                        message=reason,
+                                        extra={
+                                            "sensitivity": {
+                                                "ok": sens_res.ok,
+                                                "abs_delta": sens_res.abs_delta,
+                                                "rel_delta": sens_res.rel_delta,
+                                            },
+                                            "invariance": {
+                                                "ok": inv_res.ok,
+                                                "abs_delta": inv_res.abs_delta,
+                                                "rel_delta": inv_res.rel_delta,
+                                            },
+                                        },
+                                    )
+
+                                    if m3_prompt:
+                                        try:
+                                            ir = m3_simplify_loss(
+                                                m3_prompt,
+                                                ir,
+                                                failure_payload,
+                                                global_feedback=global_feedback,
+                                            )
+                                            llm_op = "M3_REPAIR"
+                                            continue
+                                        except Exception as exc:  # noqa: BLE001
+                                            LOGGER.warning(
+                                                "Failed to simplify (M3) for gen=%d, idx=%d: %s",
+                                                gen,
+                                                idx,
+                                                exc,
+                                            )
+
+                                    if repair_prompt:
+                                        ir = repair_free_loss(repair_prompt, ir, failure_payload)
+                                        llm_op = "REPAIR"
+                                        continue
+                                except Exception as exc:  # noqa: BLE001
+                                    LOGGER.warning(
+                                        "Failed to repair CO gate error for gen=%d, idx=%d: %s",
+                                        gen,
+                                        idx,
+                                        exc,
+                                    )
+                            dynamic_fail += 1
+                            break
+                    else:
+                        gate_entry["co_enabled"] = False
 
                     pref_res: PreferenceSemanticGateResult | None = None
                     if pref_semantic_gate_enabled:

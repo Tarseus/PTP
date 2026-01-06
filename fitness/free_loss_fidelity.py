@@ -7,10 +7,12 @@ import logging
 import torch
 from torch.optim import Adam
 
+from .co_features import build_model_output, gather_pairwise_deltas
 from .ptp_high_fidelity import (
     HighFidelityConfig,
     _set_seed,
     _evaluate_tsp_model,
+    aggregate_objectives_by_size,
     get_hf_epoch_plan,
     get_total_hf_train_steps,
 )
@@ -83,9 +85,20 @@ def _train_one_batch_with_free_loss(
     objective = -reward  # (batch, pomo)
     log_prob = torch.log(prob_list + 1e-8).sum(dim=2)  # (batch, pomo)
 
+    model_output, co_features = build_model_output(objective=objective, log_prob=log_prob)
+
     (b_idx, winner_idx, loser_idx), pair_count = _build_preference_pairs(objective)
 
-    if pair_count == 0:
+    mode = getattr(compiled_loss.ir.implementation_hint, "mode", "pairwise")
+    mode = str(mode or "pairwise").strip().lower()
+
+    if mode == "setwise":
+        loss = compiled_loss.loss_fn(
+            batch={},
+            model_output=model_output,
+            extra={"alpha": hf_cfg.alpha},
+        )
+    elif pair_count == 0:
         # Fallback to a simple policy-gradient-style loss when no preference
         # pairs exist. This keeps training stable without imposing additional
         # theoretical structure beyond the candidate loss itself.
@@ -98,15 +111,20 @@ def _train_one_batch_with_free_loss(
         logp_w_tensor = log_prob[b_idx, winner_idx]
         logp_l_tensor = log_prob[b_idx, loser_idx]
 
+        pairwise_deltas = gather_pairwise_deltas(
+            co_features, b_idx=b_idx, winner_idx=winner_idx, loser_idx=loser_idx
+        )
         batch = {
             "cost_a": cost_a_tensor,
             "cost_b": cost_b_tensor,
             "log_prob_w": logp_w_tensor,
             "log_prob_l": logp_l_tensor,
+            **pairwise_deltas,
+            "weight": torch.ones_like(logp_w_tensor),
         }
         loss = compiled_loss.loss_fn(
             batch=batch,
-            model_output={},
+            model_output=model_output,
             extra={"alpha": hf_cfg.alpha},
         )
 
@@ -290,10 +308,12 @@ def evaluate_free_loss_candidate(
             batch_size=cfg.hf.validation_batch_size,
         )
 
-    gen_objectives: Dict[int, float] = {}
+    size_objectives: Dict[int, float] = {int(cfg.hf.train_problem_size): float(main_valid_obj)}
     for size in cfg.hf.valid_problem_sizes:
         size_int = int(size)
-        gen_obj = _evaluate_tsp_model(
+        if size_int in size_objectives:
+            continue
+        size_objectives[size_int] = _evaluate_tsp_model(
             model=model,
             problem_size=size_int,
             pomo_size=cfg.hf.pomo_size,
@@ -301,7 +321,9 @@ def evaluate_free_loss_candidate(
             num_episodes=cfg.hf.num_validation_episodes,
             batch_size=cfg.hf.validation_batch_size,
         )
-        gen_objectives[size_int] = gen_obj
+    gen_objectives = {
+        k: v for k, v in size_objectives.items() if k != int(cfg.hf.train_problem_size)
+    }
     t_eval_end = _time.perf_counter()
 
     max_gen_obj = max(gen_objectives.values()) if gen_objectives else main_valid_obj
@@ -328,10 +350,16 @@ def evaluate_free_loss_candidate(
         epoch_baseline_violations = int(violations)
         epoch_better_than_baseline = epoch_baseline_violations == 0
 
-    base_objective = (
-        epoch_objective_mean if epoch_objective_mean is not None else main_valid_obj
-    )
-    hf_like_score = base_objective + cfg.hf.generalization_penalty_weight * generalization_penalty
+    agg_method = str(cfg.hf.size_aggregation or "legacy").strip().lower()
+    base_objective = epoch_objective_mean if epoch_objective_mean is not None else float(main_valid_obj)
+    if agg_method == "legacy":
+        hf_like_score = base_objective + cfg.hf.generalization_penalty_weight * generalization_penalty
+    else:
+        hf_like_score = aggregate_objectives_by_size(
+            size_objectives,
+            method=agg_method,
+            cvar_alpha=float(cfg.hf.size_cvar_alpha),
+        )
     if epoch_baseline_violations is not None:
         hf_like_score += cfg.baseline_epoch_violation_weight * float(epoch_baseline_violations)
 
@@ -347,6 +375,9 @@ def evaluate_free_loss_candidate(
         "validation_objective": main_valid_obj,
         "generalization_penalty": generalization_penalty,
         "generalization_objectives": gen_objectives,
+        "size_objectives": size_objectives,
+        "size_aggregation": agg_method,
+        "size_cvar_alpha": float(cfg.hf.size_cvar_alpha),
         "epoch_objective_mean": epoch_objective_mean,
         "epoch_baseline_violations": epoch_baseline_violations,
         "epoch_better_than_baseline": epoch_better_than_baseline,

@@ -26,7 +26,4 @@ In `intuition`, include `Mode: refine` and a single sentence stating what you tu
 - Output must be a single JSON object with fields:
   - `name`, `intuition`, `pseudocode`, `hyperparams`, `operators_used`, `theoretical_basis`,
     `implementation_hint`, `code`
-- `implementation_hint.expects` must be exactly: `["cost_a","cost_b","log_prob_w","log_prob_l"]`
-- `implementation_hint.returns` must be exactly: `"scalar"`
 - Return only the JSON object, no extra text.
-

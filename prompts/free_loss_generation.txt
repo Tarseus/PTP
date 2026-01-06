@@ -6,14 +6,20 @@ You may freely design the loss structure and are **not** restricted to Bradley�
 3. It must be numerically stable: extreme Δcost or logits must not produce NaN/Inf.
 
 Setting:
-- You consider a pair of solutions (a, b) for the same instance.
-- `cost(a)` and `cost(b)` are scalar objective values (lower is better).
-- The model produces log probabilities `logp(a)` and `logp(b)`.
+- You may propose either a **pairwise** loss (on winner/loser pairs) or a **setwise** loss (on the full set of K rollouts).
+- The model produces log probabilities (`log_prob`) for sampled solutions.
+- The environment produces objective values (`objective`, lower is better).
+- The system also provides **dimensionless CO features** derived from objective values:
+  - pairwise: `delta_z`, `delta_rank`, `delta_regret` (loser - winner)
+  - setwise: `obj_z`, `rank`, `regret`
 - You may use any differentiable tensor operations available in PyTorch (`torch`, `torch.nn.functional`). The following operators are particularly relevant and well-tested for this task (but not mandatory): `logsigmoid`, `softplus`, `sigmoid`, `exp`, `log`, `tanh`, `relu`, `clamp`, `normalize`, `zscore`, `rank_gap`.
 Important implementation notes (to avoid gate failures):
 - `log_prob_w` must correspond to the lower-cost solution and `log_prob_l` to the higher-cost solution.
 - If you scale or weight `log_prob_w - log_prob_l` or a margin using cost gaps or normalizations, ensure the scale is non-negative (e.g., apply `softplus` or `clamp(min=0)`).
-- Only read from `batch` the keys `cost_a`, `cost_b`, `log_prob_w`, `log_prob_l`, and optional `weight`. Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
+- Use only the declared inputs in `implementation_hint.expects`:
+  - If `implementation_hint.mode == "pairwise"`, read from `batch` only (do not use `model_output`).
+  - If `implementation_hint.mode == "setwise"`, read from `model_output` only (use `batch` as empty).
+  - Do NOT access `batch['ops']` or `batch['torch']`; `ops` and `torch` are globals.
 
 The baseline preference loss used in our method is derived from an entropy-regularized RL objective and can be viewed as a Bradley–Terry / logistic-style loss on the log-probability difference `logp(a) - logp(b)` with a temperature parameter and a margin that depends on the cost gap. Your proposed loss should be **theoretically compatible** with this family, in the sense that:
 - It can be interpreted as optimizing a probabilistic preference model where the probability that `a` is preferred over `b` is a monotone function of `logp(a) - logp(b)` and the cost difference.
@@ -55,8 +61,16 @@ In the `intuition` field, explicitly mention which mode you conceptually followe
   - `implementation_hint` (JSON object with `expects` and `returns`)
   - `code` (string containing valid Python source code for the loss function)
 - For `implementation_hint`:
-  - `expects` **must** be a JSON array of short input names **only**, and **must** be exactly: `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`.
-    Do **not** write descriptions or full sentences here. Do **not** use a single string or an object.
+  - It must include `mode` which is exactly one of: `"pairwise"` or `"setwise"`.
+  - `expects` must be a JSON array of short input names only (no sentences, no objects).
+  - If `mode == "pairwise"`:
+    - `expects` must include `log_prob_w` and `log_prob_l`
+    - and must include at least one objective signal from: `delta_z`, `delta_rank`, `delta_regret`, `cost_a`, `cost_b`
+    - and must be a subset of: `["log_prob_w","log_prob_l","delta_z","delta_rank","delta_regret","cost_a","cost_b","weight"]`
+  - If `mode == "setwise"`:
+    - `expects` must include `log_prob`
+    - and must include at least one objective signal from: `obj_z`, `rank`, `regret`, `objective`
+    - and must be a subset of: `["objective","log_prob","obj_z","rank","regret"]`
   - `returns` **must** be exactly the string `"scalar"`.
 - For `code`:
   - It **must** define a function with the exact signature:
@@ -64,10 +78,13 @@ In the `intuition` field, explicitly mention which mode you conceptually followe
     `def generated_loss(batch, model_output, extra):`
 
   - The function must:
-    - Read tensors from `batch`:
-      * `cost_a`, `cost_b` (shape [N])
-      * `log_prob_w`, `log_prob_l` (shape [N])
-      * optional `weight` (shape [N]) which may be None.
+    - If `mode == "pairwise"`, read tensors from `batch` (shape [N]):
+      * required: `log_prob_w`, `log_prob_l`
+      * objective signals: one or more of `delta_z`, `delta_rank`, `delta_regret`, `cost_a`, `cost_b`
+      * optional: `weight`
+    - If `mode == "setwise"`, read tensors from `model_output` (shape [B,K]):
+      * required: `log_prob`
+      * objective signals: one or more of `obj_z`, `rank`, `regret` (using raw `objective` is allowed but discouraged for invariance)
     - Optionally read hyperparameters from `hyperparams` and/or `extra` (e.g. `alpha`).
     - Use only PyTorch (`torch`), `torch.nn.functional as F`, and standard differentiable tensor operations; do **not** use non-numerical APIs such as file I/O, subprocesses, networking, or reflection.
     - Return a **scalar tensor** representing the mean loss over the batch.
@@ -76,8 +93,8 @@ In the `intuition` field, explicitly mention which mode you conceptually followe
 
 Return **only** the JSON object, with no extra explanation or Markdown code fences, and use **English only** in all string fields.
 
-Minimal valid example (structure only, keep your own content):
-{"name":"MinimalLogsigmoidLoss","intuition":"Mode: explore. Minimal baseline-consistent loss.","pseudocode":"Compute delta = log_prob_w - log_prob_l; loss = -logsigmoid(delta).","hyperparams":{},"operators_used":["logsigmoid"],"theoretical_basis":"Bradley-Terry logistic preference model.","implementation_hint":{"expects":["cost_a","cost_b","log_prob_w","log_prob_l"],"returns":"scalar"},"code":"def generated_loss(batch, model_output, extra):\\n    log_prob_w = batch['log_prob_w']\\n    log_prob_l = batch['log_prob_l']\\n    delta = log_prob_w - log_prob_l\\n    loss = -F.logsigmoid(delta)\\n    return loss.mean()"}
+Minimal valid example (pairwise; structure only, keep your own content):
+{"name":"MinimalDeltaZLoss","intuition":"Mode: explore. Minimal CO-aligned pairwise loss using dimensionless delta_z.","pseudocode":"Compute delta = log_prob_w - log_prob_l; loss = -logsigmoid(delta - margin * delta_z).","hyperparams":{"margin":0.5},"operators_used":["logsigmoid","clamp"],"theoretical_basis":"Logistic preference model with dimensionless margin shaping.","implementation_hint":{"mode":"pairwise","expects":["log_prob_w","log_prob_l","delta_z"],"returns":"scalar"},"code":"def generated_loss(batch, model_output, extra):\\n    log_prob_w = batch['log_prob_w']\\n    log_prob_l = batch['log_prob_l']\\n    delta_z = batch['delta_z']\\n    margin = float(extra.get('hyperparams', {}).get('margin', 0.5))\\n    x = (log_prob_w - log_prob_l) - margin * delta_z\\n    loss = -F.logsigmoid(x)\\n    return loss.mean()"}
 
 Common mistakes to avoid:
 - Do NOT define generated_loss with positional args like generated_loss(cost_a, cost_b, ...).

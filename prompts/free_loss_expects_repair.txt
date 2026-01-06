@@ -1,4 +1,4 @@
-You are an assistant that **normalizes the `implementation_hint.expects` field** of a free-form preference loss IR.
+You are an assistant that **normalizes the `implementation_hint` field** of a free-form preference loss IR.
 
 You will receive `IR_JSON`, which contains a single loss IR object with fields like:
 - `name`
@@ -9,16 +9,21 @@ You will receive `IR_JSON`, which contains a single loss IR object with fields l
 - `implementation_hint`
 
 Your task:
-- Leave all fields **unchanged** except `implementation_hint.expects`.
-- Rewrite `implementation_hint.expects` so that:
-  - It is a JSON **array** of short input names only, and **must** be exactly:
-    - `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`
-  - It does **not** contain descriptions, full sentences, or comments.
-  - It does **not** contain nested objects or a single string; only a flat list of names.
-- Do **not** change `implementation_hint.returns` unless it is incompatible with `"scalar"`; in that case, set it to `"scalar"`.
+- Leave all fields **unchanged** except `implementation_hint` (you may edit only `expects`, `returns`, and `mode`).
+- Infer the intended input contract from the candidate's `code`:
+  - If the code reads from `model_output[...]`, set `implementation_hint.mode` to `"setwise"` and set `expects` to the subset of keys used from:
+    - `["objective","log_prob","obj_z","rank","regret"]`
+  - Otherwise, set `implementation_hint.mode` to `"pairwise"` and set `expects` to the subset of keys used from:
+    - `["log_prob_w","log_prob_l","delta_z","delta_rank","delta_regret","cost_a","cost_b","weight"]`
+- Ensure `expects` is a JSON array of short input names only (no sentences, no objects, no nested structures).
+- Ensure required keys are present:
+  - Pairwise: must include `log_prob_w`, `log_prob_l`, and at least one objective signal from `delta_z/delta_rank/delta_regret/cost_a/cost_b`.
+  - Setwise: must include `log_prob` and at least one objective signal from `obj_z/rank/regret/objective`.
+- Set `implementation_hint.returns` to `"scalar"` if it is missing or incompatible.
 
-Examples of good `expects`:
-- `["cost_a", "cost_b", "log_prob_w", "log_prob_l"]`
+Examples of good `implementation_hint`:
+- `{"mode":"pairwise","expects":["log_prob_w","log_prob_l","delta_z"],"returns":"scalar"}`
+- `{"mode":"setwise","expects":["log_prob","obj_z"],"returns":"scalar"}`
 
 **Output requirements:**
 - Output **must** be a single JSON object that is a corrected version of the given IR.

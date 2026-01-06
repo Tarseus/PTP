@@ -51,6 +51,13 @@ device: cuda
 num_validation_episodes: 10000
 validation_batch_size: 64
 generalization_penalty_weight: 1.0
+# Cross-size aggregation of evaluation objectives.
+# - legacy: train_size objective + (max(valid)-train_size) penalty (previous behavior)
+# - cvar: CVaR over sizes (worst-tail average; CO-aligned robustness)
+# - worst: worst-case size objective
+# - mean: mean over sizes
+size_aggregation: cvar
+size_cvar_alpha: 0.2
 baseline_epoch_violation_weight: 0.0
 pref_semantic_gate_enabled: true
 pref_semantic_trials: 6
@@ -58,6 +65,13 @@ pref_semantic_batch_size: 128
 pref_semantic_min_pass_rate: 0.5
 pref_semantic_swap_tolerance: 0.01
 pref_semantic_gap_min_ratio: 0.5
+
+# CO-alignment gates (enabled by default).
+co_gate_enabled: true
+co_sensitivity_min_abs_delta: 0.001
+co_sensitivity_min_rel_delta: 0.01
+co_invariance_max_abs_delta: 0.001
+co_invariance_max_rel_delta: 0.01
 
 # Gate thresholds for dynamic checks.
 grad_norm_max: 10.0

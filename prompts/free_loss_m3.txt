@@ -12,10 +12,9 @@ Goal (M3):
   - adding minimal, targeted stability (clamp/softplus/eps) if needed.
 
 Strict constraints:
-- Preserve `implementation_hint.expects` exactly: `["cost_a","cost_b","log_prob_w","log_prob_l"]`
-- Preserve `implementation_hint.returns` exactly: `"scalar"`
+- Preserve `implementation_hint` exactly (including `mode`, `expects`, and `returns`).
 - Keep the loss differentiable and numerically stable (no NaN/Inf).
-- Only read from `batch` the keys `cost_a`, `cost_b`, `log_prob_w`, `log_prob_l`, and optional `weight`.
+- Only read inputs that are declared in `implementation_hint.expects` (from `batch` if pairwise, from `model_output` if setwise).
 
 In `intuition`, include `Mode: simplify` and explicitly mention what you removed/merged and how it addresses the failure.
 
@@ -25,4 +24,3 @@ In `intuition`, include `Mode: simplify` and explicitly mention what you removed
     `implementation_hint`, `code`
 - Do not wrap code in Markdown fences; encode it as a JSON string with escaped newlines (`\\n`).
 - Return only the JSON object, no extra text.
-
