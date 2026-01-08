@@ -224,6 +224,11 @@ def run_dynamic_gates(
                 ok=False,
                 reason=f"loss_not_tensor: {type(loss)}",
             )
+        if loss.numel() != 1:
+            return DynamicGateResult(
+                ok=False,
+                reason=f"loss_not_scalar: shape={tuple(loss.shape)}",
+            )
     except KeyError as exc:
         return DynamicGateResult(ok=False, reason=f"missing_batch_key: {exc}")
     except NameError as exc:
@@ -231,7 +236,7 @@ def run_dynamic_gates(
     except Exception as exc:  # noqa: BLE001
         return DynamicGateResult(ok=False, reason=f"forward_error: {exc}")
 
-    if not torch.isfinite(loss):
+    if not torch.isfinite(loss).all().item():
         return DynamicGateResult(ok=False, reason="loss is not finite.")
 
     # Some candidate losses may not depend on model parameters for this
@@ -348,10 +353,15 @@ def run_preference_semantic_gates(
                     ok=False,
                     reason=f"pref_loss_not_tensor: {type(loss)}",
                 )
+            if loss.numel() != 1:
+                return PreferenceSemanticGateResult(
+                    ok=False,
+                    reason=f"pref_loss_not_scalar: shape={tuple(loss.shape)}",
+                )
         except Exception as exc:  # noqa: BLE001
             return PreferenceSemanticGateResult(ok=False, reason=f"pref_forward_error: {exc}")
 
-        if not torch.isfinite(loss):
+        if not torch.isfinite(loss).all().item():
             return PreferenceSemanticGateResult(ok=False, reason="pref_loss_not_finite")
 
         grad_w, grad_l = torch.autograd.grad(
@@ -385,10 +395,15 @@ def run_preference_semantic_gates(
                     ok=False,
                     reason=f"pref_loss_not_tensor: {type(swap_loss)}",
                 )
+            if swap_loss.numel() != 1:
+                return PreferenceSemanticGateResult(
+                    ok=False,
+                    reason=f"pref_loss_not_scalar: shape={tuple(swap_loss.shape)}",
+                )
         except Exception as exc:  # noqa: BLE001
             return PreferenceSemanticGateResult(ok=False, reason=f"pref_swap_error: {exc}")
         swap_total += 1
-        if torch.isfinite(swap_loss) and (swap_loss.item() + swap_tolerance >= loss.item()):
+        if torch.isfinite(swap_loss).all().item() and (swap_loss.item() + swap_tolerance >= loss.item()):
             swap_ok += 1
 
         # Gap response: larger gaps should not reduce gradient magnitude on average.
@@ -433,20 +448,30 @@ def run_preference_semantic_gates(
                     ok=False,
                     reason="pref_loss_not_tensor",
                 )
+            if loss_small.numel() != 1 or loss_large.numel() != 1:
+                return PreferenceSemanticGateResult(
+                    ok=False,
+                    reason=f"pref_loss_not_scalar: shape_small={tuple(loss_small.shape)} shape_large={tuple(loss_large.shape)}",
+                )
+            if not torch.isfinite(loss_small).all().item() or not torch.isfinite(loss_large).all().item():
+                return PreferenceSemanticGateResult(ok=False, reason="pref_loss_not_finite")
         except Exception as exc:  # noqa: BLE001
             return PreferenceSemanticGateResult(ok=False, reason=f"pref_gap_error: {exc}")
 
-        grad_small = torch.autograd.grad(
-            loss_small,
-            [log_prob_w2, log_prob_l2],
-            allow_unused=True,
-            retain_graph=True,
-        )
-        grad_large = torch.autograd.grad(
-            loss_large,
-            [log_prob_w2, log_prob_l2],
-            allow_unused=True,
-        )
+        try:
+            grad_small = torch.autograd.grad(
+                loss_small,
+                [log_prob_w2, log_prob_l2],
+                allow_unused=True,
+                retain_graph=True,
+            )
+            grad_large = torch.autograd.grad(
+                loss_large,
+                [log_prob_w2, log_prob_l2],
+                allow_unused=True,
+            )
+        except Exception as exc:  # noqa: BLE001
+            return PreferenceSemanticGateResult(ok=False, reason=f"pref_gap_grad_error: {exc}")
         if grad_small[0] is None or grad_small[1] is None:
             return PreferenceSemanticGateResult(ok=False, reason="pref_gap_grad_missing")
         if grad_large[0] is None or grad_large[1] is None:
@@ -581,7 +606,14 @@ def run_objective_sensitivity_gate(
             loss_1 = _loss_value(compiled, batch={}, model_output=out_1)
             loss_2 = _loss_value(compiled, batch={}, model_output=out_2)
 
-        if not torch.isfinite(loss_1) or not torch.isfinite(loss_2):
+        if not isinstance(loss_1, torch.Tensor) or not isinstance(loss_2, torch.Tensor):
+            return ObjectiveSensitivityGateResult(ok=False, reason="loss_not_tensor")
+        if loss_1.numel() != 1 or loss_2.numel() != 1:
+            return ObjectiveSensitivityGateResult(
+                ok=False,
+                reason=f"loss_not_scalar: shape_1={tuple(loss_1.shape)} shape_2={tuple(loss_2.shape)}",
+            )
+        if not torch.isfinite(loss_1).all().item() or not torch.isfinite(loss_2).all().item():
             return ObjectiveSensitivityGateResult(ok=False, reason="non_finite_loss")
 
         abs_delta, rel_delta = _delta_metrics(loss_1, loss_2)
@@ -663,7 +695,14 @@ def run_affine_invariance_gate(
             loss_1 = _loss_value(compiled, batch={}, model_output=out_1)
             loss_2 = _loss_value(compiled, batch={}, model_output=out_2)
 
-        if not torch.isfinite(loss_1) or not torch.isfinite(loss_2):
+        if not isinstance(loss_1, torch.Tensor) or not isinstance(loss_2, torch.Tensor):
+            return AffineInvarianceGateResult(ok=False, reason="loss_not_tensor")
+        if loss_1.numel() != 1 or loss_2.numel() != 1:
+            return AffineInvarianceGateResult(
+                ok=False,
+                reason=f"loss_not_scalar: shape_1={tuple(loss_1.shape)} shape_2={tuple(loss_2.shape)}",
+            )
+        if not torch.isfinite(loss_1).all().item() or not torch.isfinite(loss_2).all().item():
             return AffineInvarianceGateResult(ok=False, reason="non_finite_loss")
 
         abs_delta, rel_delta = _delta_metrics(loss_1, loss_2)

@@ -196,7 +196,11 @@ def _behavior_descriptor(
             loss = compiled.loss_fn(batch=batch, model_output={}, extra={})
         except Exception:
             return None
-        if not torch.isfinite(loss):
+        if not isinstance(loss, torch.Tensor):
+            return None
+        if loss.numel() != 1:
+            return None
+        if not torch.isfinite(loss).all().item():
             return None
 
         grad_w, grad_l = torch.autograd.grad(
