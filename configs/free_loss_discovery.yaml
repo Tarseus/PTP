@@ -28,6 +28,12 @@ f3_enabled: false
 # This controls the "attempting repair (repair_round=...)" log lines.
 max_repair_rounds: 4
 
+# Directed repair (CEGIS-style) when dynamic gates fail.
+directed_repair_enabled: true
+# Per generation budgets (keep bounded to avoid repair loops).
+directed_repair_max_parents_per_generation: 4
+directed_repair_children_per_strategy: 1
+
 # Early-eval horizon for baseline/candidates, expressed in epochs/instances.
 # If both are > 0, we compute:
 #   early_eval_steps = early_eval_epochs * ceil(early_eval_instances_per_epoch / train_batch_size)
@@ -77,6 +83,8 @@ co_invariance_max_rel_delta: 0.01
 grad_norm_max: 10.0
 loss_soft_min: -5.0
 loss_soft_max: 5.0
+# Use a second "hidden" dynamic gate suite (different sampling) for acceptance.
+hidden_dynamic_gates_enabled: true
 # Drop-and-resample retries for *structural* dynamic-gate failures (e.g. missing
 # batch keys / expects / dependencies). This controls the
 # "dropping candidate and resampling (resample_round=...)" log lines.
@@ -115,6 +123,7 @@ prompts:
   m2: prompts/free_loss_m2.txt
   m3: prompts/free_loss_m3.txt
   repair: prompts/free_loss_repair.txt
+  directed_repair: prompts/free_loss_directed_repair.txt
   expects_repair: prompts/free_loss_expects_repair.txt
 
 # Output directory pattern for discovery runs.

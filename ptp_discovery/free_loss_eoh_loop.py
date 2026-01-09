@@ -42,6 +42,7 @@ from ptp_discovery.free_loss_gates import (
     run_objective_sensitivity_gate,
     run_preference_semantic_gates,
     run_static_gates,
+    supported_keys_for_mode,
 )
 from ptp_discovery.free_loss_ir import FreeLossIR, ir_from_json
 from ptp_discovery.free_loss_llm_ops import (
@@ -53,6 +54,7 @@ from ptp_discovery.free_loss_llm_ops import (
     m3_simplify_loss,
     mutate_free_loss,
     repair_free_loss,
+    repair_from_gate_failure,
     repair_expects_with_prompt,
 )
 
@@ -1337,9 +1339,16 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     m2_prompt = prompts.get("m2")
     m3_prompt = prompts.get("m3")
     repair_prompt = prompts.get("repair")
+    directed_repair_prompt = prompts.get("directed_repair")
     expects_repair_prompt = prompts.get("expects_repair")
     max_resample_rounds = int(cfg_yaml.get("max_resample_rounds", 1) or 0)
     burn_in_objectives_auto = bool(cfg_yaml.get("burn_in_objectives_auto", True))
+
+    directed_repair_enabled = bool(cfg_yaml.get("directed_repair_enabled", False)) and bool(directed_repair_prompt)
+    directed_repair_max_parents = int(cfg_yaml.get("directed_repair_max_parents_per_generation", 0) or 0)
+    directed_repair_children_per_strategy = int(cfg_yaml.get("directed_repair_children_per_strategy", 1) or 1)
+    directed_repair_strategies = cfg_yaml.get("directed_repair_strategies") or ["e1", "e2", "m1", "m2"]
+    directed_repair_strategies = [str(s).strip().lower() for s in directed_repair_strategies if str(s).strip()]
 
     pref_semantic_gate_enabled = bool(cfg_yaml.get("pref_semantic_gate_enabled", True))
     pref_semantic_trials = int(cfg_yaml.get("pref_semantic_trials", 6))
@@ -1347,6 +1356,8 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     pref_semantic_min_pass_rate = float(cfg_yaml.get("pref_semantic_min_pass_rate", 0.8))
     pref_semantic_swap_tolerance = float(cfg_yaml.get("pref_semantic_swap_tolerance", 1e-3))
     pref_semantic_gap_min_ratio = float(cfg_yaml.get("pref_semantic_gap_min_ratio", 0.9))
+
+    hidden_dynamic_gates_enabled = bool(cfg_yaml.get("hidden_dynamic_gates_enabled", False))
 
     behavior_deltas = cfg_yaml.get("novelty_behavior_deltas") or [-10, -5, -2, -1, 0, 1, 2, 5, 10]
     behavior_deltas = [float(v) for v in behavior_deltas]
@@ -1588,6 +1599,46 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             or "unsupported_expects" in msg
         )
 
+    def _extract_counterexamples_from_trace(trace: Any) -> List[Dict[str, Any]]:
+        if not isinstance(trace, dict):
+            return []
+        raw = trace.get("counterexamples")
+        if not isinstance(raw, list):
+            return []
+        out: List[Dict[str, Any]] = []
+        for item in raw:
+            if isinstance(item, dict):
+                out.append(dict(item))
+        return out
+
+    def _directed_repair_children(
+        parent_ir: FreeLossIR,
+        *,
+        strategy: str,
+        gate_spec: Dict[str, Any],
+        fail_report: Dict[str, Any],
+        counterexamples: List[Dict[str, Any]],
+        global_feedback: Dict[str, Any],
+    ) -> List[FreeLossIR]:
+        if not directed_repair_enabled or not directed_repair_prompt:
+            return []
+
+        allowed_keys = list(supported_keys_for_mode(parent_ir.implementation_hint.mode))
+        children: List[FreeLossIR] = []
+        for _ in range(max(1, int(directed_repair_children_per_strategy))):
+            child = repair_from_gate_failure(
+                directed_repair_prompt,
+                parent_ir,
+                strategy=strategy,
+                gate_spec=gate_spec,
+                fail_report=fail_report,
+                counterexamples=counterexamples,
+                allowed_keys=allowed_keys,
+                global_feedback=global_feedback,
+            )
+            children.append(child)
+        return children
+
     for gen in range(generations):
         LOGGER.info("=== Generation %d/%d ===", gen, generations - 1)
         global_feedback = _build_global_feedback(
@@ -1625,6 +1676,10 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         static_fail = 0
         dynamic_fail = 0
         evaluated = 0
+
+        directed_repair_parents_used = 0
+        next_child_index = len(population)
+        directed_repair_parent_signatures: set[str] = set()
 
         # Collect candidates that pass all gates and evaluate them in
         # parallel across available devices.
@@ -1743,54 +1798,103 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                     mode = str(getattr(ir.implementation_hint, "mode", "pairwise") or "pairwise").strip().lower()
                     expects = [str(x) for x in (ir.implementation_hint.expects or [])]
 
-                    dummy_model_output: Dict[str, torch.Tensor] = {}
-                    dummy_batch: Dict[str, torch.Tensor] = {}
-                    if mode == "setwise":
-                        from fitness.co_features import build_model_output  # local import to keep gates lightweight
+                    def _make_dummy_inputs(*, variant: str) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
+                        if mode == "setwise":
+                            from fitness.co_features import (  # local import to keep gates lightweight
+                                build_model_output,
+                            )
 
-                        objective = torch.rand(4, 8)
-                        log_prob = torch.rand(4, 8) * -8.0
-                        dummy_model_output, _ = build_model_output(objective=objective, log_prob=log_prob)
-                    else:
+                            if variant == "hidden":
+                                objective = torch.rand(4, 8) * 10.0
+                                log_prob = torch.rand(4, 8) * -12.0
+                            else:
+                                objective = torch.rand(4, 8)
+                                log_prob = torch.rand(4, 8) * -8.0
+                            model_out, _ = build_model_output(objective=objective, log_prob=log_prob)
+                            dummy_out = {k: model_out[k] for k in expects if k in model_out}
+                            return {}, dummy_out
+
+                        if variant == "hidden":
+                            cost_a = torch.rand(16)
+                            gap = torch.rand(16) * 3.0
+                            cost_b = cost_a + gap
+                            log_prob_l = torch.empty(16).uniform_(-30.0, 0.0)
+                            log_prob_w = log_prob_l + torch.empty(16).uniform_(-10.0, 10.0)
+                            delta_z = gap * 4.0
+                        else:
+                            cost_a = torch.zeros(16)
+                            cost_b = torch.ones(16)
+                            log_prob_w = torch.zeros(16)
+                            log_prob_l = torch.zeros(16)
+                            delta_z = torch.ones(16)
+
                         full_dummy = {
-                            "cost_a": torch.zeros(16),
-                            "cost_b": torch.ones(16),
-                            "log_prob_w": torch.zeros(16),
-                            "log_prob_l": torch.zeros(16),
-                            "delta_z": torch.ones(16),
+                            "cost_a": cost_a,
+                            "cost_b": cost_b,
+                            "log_prob_w": log_prob_w,
+                            "log_prob_l": log_prob_l,
+                            "delta_z": delta_z,
                             "delta_rank": torch.ones(16),
                             "delta_regret": torch.ones(16),
                             "weight": torch.ones(16),
                         }
-                        dummy_batch = {k: full_dummy[k] for k in expects if k in full_dummy}
-                        if not dummy_batch:
-                            dummy_batch = dict(full_dummy)
+                        dummy_batch_local = {k: full_dummy[k] for k in expects if k in full_dummy}
+                        if not dummy_batch_local:
+                            dummy_batch_local = dict(full_dummy)
+                        return dummy_batch_local, {}
 
-                    dyn_res: DynamicGateResult
-                    dyn_res = run_dynamic_gates(
+                    dummy_batch_vis, dummy_out_vis = _make_dummy_inputs(variant="visible")
+                    dyn_vis = run_dynamic_gates(
                         compiled,
-                        batch=dummy_batch,
-                        model_output=dummy_model_output,
+                        batch=dummy_batch_vis,
+                        model_output=dummy_out_vis,
                         model=model,
                         grad_norm_max=float(cfg_yaml.get("grad_norm_max", 10.0)),
                         loss_soft_min=float(cfg_yaml.get("loss_soft_min", -5.0)),
                         loss_soft_max=float(cfg_yaml.get("loss_soft_max", 5.0)),
                     )
+                    dyn_hid: DynamicGateResult | None = None
+                    if dyn_vis.ok and hidden_dynamic_gates_enabled:
+                        dummy_batch_hid, dummy_out_hid = _make_dummy_inputs(variant="hidden")
+                        dyn_hid = run_dynamic_gates(
+                            compiled,
+                            batch=dummy_batch_hid,
+                            model_output=dummy_out_hid,
+                            model=model,
+                            grad_norm_max=float(cfg_yaml.get("grad_norm_max", 10.0)),
+                            loss_soft_min=float(cfg_yaml.get("loss_soft_min", -5.0)),
+                            loss_soft_max=float(cfg_yaml.get("loss_soft_max", 5.0)),
+                        )
 
+                    dyn_res: DynamicGateResult = dyn_vis
+                    dyn_ok = bool(dyn_vis.ok) and (True if dyn_hid is None else bool(dyn_hid.ok))
+                    dyn_reason = dyn_vis.reason if not dyn_vis.ok else (dyn_hid.reason if dyn_hid is not None and not dyn_hid.ok else "ok")
+                    loss_value = dyn_vis.loss_value if not dyn_vis.ok else (dyn_hid.loss_value if dyn_hid is not None and not dyn_hid.ok else dyn_vis.loss_value)
+                    grad_norm = dyn_vis.grad_norm if not dyn_vis.ok else (dyn_hid.grad_norm if dyn_hid is not None and not dyn_hid.ok else dyn_vis.grad_norm)
                     gate_entry.update(
                         {
-                            "dynamic_ok": dyn_res.ok,
-                            "dynamic_reason": dyn_res.reason,
-                            "loss_value": dyn_res.loss_value,
-                            "grad_norm": dyn_res.grad_norm,
+                            "dynamic_ok": dyn_ok,
+                            "dynamic_reason": dyn_reason,
+                            "loss_value": loss_value,
+                            "grad_norm": grad_norm,
+                            "dynamic_visible_ok": dyn_vis.ok,
+                            "dynamic_visible_reason": dyn_vis.reason,
+                            "dynamic_visible_trace": dyn_vis.trace,
+                            "dynamic_hidden_ok": None if dyn_hid is None else dyn_hid.ok,
+                            "dynamic_hidden_reason": None if dyn_hid is None else dyn_hid.reason,
+                            "dynamic_hidden_trace": None if dyn_hid is None else dyn_hid.trace,
                         }
                     )
-                    if not dyn_res.ok:
-                        gate_entry["dynamic_error_code"] = _classify_failure("dynamic", dyn_res.reason)
+                    if not dyn_ok:
+                        gate_entry["dynamic_error_code"] = _classify_failure("dynamic", dyn_reason)
 
-                    if not dyn_res.ok:
+                    if not dyn_ok:
                         gates_log.append(gate_entry)
-                        if _should_resample_dynamic(dyn_res.reason) and resample_attempts < max_resample_rounds:
+                        if (
+                            (not dyn_vis.ok)
+                            and _should_resample_dynamic(dyn_vis.reason)
+                            and resample_attempts < max_resample_rounds
+                        ):
                             resample_attempts += 1
                             LOGGER.warning(
                                 "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
@@ -1798,7 +1902,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                 gen,
                                 idx,
                                 ir.name,
-                                dyn_res.reason,
+                                dyn_vis.reason,
                                 resample_attempts,
                                 max_resample_rounds,
                             )
@@ -1810,6 +1914,72 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                             ir = _maybe_repair_expects(ir)
                             resampled = True
                             break
+
+                        # Directed repair (CEGIS-style): if the VISIBLE dynamic gate fails,
+                        # treat this candidate as a parent and enqueue multiple children
+                        # via e1/e2/m1/m2 rather than discarding immediately.
+                        if (
+                            attempt < max_repair_rounds
+                            and directed_repair_enabled
+                            and directed_repair_prompt
+                            and (not dyn_vis.ok)
+                            and (directed_repair_max_parents <= 0 or directed_repair_parents_used < directed_repair_max_parents)
+                        ):
+                            parent_sig = _candidate_signature(ir)
+                            if parent_sig not in directed_repair_parent_signatures:
+                                directed_repair_parent_signatures.add(parent_sig)
+                                directed_repair_parents_used += 1
+
+                                gate_spec = {
+                                    "gate": "DynamicStability",
+                                    "checks": {
+                                        "grad_norm_max": float(cfg_yaml.get("grad_norm_max", 10.0)),
+                                        "loss_soft_range": [
+                                            float(cfg_yaml.get("loss_soft_min", -5.0)),
+                                            float(cfg_yaml.get("loss_soft_max", 5.0)),
+                                        ],
+                                    },
+                                }
+                                fail_report = {
+                                    "failed_gate": "DynamicStability",
+                                    "reason": dyn_vis.reason,
+                                    "trace": dyn_vis.trace or {},
+                                }
+                                counterexamples = _extract_counterexamples_from_trace(dyn_vis.trace)
+
+                                LOGGER.warning(
+                                    "Directed repair enqueue for gen=%d, idx=%d, name=%s (strategies=%s)",
+                                    gen,
+                                    idx,
+                                    ir.name,
+                                    ",".join(directed_repair_strategies),
+                                )
+                                for strat in directed_repair_strategies:
+                                    try:
+                                        children = _directed_repair_children(
+                                            ir,
+                                            strategy=strat,
+                                            gate_spec=gate_spec,
+                                            fail_report=fail_report,
+                                            counterexamples=counterexamples,
+                                            global_feedback=global_feedback,
+                                        )
+                                        for child in children:
+                                            # Tag parent linkage for analysis/debugging.
+                                            child.name = f"{child.name}_p{idx}"
+                                            population.append(child)
+                                            sample_ops.append(f"DR_{strat.upper()}")
+                                    except Exception as exc:  # noqa: BLE001
+                                        LOGGER.warning(
+                                            "Directed repair failed for gen=%d, idx=%d, strategy=%s: %s",
+                                            gen,
+                                            idx,
+                                            strat,
+                                            exc,
+                                        )
+                                dynamic_fail += 1
+                                break
+
                         if attempt < max_repair_rounds and (repair_prompt or m3_prompt):
                             LOGGER.warning(
                                 "Dynamic gates failed for gen=%d, idx=%d, name=%s: reason=%s, "
@@ -1817,9 +1987,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                 gen,
                                 idx,
                                 ir.name,
-                                dyn_res.reason,
-                                str(dyn_res.loss_value),
-                                str(dyn_res.grad_norm),
+                                dyn_reason,
+                                str(loss_value),
+                                str(grad_norm),
                                 attempt + 1,
                                 max_repair_rounds,
                             )
@@ -1830,10 +2000,11 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                     attempt=attempt,
                                     stage="dynamic_gate",
                                     code=gate_entry.get("dynamic_error_code", "E_DYNAMIC_OTHER"),
-                                    message=dyn_res.reason,
+                                    message=dyn_reason,
                                     extra={
-                                        "loss_value": dyn_res.loss_value,
-                                        "grad_norm": dyn_res.grad_norm,
+                                        "loss_value": loss_value,
+                                        "grad_norm": grad_norm,
+                                        "gate_trace": dyn_vis.trace,
                                     },
                                 )
 
@@ -1883,43 +2054,154 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                             gen,
                             idx,
                             ir.name,
-                            dyn_res.reason,
-                            str(dyn_res.loss_value),
-                            str(dyn_res.grad_norm),
+                            dyn_reason,
+                            str(loss_value),
+                            str(grad_norm),
                         )
                         break
 
                     co_gate_enabled = bool(cfg_yaml.get("co_gate_enabled", True))
                     if co_gate_enabled:
-                        sens_res: ObjectiveSensitivityGateResult = run_objective_sensitivity_gate(
+                        sens_vis: ObjectiveSensitivityGateResult = run_objective_sensitivity_gate(
                             compiled,
                             min_abs_delta=float(cfg_yaml.get("co_sensitivity_min_abs_delta", 1e-3)),
                             min_rel_delta=float(cfg_yaml.get("co_sensitivity_min_rel_delta", 1e-2)),
+                            variant="visible",
                         )
-                        inv_res: AffineInvarianceGateResult = run_affine_invariance_gate(
+                        inv_vis: AffineInvarianceGateResult = run_affine_invariance_gate(
                             compiled,
                             max_abs_delta=float(cfg_yaml.get("co_invariance_max_abs_delta", 1e-3)),
                             max_rel_delta=float(cfg_yaml.get("co_invariance_max_rel_delta", 1e-2)),
+                            variant="visible",
                         )
+                        sens_hid: ObjectiveSensitivityGateResult | None = None
+                        inv_hid: AffineInvarianceGateResult | None = None
+                        if hidden_dynamic_gates_enabled and sens_vis.ok and inv_vis.ok:
+                            sens_hid = run_objective_sensitivity_gate(
+                                compiled,
+                                min_abs_delta=float(cfg_yaml.get("co_sensitivity_min_abs_delta", 1e-3)),
+                                min_rel_delta=float(cfg_yaml.get("co_sensitivity_min_rel_delta", 1e-2)),
+                                variant="hidden",
+                            )
+                            inv_hid = run_affine_invariance_gate(
+                                compiled,
+                                max_abs_delta=float(cfg_yaml.get("co_invariance_max_abs_delta", 1e-3)),
+                                max_rel_delta=float(cfg_yaml.get("co_invariance_max_rel_delta", 1e-2)),
+                                variant="hidden",
+                            )
                         gate_entry.update(
                             {
                                 "co_enabled": True,
-                                "co_sensitivity_ok": sens_res.ok,
-                                "co_sensitivity_reason": sens_res.reason,
-                                "co_sensitivity_abs_delta": sens_res.abs_delta,
-                                "co_sensitivity_rel_delta": sens_res.rel_delta,
-                                "co_invariance_ok": inv_res.ok,
-                                "co_invariance_reason": inv_res.reason,
-                                "co_invariance_abs_delta": inv_res.abs_delta,
-                                "co_invariance_rel_delta": inv_res.rel_delta,
+                                "co_sensitivity_ok": bool(sens_vis.ok)
+                                and (True if sens_hid is None else bool(sens_hid.ok)),
+                                "co_sensitivity_visible_ok": sens_vis.ok,
+                                "co_sensitivity_visible_reason": sens_vis.reason,
+                                "co_sensitivity_visible_abs_delta": sens_vis.abs_delta,
+                                "co_sensitivity_visible_rel_delta": sens_vis.rel_delta,
+                                "co_sensitivity_visible_trace": sens_vis.trace,
+                                "co_sensitivity_hidden_ok": None if sens_hid is None else sens_hid.ok,
+                                "co_sensitivity_hidden_reason": None if sens_hid is None else sens_hid.reason,
+                                "co_sensitivity_hidden_abs_delta": None if sens_hid is None else sens_hid.abs_delta,
+                                "co_sensitivity_hidden_rel_delta": None if sens_hid is None else sens_hid.rel_delta,
+                                "co_sensitivity_hidden_trace": None if sens_hid is None else sens_hid.trace,
+                                "co_invariance_ok": bool(inv_vis.ok) and (True if inv_hid is None else bool(inv_hid.ok)),
+                                "co_invariance_visible_ok": inv_vis.ok,
+                                "co_invariance_visible_reason": inv_vis.reason,
+                                "co_invariance_visible_abs_delta": inv_vis.abs_delta,
+                                "co_invariance_visible_rel_delta": inv_vis.rel_delta,
+                                "co_invariance_visible_trace": inv_vis.trace,
+                                "co_invariance_hidden_ok": None if inv_hid is None else inv_hid.ok,
+                                "co_invariance_hidden_reason": None if inv_hid is None else inv_hid.reason,
+                                "co_invariance_hidden_abs_delta": None if inv_hid is None else inv_hid.abs_delta,
+                                "co_invariance_hidden_rel_delta": None if inv_hid is None else inv_hid.rel_delta,
+                                "co_invariance_hidden_trace": None if inv_hid is None else inv_hid.trace,
                             }
                         )
-                        if not sens_res.ok or not inv_res.ok:
-                            reason = sens_res.reason if not sens_res.ok else inv_res.reason
+                        co_ok = bool(gate_entry.get("co_sensitivity_ok")) and bool(gate_entry.get("co_invariance_ok"))
+                        if not co_ok:
+                            visible_fail = (not sens_vis.ok) or (not inv_vis.ok)
+                            if not sens_vis.ok:
+                                reason = sens_vis.reason
+                            elif not inv_vis.ok:
+                                reason = inv_vis.reason
+                            elif sens_hid is not None and not sens_hid.ok:
+                                reason = sens_hid.reason
+                            else:
+                                reason = (inv_hid.reason if inv_hid is not None else "co_gate_failed")
                             gate_entry["dynamic_ok"] = False
                             gate_entry["dynamic_reason"] = reason
                             gate_entry["dynamic_error_code"] = _classify_failure("dynamic", reason)
                             gates_log.append(gate_entry)
+
+                            # Directed repair only uses VISIBLE counterexamples.
+                            if (
+                                attempt < max_repair_rounds
+                                and directed_repair_enabled
+                                and directed_repair_prompt
+                                and visible_fail
+                                and (directed_repair_max_parents <= 0 or directed_repair_parents_used < directed_repair_max_parents)
+                            ):
+                                parent_sig = _candidate_signature(ir)
+                                if parent_sig not in directed_repair_parent_signatures:
+                                    directed_repair_parent_signatures.add(parent_sig)
+                                    directed_repair_parents_used += 1
+
+                                    gate_spec = {
+                                        "gate": "COAlignment",
+                                        "objective_sensitivity": {
+                                            "min_abs_delta": float(cfg_yaml.get("co_sensitivity_min_abs_delta", 1e-3)),
+                                            "min_rel_delta": float(cfg_yaml.get("co_sensitivity_min_rel_delta", 1e-2)),
+                                        },
+                                        "affine_invariance": {
+                                            "max_abs_delta": float(cfg_yaml.get("co_invariance_max_abs_delta", 1e-3)),
+                                            "max_rel_delta": float(cfg_yaml.get("co_invariance_max_rel_delta", 1e-2)),
+                                        },
+                                        "note": "Child must pass both visible and hidden variants to be accepted.",
+                                    }
+                                    fail_report = {
+                                        "failed_gate": "COAlignment",
+                                        "reason": reason,
+                                        "visible": {
+                                            "sensitivity": sens_vis.trace or {},
+                                            "invariance": inv_vis.trace or {},
+                                        },
+                                    }
+                                    counterexamples: List[Dict[str, Any]] = []
+                                    counterexamples.extend(_extract_counterexamples_from_trace(sens_vis.trace))
+                                    counterexamples.extend(_extract_counterexamples_from_trace(inv_vis.trace))
+
+                                    LOGGER.warning(
+                                        "Directed repair enqueue (CO gates) for gen=%d, idx=%d, name=%s (strategies=%s)",
+                                        gen,
+                                        idx,
+                                        ir.name,
+                                        ",".join(directed_repair_strategies),
+                                    )
+                                    for strat in directed_repair_strategies:
+                                        try:
+                                            children = _directed_repair_children(
+                                                ir,
+                                                strategy=strat,
+                                                gate_spec=gate_spec,
+                                                fail_report=fail_report,
+                                                counterexamples=counterexamples,
+                                                global_feedback=global_feedback,
+                                            )
+                                            for child in children:
+                                                child.name = f"{child.name}_p{idx}"
+                                                population.append(child)
+                                                sample_ops.append(f"DR_{strat.upper()}")
+                                        except Exception as exc:  # noqa: BLE001
+                                            LOGGER.warning(
+                                                "Directed repair failed for gen=%d, idx=%d, strategy=%s: %s",
+                                                gen,
+                                                idx,
+                                                strat,
+                                                exc,
+                                            )
+                                    dynamic_fail += 1
+                                    break
+
                             if attempt < max_repair_rounds and (repair_prompt or m3_prompt):
                                 LOGGER.warning(
                                     "CO gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
@@ -1941,14 +2223,16 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                         message=reason,
                                         extra={
                                             "sensitivity": {
-                                                "ok": sens_res.ok,
-                                                "abs_delta": sens_res.abs_delta,
-                                                "rel_delta": sens_res.rel_delta,
+                                                "ok": sens_vis.ok,
+                                                "abs_delta": sens_vis.abs_delta,
+                                                "rel_delta": sens_vis.rel_delta,
+                                                "trace": sens_vis.trace,
                                             },
                                             "invariance": {
-                                                "ok": inv_res.ok,
-                                                "abs_delta": inv_res.abs_delta,
-                                                "rel_delta": inv_res.rel_delta,
+                                                "ok": inv_vis.ok,
+                                                "abs_delta": inv_vis.abs_delta,
+                                                "rel_delta": inv_vis.rel_delta,
+                                                "trace": inv_vis.trace,
                                             },
                                         },
                                     )
@@ -1989,29 +2273,116 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
 
                     pref_res: PreferenceSemanticGateResult | None = None
                     if pref_semantic_gate_enabled:
-                        pref_res = run_preference_semantic_gates(
+                        pref_vis = run_preference_semantic_gates(
                             compiled,
                             trials=pref_semantic_trials,
                             batch_size=pref_semantic_batch_size,
                             min_pass_rate=pref_semantic_min_pass_rate,
                             swap_tolerance=pref_semantic_swap_tolerance,
                             gap_min_ratio=pref_semantic_gap_min_ratio,
+                            variant="visible",
                         )
+                        pref_hid: PreferenceSemanticGateResult | None = None
+                        if hidden_dynamic_gates_enabled and pref_vis.ok:
+                            pref_hid = run_preference_semantic_gates(
+                                compiled,
+                                trials=pref_semantic_trials,
+                                batch_size=pref_semantic_batch_size,
+                                min_pass_rate=pref_semantic_min_pass_rate,
+                                swap_tolerance=pref_semantic_swap_tolerance,
+                                gap_min_ratio=pref_semantic_gap_min_ratio,
+                                variant="hidden",
+                            )
+                        pref_ok = bool(pref_vis.ok) and (True if pref_hid is None else bool(pref_hid.ok))
+                        pref_res = pref_vis
                         gate_entry.update(
                             {
-                                "pref_ok": pref_res.ok,
-                                "pref_reason": pref_res.reason,
-                                "pref_mono_pass_rate": pref_res.mono_pass_rate,
-                                "pref_swap_pass_rate": pref_res.swap_pass_rate,
-                                "pref_gap_pass_rate": pref_res.gap_pass_rate,
+                                "pref_ok": pref_ok,
+                                "pref_reason": pref_vis.reason
+                                if not pref_vis.ok
+                                else (pref_hid.reason if pref_hid is not None and not pref_hid.ok else "ok"),
+                                "pref_visible_ok": pref_vis.ok,
+                                "pref_visible_reason": pref_vis.reason,
+                                "pref_visible_mono_pass_rate": pref_vis.mono_pass_rate,
+                                "pref_visible_swap_pass_rate": pref_vis.swap_pass_rate,
+                                "pref_visible_gap_pass_rate": pref_vis.gap_pass_rate,
+                                "pref_visible_trace": pref_vis.trace,
+                                "pref_hidden_ok": None if pref_hid is None else pref_hid.ok,
+                                "pref_hidden_reason": None if pref_hid is None else pref_hid.reason,
+                                "pref_hidden_mono_pass_rate": None if pref_hid is None else pref_hid.mono_pass_rate,
+                                "pref_hidden_swap_pass_rate": None if pref_hid is None else pref_hid.swap_pass_rate,
+                                "pref_hidden_gap_pass_rate": None if pref_hid is None else pref_hid.gap_pass_rate,
+                                "pref_hidden_trace": None if pref_hid is None else pref_hid.trace,
                             }
                         )
-                        if not pref_res.ok:
+                        if not pref_ok:
+                            visible_fail = not pref_vis.ok
                             gate_entry["dynamic_error_code"] = _classify_failure(
                                 "dynamic",
-                                pref_res.reason,
+                                gate_entry.get("pref_reason", pref_vis.reason),
                             )
                             gates_log.append(gate_entry)
+
+                            if (
+                                attempt < max_repair_rounds
+                                and directed_repair_enabled
+                                and directed_repair_prompt
+                                and visible_fail
+                                and (directed_repair_max_parents <= 0 or directed_repair_parents_used < directed_repair_max_parents)
+                            ):
+                                parent_sig = _candidate_signature(ir)
+                                if parent_sig not in directed_repair_parent_signatures:
+                                    directed_repair_parent_signatures.add(parent_sig)
+                                    directed_repair_parents_used += 1
+
+                                    gate_spec = {
+                                        "gate": "PreferenceSemantics",
+                                        "checks": {
+                                            "min_pass_rate": float(pref_semantic_min_pass_rate),
+                                            "swap_tolerance": float(pref_semantic_swap_tolerance),
+                                            "gap_min_ratio": float(pref_semantic_gap_min_ratio),
+                                        },
+                                        "note": "Child must pass both visible and hidden variants to be accepted.",
+                                    }
+                                    fail_report = {
+                                        "failed_gate": "PreferenceSemantics",
+                                        "reason": pref_vis.reason,
+                                        "trace": pref_vis.trace or {},
+                                    }
+                                    counterexamples = _extract_counterexamples_from_trace(pref_vis.trace)
+
+                                    LOGGER.warning(
+                                        "Directed repair enqueue (pref gates) for gen=%d, idx=%d, name=%s (strategies=%s)",
+                                        gen,
+                                        idx,
+                                        ir.name,
+                                        ",".join(directed_repair_strategies),
+                                    )
+                                    for strat in directed_repair_strategies:
+                                        try:
+                                            children = _directed_repair_children(
+                                                ir,
+                                                strategy=strat,
+                                                gate_spec=gate_spec,
+                                                fail_report=fail_report,
+                                                counterexamples=counterexamples,
+                                                global_feedback=global_feedback,
+                                            )
+                                            for child in children:
+                                                child.name = f"{child.name}_p{idx}"
+                                                population.append(child)
+                                                sample_ops.append(f"DR_{strat.upper()}")
+                                        except Exception as exc:  # noqa: BLE001
+                                            LOGGER.warning(
+                                                "Directed repair failed for gen=%d, idx=%d, strategy=%s: %s",
+                                                gen,
+                                                idx,
+                                                strat,
+                                                exc,
+                                            )
+                                    dynamic_fail += 1
+                                    break
+
                             if attempt < max_repair_rounds and (repair_prompt or m3_prompt):
                                 LOGGER.warning(
                                     "Preference gates failed for gen=%d, idx=%d, name=%s: reason=%s; "
@@ -2019,7 +2390,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                     gen,
                                     idx,
                                     ir.name,
-                                    pref_res.reason,
+                                    gate_entry.get("pref_reason", pref_vis.reason),
                                     attempt + 1,
                                     max_repair_rounds,
                                 )
@@ -2030,11 +2401,12 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                         attempt=attempt,
                                         stage="preference_gate",
                                         code=gate_entry.get("dynamic_error_code", "E_PREF_SEMANTIC"),
-                                        message=pref_res.reason,
+                                        message=gate_entry.get("pref_reason", pref_vis.reason),
                                         extra={
-                                            "mono_pass_rate": pref_res.mono_pass_rate,
-                                            "swap_pass_rate": pref_res.swap_pass_rate,
-                                            "gap_pass_rate": pref_res.gap_pass_rate,
+                                            "mono_pass_rate": pref_vis.mono_pass_rate,
+                                            "swap_pass_rate": pref_vis.swap_pass_rate,
+                                            "gap_pass_rate": pref_vis.gap_pass_rate,
+                                            "gate_trace": pref_vis.trace,
                                         },
                                     )
 

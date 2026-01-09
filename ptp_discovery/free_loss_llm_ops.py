@@ -460,6 +460,116 @@ def repair_expects_with_prompt(
     return parse_free_loss_from_text(json_str)
 
 
+def repair_from_gate_failure(
+    directed_repair_prompt_path: str,
+    parent_ir: FreeLossIR,
+    *,
+    strategy: str,
+    gate_spec: Mapping[str, Any],
+    fail_report: Mapping[str, Any],
+    counterexamples: Sequence[Mapping[str, Any]],
+    allowed_keys: Sequence[str],
+    global_feedback: Mapping[str, Any] | None = None,
+) -> FreeLossIR:
+    """Generate a repaired child candidate guided by gate diagnostics.
+
+    The prompt is designed for CEGIS-style repair: provide a failure report
+    plus counterexamples (visible tests) and request a structured patch.
+    """
+
+    strategy = str(strategy or "").strip().lower()
+    if strategy not in {"e1", "e2", "m1", "m2"}:
+        raise ValueError(f"Unknown directed repair strategy: {strategy!r}")
+
+    prompt = _read_prompt(directed_repair_prompt_path)
+    prompt = (
+        prompt
+        + "\n\nSTRATEGY:\n"
+        + strategy
+        + "\n\nPARENT_CODE:\n"
+        + (parent_ir.code or "").strip()
+        + "\n\nGATE_SPEC_JSON:\n"
+        + json.dumps(dict(gate_spec), indent=2, ensure_ascii=False)
+        + "\n\nFAIL_REPORT_JSON:\n"
+        + json.dumps(dict(fail_report), indent=2, ensure_ascii=False)
+        + "\n\nCOUNTEREXAMPLES_JSON:\n"
+        + json.dumps(list(counterexamples), indent=2, ensure_ascii=False)
+        + "\n\nCONTRACT_JSON:\n"
+        + json.dumps(
+            {
+                "allowed_keys": list(allowed_keys),
+                "required_function": "generated_loss(batch, model_output, extra)",
+                "no_imports": True,
+                "no_external_state": True,
+                "must_be_numerically_stable": True,
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
+    if global_feedback is not None:
+        prompt = prompt + "\n\nGLOBAL_FEEDBACK_JSON:\n" + json.dumps(global_feedback, indent=2, ensure_ascii=False)
+
+    raw = _call_llm(prompt)
+    obj = json.loads(_extract_json_object(raw))
+
+    out_strategy = str(obj.get("strategy", strategy) or strategy).strip().lower()
+    expects_raw = obj.get("expects", None)
+    code = str(obj.get("code", "")).strip()
+    reasoning = str(obj.get("reasoning_brief", "")).strip()
+
+    if out_strategy not in {"e1", "e2", "m1", "m2"}:
+        out_strategy = strategy
+
+    if not code:
+        raise ValueError("Directed repair output missing 'code'.")
+    if "def generated_loss" not in code:
+        raise ValueError("Directed repair code must define 'generated_loss'.")
+
+    expects: list[str]
+    if isinstance(expects_raw, (list, tuple)):
+        expects = [str(x) for x in expects_raw]
+    elif expects_raw is None:
+        expects = [str(x) for x in (parent_ir.implementation_hint.expects or [])]
+    else:
+        expects = [str(expects_raw)]
+
+    # Optional: allow the model to update these, but default to the parent.
+    name = str(obj.get("name", "")).strip() or f"{parent_ir.name}_dr_{out_strategy}"
+    intuition = str(obj.get("intuition", "")).strip() or parent_ir.intuition
+    if reasoning:
+        intuition = f"{intuition}\nDirected repair ({out_strategy}): {reasoning}".strip()
+    pseudocode = str(obj.get("pseudocode", "")).strip() or parent_ir.pseudocode
+    hyperparams = obj.get("hyperparams", None)
+    if not isinstance(hyperparams, dict):
+        hyperparams = dict(parent_ir.hyperparams or {})
+    operators_used = obj.get("operators_used", None)
+    if isinstance(operators_used, (list, tuple)):
+        operators_list = [str(x) for x in operators_used] or list(parent_ir.operators_used)
+    else:
+        operators_list = list(parent_ir.operators_used)
+
+    mode = str(obj.get("mode", "") or parent_ir.implementation_hint.mode or "pairwise").strip().lower()
+    if mode not in {"pairwise", "setwise"}:
+        mode = str(parent_ir.implementation_hint.mode or "pairwise").strip().lower() or "pairwise"
+
+    return FreeLossIR(
+        name=name,
+        intuition=intuition,
+        pseudocode=pseudocode,
+        hyperparams=dict(hyperparams),
+        operators_used=operators_list,
+        implementation_hint=type(parent_ir.implementation_hint)(
+            expects=expects,
+            returns="scalar",
+            mode=mode,
+        ),
+        code=code,
+        theoretical_basis=str(obj.get("theoretical_basis", "")).strip()
+        or getattr(parent_ir, "theoretical_basis", ""),
+    )
+
+
 def compile_free_loss_candidate(
     ir: FreeLossIR,
     *,
