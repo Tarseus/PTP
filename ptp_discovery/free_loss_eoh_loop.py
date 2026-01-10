@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import ast
+import base64
+from collections import deque
 from contextlib import contextmanager
 import hashlib
 import json
 import math
 import os
+import pickle
 import re
 import time
 import logging
@@ -638,7 +641,8 @@ def _write_run_analysis(
     baseline_hf_score: float | None,
     generations: int,
     population_size: int,
-    gates_log: List[Dict[str, Any]],
+    gates_log: List[Dict[str, Any]] | None = None,
+    gate_failure_stats: Dict[str, int] | None = None,
     elites: List[Dict[str, Any]],
 ) -> None:
     """Emit a lightweight JSON summary for downstream analysis.
@@ -649,12 +653,15 @@ def _write_run_analysis(
     """
 
     error_stats: Dict[str, int] = {}
-    for entry in gates_log:
-        for key in ("static_error_code", "dynamic_error_code"):
-            code = entry.get(key)
-            if not code:
-                continue
-            error_stats[code] = error_stats.get(code, 0) + 1
+    if gate_failure_stats is not None:
+        error_stats = {str(k): int(v) for k, v in gate_failure_stats.items()}
+    elif gates_log is not None:
+        for entry in gates_log:
+            for key in ("static_error_code", "dynamic_error_code"):
+                code = entry.get(key)
+                if not code:
+                    continue
+                error_stats[code] = error_stats.get(code, 0) + 1
 
     failures_by_code = [
         {"code": code, "count": count}
@@ -959,6 +966,49 @@ def _dump_jsonl(path: str, records: List[Dict[str, Any]]) -> None:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
 
+def _append_jsonl(path: str, records: List[Dict[str, Any]]) -> None:
+    if not records:
+        return
+    with open(path, "a", encoding="utf-8") as f:
+        for rec in records:
+            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
+def _atomic_write_json(path: str, payload: Dict[str, Any]) -> None:
+    tmp = f"{path}.tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, path)
+
+
+def _b64_pickle(obj: Any) -> str:
+    return base64.b64encode(pickle.dumps(obj)).decode("ascii")
+
+
+def _unb64_pickle(data: str) -> Any:
+    return pickle.loads(base64.b64decode(data.encode("ascii")))
+
+
+def _checkpoint_path(run_dir: str) -> str:
+    return os.path.join(run_dir, "checkpoint.json")
+
+
+def _save_checkpoint(run_dir: str, state: Dict[str, Any]) -> None:
+    state = dict(state)
+    state["schema_version"] = 1
+    state["saved_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    _atomic_write_json(_checkpoint_path(run_dir), state)
+
+
+def _load_checkpoint(run_dir: str) -> Dict[str, Any]:
+    path = _checkpoint_path(run_dir)
+    with open(path, "r", encoding="utf-8") as f:
+        state = json.load(f)
+    if not isinstance(state, dict):
+        raise ValueError(f"Invalid checkpoint format: {path}")
+    return state
+
+
 def _train_one_batch_with_po(
     env: TSPEnv,
     model: TSPModel,
@@ -1215,13 +1265,30 @@ def evaluate_po_baseline(
     }
 
 
-def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
+def run_free_loss_eoh(
+    config_path: str,
+    *,
+    resume_dir: str | None = None,
+    **overrides: Any,
+) -> None:
     with open(config_path, "r", encoding="utf-8") as f:
-        cfg_yaml = yaml.safe_load(f)
+        cfg_yaml = yaml.safe_load(f) or {}
 
     cfg_yaml.update({k: v for k, v in overrides.items() if v is not None})
 
     LOGGER.info("Starting free loss EoH search with config=%s", config_path)
+
+    resume_state: Dict[str, Any] | None = None
+    run_dir: str | None = None
+    if resume_dir:
+        run_dir = os.path.abspath(str(resume_dir))
+        if not os.path.isdir(run_dir):
+            raise FileNotFoundError(f"resume_dir does not exist: {run_dir}")
+        resume_state = _load_checkpoint(run_dir)
+        seed_from_ckpt = resume_state.get("seed")
+        if seed_from_ckpt is not None:
+            cfg_yaml["seed"] = int(seed_from_ckpt)
+        LOGGER.info("Resuming search from run directory: %s", run_dir)
 
     seed = int(cfg_yaml.get("seed", 0))
     _set_seed(seed)
@@ -1284,19 +1351,51 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     seen_signatures: set[str] = set()
 
     out_root = cfg_yaml.get("output_root", "runs/free_loss_discovery")
-    run_dir = _timestamp_dir(out_root)
+    if run_dir is None:
+        run_dir = _timestamp_dir(out_root)
     LOGGER.info("Run directory: %s", os.path.abspath(run_dir))
+
+    candidates_jsonl_path = os.path.join(run_dir, "candidates.jsonl")
+    gates_jsonl_path = os.path.join(run_dir, "gate_reports.jsonl")
+    fitness_jsonl_path = os.path.join(run_dir, "fitness_scores.jsonl")
+
+    if resume_state is None:
+        # Fresh run: truncate/initialize JSONL logs.
+        for path in (candidates_jsonl_path, gates_jsonl_path, fitness_jsonl_path):
+            with open(path, "w", encoding="utf-8"):
+                pass
 
     # Baseline: evaluate the original POMO po_loss once, using the same HF
     # configuration. This provides a reference score before searching over
     # free-form preference losses.
-    try:
-        baseline_log_path = os.path.join(run_dir, "baseline_po_loss.log")
-        with _capture_logs_to_file(baseline_log_path):
-            LOGGER.info(
-                "Saving baseline training log to %s", os.path.abspath(baseline_log_path)
-            )
-            baseline = evaluate_po_baseline(hf_cfg, early_eval_steps=early_eval_steps)
+    baseline: Dict[str, Any] | None = None
+    baseline_json_path = os.path.join(run_dir, "baseline.json")
+    if os.path.isfile(baseline_json_path):
+        try:
+            with open(baseline_json_path, "r", encoding="utf-8") as f:
+                baseline = json.load(f)
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.warning("Failed to load baseline.json (%s): %s", baseline_json_path, exc)
+            baseline = None
+    elif resume_state is not None:
+        cand = resume_state.get("baseline")
+        if isinstance(cand, dict):
+            baseline = dict(cand)
+
+    if baseline is None:
+        try:
+            baseline_log_path = os.path.join(run_dir, "baseline_po_loss.log")
+            with _capture_logs_to_file(baseline_log_path):
+                LOGGER.info(
+                    "Saving baseline training log to %s", os.path.abspath(baseline_log_path)
+                )
+                baseline = evaluate_po_baseline(hf_cfg, early_eval_steps=early_eval_steps)
+            _atomic_write_json(baseline_json_path, dict(baseline))
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.warning("Failed to evaluate baseline po_loss: %s", exc)
+            baseline = None
+
+    if baseline is not None:
         baseline_hf_score = float(baseline.get("fitness_score", baseline["hf_score"]))
         baseline_early_valid = float(
             baseline.get("early_validation_objective", baseline["validation_objective"])
@@ -1322,13 +1421,22 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         )
         LOGGER.info(
             "Baseline po_loss: hf_score=%.6f, fitness_score=%.6f, validation_objective=%.6f, gen_penalty=%.6f",
-            baseline["hf_score"],
-            baseline.get("fitness_score", baseline["hf_score"]),
-            baseline["validation_objective"],
-            baseline["generalization_penalty"],
+            float(baseline["hf_score"]),
+            float(baseline.get("fitness_score", baseline["hf_score"])),
+            float(baseline["validation_objective"]),
+            float(baseline["generalization_penalty"]),
         )
-    except Exception as exc:  # noqa: BLE001
-        LOGGER.warning("Failed to evaluate baseline po_loss: %s", exc)
+
+    if resume_state is not None:
+        burn_in_loaded = resume_state.get("burn_in_objectives")
+        if isinstance(burn_in_loaded, list):
+            burn_in_objectives = [dict(v) for v in burn_in_loaded if isinstance(v, dict)]
+        diversity_loaded = resume_state.get("diversity_archive")
+        if isinstance(diversity_loaded, list):
+            diversity_archive = [dict(v) for v in diversity_loaded if isinstance(v, dict)]
+        seen_loaded = resume_state.get("seen_signatures")
+        if isinstance(seen_loaded, list):
+            seen_signatures = {str(v) for v in seen_loaded}
 
     operator_whitelist = list(cfg_yaml.get("operator_whitelist", []))
     prompts = cfg_yaml.get("prompts", {}) or {}
@@ -1368,11 +1476,12 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
     novelty_thought_weight = float(cfg_yaml.get("novelty_thought_weight", 0.25))
     diversity_archive_size = int(cfg_yaml.get("diversity_archive_size", 32))
 
-    candidates_log: List[Dict[str, Any]] = []
-    gates_log: List[Dict[str, Any]] = []
-    fitness_log: List[Dict[str, Any]] = []
-
     elites: List[Dict[str, Any]] = []
+    gen_start = 0
+
+    gate_recent_maxlen = int(cfg_yaml.get("gate_recent_maxlen", 200) or 200)
+    gates_recent: deque[Dict[str, Any]] = deque(maxlen=max(1, gate_recent_maxlen))
+    gate_failure_stats: Dict[str, int] = {}
 
     max_repair_rounds = int(cfg_yaml.get("max_repair_rounds", 0) or 0)
     LOGGER.info(
@@ -1381,13 +1490,59 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         max_resample_rounds,
     )
 
-    if burn_in_objectives_auto:
+    if burn_in_objectives_auto and resume_state is None:
         burn_in_objectives.extend(_build_auto_seed_objectives())
 
-    rng = random.Random(seed)
+    def _restore_pool(raw: Any) -> List[Dict[str, Any]]:
+        if not isinstance(raw, list):
+            return []
+        restored: List[Dict[str, Any]] = []
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            entry = dict(item)
+            ir_payload = entry.get("ir")
+            if isinstance(ir_payload, dict):
+                try:
+                    entry["ir"] = ir_from_json(ir_payload)
+                except Exception:  # noqa: BLE001
+                    continue
+            restored.append(entry)
+        return restored
+
+    rng = random.Random()
     best_hf_so_far = float("inf")
     stalled_gens = 0
     prev_dynamic_fail_rate = 0.0
+    if resume_state is not None:
+        gen_start = int(resume_state.get("next_generation", 0) or 0)
+        diverse_elites = _restore_pool(resume_state.get("diverse_elites"))
+        elites = _restore_pool(resume_state.get("elites"))
+
+        gate_failure_loaded = resume_state.get("gate_failure_stats")
+        if isinstance(gate_failure_loaded, dict):
+            gate_failure_stats = {str(k): int(v) for k, v in gate_failure_loaded.items()}
+
+        recent_loaded = resume_state.get("gates_recent")
+        if isinstance(recent_loaded, list):
+            for item in recent_loaded:
+                if isinstance(item, dict):
+                    gates_recent.append(dict(item))
+
+        best_hf_so_far = float(resume_state.get("best_hf_so_far", float("inf")))
+        stalled_gens = int(resume_state.get("stalled_gens", 0) or 0)
+        prev_dynamic_fail_rate = float(resume_state.get("prev_dynamic_fail_rate", 0.0) or 0.0)
+
+        rng_state_b64 = resume_state.get("rng_state_b64")
+        if isinstance(rng_state_b64, str) and rng_state_b64:
+            try:
+                rng.setstate(_unb64_pickle(rng_state_b64))
+            except Exception:  # noqa: BLE001
+                rng.seed(seed)
+        else:
+            rng.seed(seed)
+    else:
+        rng.seed(seed)
 
     def _maybe_repair_expects(ir: FreeLossIR) -> FreeLossIR:
         if not expects_repair_prompt:
@@ -1639,11 +1794,113 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             children.append(child)
         return children
 
-    for gen in range(generations):
+    pending_candidates: List[Dict[str, Any]] = []
+    pending_fitness: List[Dict[str, Any]] = []
+    pending_gates: List[Dict[str, Any]] = []
+
+    def _flush_jsonl_logs() -> None:
+        _append_jsonl(candidates_jsonl_path, pending_candidates)
+        _append_jsonl(gates_jsonl_path, pending_gates)
+        _append_jsonl(fitness_jsonl_path, pending_fitness)
+        pending_candidates.clear()
+        pending_gates.clear()
+        pending_fitness.clear()
+
+    def _record_gate_entry(entry: Dict[str, Any]) -> None:
+        pending_gates.append(entry)
+        is_failure = (not entry.get("static_ok", True)) or (entry.get("dynamic_ok") is False)
+        if not is_failure:
+            return
+        stub = {
+            "generation": int(entry.get("generation", -1)),
+            "index": int(entry.get("index", -1)),
+            "attempt": int(entry.get("attempt", 0)),
+            "llm_op": entry.get("llm_op"),
+            "static_ok": bool(entry.get("static_ok", True)),
+            "dynamic_ok": entry.get("dynamic_ok"),
+            "static_error_code": entry.get("static_error_code"),
+            "dynamic_error_code": entry.get("dynamic_error_code"),
+            "static_reason": entry.get("static_reason"),
+            "dynamic_reason": entry.get("dynamic_reason"),
+        }
+        gates_recent.append(stub)
+        for key in ("static_error_code", "dynamic_error_code"):
+            code = entry.get(key)
+            if code:
+                gate_failure_stats[str(code)] = gate_failure_stats.get(str(code), 0) + 1
+
+    def _serialize_pool(entries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        out: List[Dict[str, Any]] = []
+        for item in entries:
+            if not isinstance(item, dict):
+                continue
+            entry = dict(item)
+            ir_val = entry.get("ir")
+            if isinstance(ir_val, FreeLossIR):
+                entry["ir"] = asdict(ir_val)
+            out.append(entry)
+        return out
+
+    def _checkpoint_state(next_generation: int) -> Dict[str, Any]:
+        state: Dict[str, Any] = {
+            "config_path": os.path.abspath(config_path),
+            "seed": int(seed),
+            "next_generation": int(next_generation),
+            "rng_state_b64": _b64_pickle(rng.getstate()),
+            "baseline": dict(baseline) if baseline is not None else None,
+            "baseline_hf_score": baseline_hf_score,
+            "baseline_early_valid": baseline_early_valid,
+            "baseline_epoch_objectives": baseline_epoch_objectives,
+            "burn_in_objectives": burn_in_objectives,
+            "diversity_archive": diversity_archive[-diversity_archive_size:],
+            "diverse_elites": _serialize_pool(diverse_elites),
+            "elites": _serialize_pool(elites),
+            "seen_signatures": sorted(seen_signatures),
+            "best_hf_so_far": float(best_hf_so_far),
+            "stalled_gens": int(stalled_gens),
+            "prev_dynamic_fail_rate": float(prev_dynamic_fail_rate),
+            "gate_failure_stats": gate_failure_stats,
+            "gates_recent": list(gates_recent),
+        }
+        return state
+
+    def _write_best_candidate_snapshot() -> None:
+        if not elites:
+            return
+        best = sorted(elites, key=lambda e: float(e["fitness"]["hf_like_score"]))[0]
+        best_serializable = dict(best)
+        ir_value = best_serializable.get("ir")
+        if isinstance(ir_value, FreeLossIR):
+            best_serializable["ir"] = asdict(ir_value)
+        best_path = os.path.join(run_dir, "best_candidate.json")
+        with open(best_path, "w", encoding="utf-8") as f:
+            json.dump(best_serializable, f, indent=2, ensure_ascii=False)
+
+    # Ensure we always have a checkpoint on disk before long-running work.
+    _save_checkpoint(run_dir, _checkpoint_state(gen_start))
+    _write_best_candidate_snapshot()
+
+    if gen_start >= generations:
+        LOGGER.info(
+            "Resume point is at generation %d, but generations=%d; nothing to do.",
+            gen_start,
+            generations,
+        )
+        _write_run_analysis(
+            run_dir,
+            baseline_hf_score=baseline_hf_score,
+            generations=generations,
+            population_size=population_size,
+            gate_failure_stats=gate_failure_stats,
+            elites=elites,
+        )
+        return
+
+    for gen in range(gen_start, generations):
         LOGGER.info("=== Generation %d/%d ===", gen, generations - 1)
         global_feedback = _build_global_feedback(
             elites=elites,
-            gates_log=gates_log,
+            gates_log=list(gates_recent),
             burn_in_objectives=burn_in_objectives,
             baseline_hf_score=baseline_hf_score,
             diversity_archive=diversity_archive,
@@ -1747,7 +2004,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                     exc,
                                 )
                         static_fail += 1
-                        gates_log.append(gate_entry)
+                        _record_gate_entry(gate_entry)
                         break
 
                     try:
@@ -1780,7 +2037,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                     idx,
                                     exc2,
                                 )
-                        gates_log.append(gate_entry)
+                        _record_gate_entry(gate_entry)
                         break
 
                     model = TSPModel(
@@ -1889,7 +2146,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                         gate_entry["dynamic_error_code"] = _classify_failure("dynamic", dyn_reason)
 
                     if not dyn_ok:
-                        gates_log.append(gate_entry)
+                        _record_gate_entry(gate_entry)
                         if (
                             (not dyn_vis.ok)
                             and _should_resample_dynamic(dyn_vis.reason)
@@ -2131,7 +2388,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                             gate_entry["dynamic_ok"] = False
                             gate_entry["dynamic_reason"] = reason
                             gate_entry["dynamic_error_code"] = _classify_failure("dynamic", reason)
-                            gates_log.append(gate_entry)
+                            _record_gate_entry(gate_entry)
 
                             # Directed repair only uses VISIBLE counterexamples.
                             if (
@@ -2321,7 +2578,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                                 "dynamic",
                                 gate_entry.get("pref_reason", pref_vis.reason),
                             )
-                            gates_log.append(gate_entry)
+                            _record_gate_entry(gate_entry)
 
                             if (
                                 attempt < max_repair_rounds
@@ -2450,7 +2707,7 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                             break
 
                     if pref_res is None or pref_res.ok:
-                        gates_log.append(gate_entry)
+                        _record_gate_entry(gate_entry)
 
                     # Candidate passes all gates; queue it for evaluation.
                     eval_candidates[idx] = ir
@@ -2576,9 +2833,29 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
             early_eval_steps = early_eval.get("steps")
             early_stopped = early_eval.get("early_stopped")
             better_than_baseline = None
-            if baseline_epoch_objectives is not None:
-                better_than_baseline = bool(epoch_violations == 0)
+            baseline_compare_value = float("nan")
+            if baseline_epoch_objectives:
+                # When epoch-wise baselines exist, decide "better than baseline" by
+                # requiring that the latter half of epochs are all <= their baseline
+                # counterparts. This tolerates noisy early training as long as the
+                # model is consistently better in the later stage.
+                epoch_eval = fitness.get("epoch_eval") or {}
+                cand_epoch_objectives = epoch_eval.get("objectives") or []
+                compare_len = min(len(cand_epoch_objectives), len(baseline_epoch_objectives))
+                if compare_len > 0:
+                    base_last = float(baseline_epoch_objectives[compare_len - 1])
+                    baseline_compare_value = base_last
+                    start_idx = compare_len // 2
+                    better_than_baseline = all(
+                        float(cand_epoch_objectives[i]) <= float(baseline_epoch_objectives[i])
+                        for i in range(start_idx, compare_len)
+                    )
+                elif baseline_hf_score is not None:
+                    baseline_compare_value = float(baseline_hf_score)
+                    # Lower score is better.
+                    better_than_baseline = hf_like_score <= baseline_hf_score
             elif baseline_hf_score is not None:
+                baseline_compare_value = float(baseline_hf_score)
                 # Lower score is better.
                 better_than_baseline = hf_like_score <= baseline_hf_score
 
@@ -2594,7 +2871,9 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 str(epoch_violations),
                 str(early_eval_steps),
                 str(early_stopped),
-                float(baseline_hf_score) if baseline_hf_score is not None else float("nan"),
+                baseline_compare_value
+                if not math.isnan(baseline_compare_value)
+                else (float(baseline_hf_score) if baseline_hf_score is not None else float("nan")),
                 str(better_than_baseline),
             )
 
@@ -2607,8 +2886,8 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
                 "novelty": novelty,
                 "diversity_descriptor": descriptor,
             }
-            candidates_log.append(cand_entry_log)
-            fitness_log.append(
+            pending_candidates.append(cand_entry_log)
+            pending_fitness.append(
                 {
                     "generation": gen,
                     "index": idx,
@@ -2684,28 +2963,23 @@ def run_free_loss_eoh(config_path: str, **overrides: Any) -> None:
         else:
             stalled_gens += 1
 
-    _dump_jsonl(os.path.join(run_dir, "candidates.jsonl"), candidates_log)
-    _dump_jsonl(os.path.join(run_dir, "gate_reports.jsonl"), gates_log)
-    _dump_jsonl(os.path.join(run_dir, "fitness_scores.jsonl"), fitness_log)
+        _flush_jsonl_logs()
+        _save_checkpoint(run_dir, _checkpoint_state(gen + 1))
+        _write_best_candidate_snapshot()
+
+    _flush_jsonl_logs()
     _write_run_analysis(
         run_dir,
         baseline_hf_score=baseline_hf_score,
         generations=generations,
         population_size=population_size,
-        gates_log=gates_log,
+        gate_failure_stats=gate_failure_stats,
         elites=elites,
     )
 
+    _write_best_candidate_snapshot()
     if elites:
         best = elites[0]
-        # Make sure `ir` is JSON-serializable (convert FreeLossIR dataclass to dict).
-        best_serializable = dict(best)
-        ir_value = best_serializable.get("ir")
-        if isinstance(ir_value, FreeLossIR):
-            best_serializable["ir"] = asdict(ir_value)
-        best_path = os.path.join(run_dir, "best_candidate.json")
-        with open(best_path, "w", encoding="utf-8") as f:
-            json.dump(best_serializable, f, indent=2, ensure_ascii=False)
         LOGGER.info(
             "Search complete. Best hf_like_score=%.6f (generation=%d, index=%d)",
             best["fitness"]["hf_like_score"],

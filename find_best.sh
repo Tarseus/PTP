@@ -14,3 +14,9 @@ export CUDA_VISIBLE_DEVICES=4,5,6,7
 nohup python ptp_discovery/run_free_loss_eoh.py \
   --config configs/free_loss_discovery.yaml \
   --device cuda > nohup_free_loss.out 2>&1 &
+
+# Resume from the latest interrupted run (requires checkpoint.json in output_root):
+# nohup python ptp_discovery/run_free_loss_eoh.py \
+#   --config configs/free_loss_discovery.yaml \
+#   --device cuda \
+#   --resume-latest > nohup_free_loss.out 2>&1 &
