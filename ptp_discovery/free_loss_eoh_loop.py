@@ -9,6 +9,7 @@ import json
 import math
 import os
 import pickle
+import queue
 import re
 import time
 import logging
@@ -792,18 +793,46 @@ def _worker_evaluate_candidate(args: Tuple[
     root_logger = logging.getLogger()
     for handler in list(root_logger.handlers):
         root_logger.removeHandler(handler)
-    root_logger.setLevel(logging.WARNING)
+    # Keep root logs at INFO so that evaluation utilities (e.g.,
+    # `fitness.ptp_high_fidelity`) can emit progress into the per-candidate log.
+    # This avoids the appearance of a "silent" hang during long evaluations.
+    root_logger.setLevel(logging.INFO)
 
     # Route free-loss training logs to a per-candidate file.
     log_path = os.path.join(run_dir, f"gen{gen:03d}_cand{idx:03d}.log")
     fmt = logging.Formatter("[%(asctime)s] %(levelname)s:%(name)s: %(message)s")
 
     fl_logger = logging.getLogger("fitness.free_loss_fidelity")
-    fl_logger.handlers = []
+    # Replace any existing handlers and proactively close them to avoid leaking
+    # file descriptors when the worker evaluates multiple candidates.
+    for handler in list(fl_logger.handlers):
+        try:
+            fl_logger.removeHandler(handler)
+        finally:
+            try:
+                handler.close()
+            except Exception:  # noqa: BLE001
+                pass
     fl_logger.setLevel(logging.INFO)
-    file_handler = logging.FileHandler(log_path, mode="w", encoding="utf-8")
+    file_handler: logging.Handler
+    try:
+        file_handler = logging.FileHandler(log_path, mode="w", encoding="utf-8")
+    except Exception as exc:  # noqa: BLE001
+        # Fall back to stderr so that failures to create per-candidate logs don't
+        # make the worker appear to "silently" die.
+        print(
+            f"[free_loss_eoh][worker] failed to open candidate log file: {log_path}: {exc}",
+            flush=True,
+        )
+        file_handler = logging.StreamHandler()
     file_handler.setFormatter(fmt)
     fl_logger.addHandler(file_handler)
+    try:
+        # Also attach the per-candidate handler to the root logger so logs from
+        # other modules propagate into the same file.
+        root_logger.addHandler(file_handler)
+    except Exception:  # noqa: BLE001
+        pass
 
     # Reconstruct configs for this worker and override device.
     hf_cfg = HighFidelityConfig(**hf_cfg_dict)
@@ -832,7 +861,9 @@ def _worker_evaluate_candidate(args: Tuple[
             baseline_epoch_objectives=baseline_epoch_objectives,
             early_eval_steps=early_eval_steps,
         )
-    except Exception as exc:  # noqa: BLE001
+    except KeyboardInterrupt:
+        raise
+    except BaseException as exc:  # noqa: BLE001
         # If candidate evaluation fails (e.g., NaNs in probabilities or loss),
         # treat this candidate as having the worst possible fitness instead of
         # crashing the worker process.
@@ -877,6 +908,21 @@ def _worker_evaluate_candidate(args: Tuple[
         }
         fitness["eval_error"] = str(exc)
     finally:
+        try:
+            fl_logger = logging.getLogger("fitness.free_loss_fidelity")
+            fl_logger.removeHandler(file_handler)
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            root_logger = logging.getLogger()
+            root_logger.removeHandler(file_handler)
+        except Exception:  # noqa: BLE001
+            pass
+        try:
+            file_handler.close()
+        except Exception:  # noqa: BLE001
+            pass
+
         # Proactively release unused CUDA cache in this worker process to
         # reduce fragmentation and long-lived reservations across jobs.
         if torch.cuda.is_available():
@@ -914,6 +960,26 @@ def _device_worker(
     if not jobs:
         return
 
+    # Capture Python-level crash diagnostics (e.g., SIGSEGV, aborts) into a file
+    # under the run directory. This does not catch SIGKILL/OOM, but helps with
+    # native crashes that otherwise leave no traceback in the main log.
+    try:
+        import faulthandler
+        import os  # local import to keep worker self-contained
+
+        first_job = jobs[0]
+        run_dir = str(first_job[5])
+        device_str = str(first_job[3])
+        crash_path = os.path.join(run_dir, f"device_worker_{device_str.replace(':', '_')}_{os.getpid()}.fatal.log")
+        # Keep the file handle open for the lifetime of the worker process so
+        # faulthandler can write into it upon a fatal error.
+        faulthandler.enable(
+            file=open(crash_path, "w", encoding="utf-8"),  # noqa: SIM115
+            all_threads=True,
+        )
+    except Exception:  # noqa: BLE001
+        pass
+
     # Best-effort debug logging: print which device this worker is bound to
     # and which candidates it will evaluate.
     try:
@@ -933,6 +999,17 @@ def _device_worker(
     for job in jobs:
         idx, fitness = _worker_evaluate_candidate(job)
         result_queue.put((idx, fitness))
+
+
+def _format_exitcode(exitcode: int | None) -> str:
+    if exitcode is None:
+        return "running"
+    if exitcode == 0:
+        return "ok(0)"
+    # On POSIX, multiprocessing uses negative values for signals.
+    if exitcode < 0:
+        return f"signal({-exitcode})"
+    return f"code({exitcode})"
 
 
 def _timestamp_dir(root: str) -> str:
@@ -2743,6 +2820,20 @@ def run_free_loss_eoh(
             if not devices:
                 devices = [hf_cfg.device]
 
+            max_parallel = cfg_yaml.get("max_parallel_devices")
+            if max_parallel is not None:
+                try:
+                    max_parallel_int = max(int(max_parallel), 1)
+                except (TypeError, ValueError):
+                    max_parallel_int = len(devices)
+                if len(devices) > max_parallel_int:
+                    LOGGER.info(
+                        "Limiting parallel evaluation devices: available=%s max_parallel_devices=%d",
+                        str(devices),
+                        max_parallel_int,
+                    )
+                    devices = list(devices)[:max_parallel_int]
+
             ctx = mp.get_context("spawn")
 
             # Partition jobs by device in a round-robin fashion.
@@ -2781,12 +2872,55 @@ def run_free_loss_eoh(
                 processes.append(p)
 
             # Collect all results.
-            for _ in range(total_jobs):
-                idx, fitness = result_queue.get()
+            collected = 0
+            heartbeat_s = float(cfg_yaml.get("eval_heartbeat_seconds", 300) or 300)
+            heartbeat_s = max(5.0, heartbeat_s)
+            while collected < total_jobs:
+                try:
+                    idx, fitness = result_queue.get(timeout=heartbeat_s)
+                except queue.Empty:
+                    states = [
+                        f"pid={p.pid} {p.name} {('alive' if p.is_alive() else 'dead')} {_format_exitcode(p.exitcode)}"
+                        for p in processes
+                    ]
+                    LOGGER.info(
+                        "Waiting for eval results: collected=%d/%d workers=[%s]",
+                        collected,
+                        total_jobs,
+                        "; ".join(states),
+                    )
+                    # If any worker has exited abnormally, fail fast with a clear error.
+                    crashed = [p for p in processes if p.exitcode not in (None, 0)]
+                    if crashed:
+                        LOGGER.error(
+                            "Evaluation worker crashed before producing all results: %s",
+                            "; ".join(
+                                f"pid={p.pid} exit={_format_exitcode(p.exitcode)}" for p in crashed
+                            ),
+                        )
+                        raise RuntimeError(
+                            "Evaluation worker crashed (see worker fatal logs under the run directory)."
+                        )
+                    # If all workers have exited but we still don't have all results,
+                    # the queue likely lost messages due to an abrupt termination.
+                    if all(p.exitcode is not None for p in processes) and collected < total_jobs:
+                        raise RuntimeError(
+                            "All evaluation workers exited but results are incomplete; "
+                            "this often indicates an external kill (e.g., OOM/SIGKILL)."
+                        )
+                    continue
+
                 results.append((idx, fitness))
+                collected += 1
 
             for p in processes:
                 p.join()
+                if p.exitcode not in (None, 0):
+                    LOGGER.warning(
+                        "Evaluation worker exited non-zero after result collection: pid=%s exit=%s",
+                        str(p.pid),
+                        _format_exitcode(p.exitcode),
+                    )
 
         # Integrate evaluation results back into the evolutionary loop.
         for idx, fitness in sorted(results, key=lambda x: x[0]):
