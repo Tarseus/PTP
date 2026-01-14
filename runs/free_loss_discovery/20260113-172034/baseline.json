@@ -1,0 +1,72 @@
+{
+  "hf_score": 7.856666457366943,
+  "fitness_score": 7.856666457366943,
+  "validation_objective": 7.854142046356201,
+  "generalization_penalty": 0.002524411010742078,
+  "generalization_objectives": {
+    "100": 7.856666457366943
+  },
+  "size_objectives": {
+    "100": 7.856666457366943
+  },
+  "size_aggregation": "cvar",
+  "size_cvar_alpha": 0.2,
+  "train_score_mean": 7.949531868887649,
+  "train_loss_mean": 0.32421986860719465,
+  "early_validation_objective": 7.932715646362305,
+  "early_eval_steps": 7815,
+  "epoch_eval": {
+    "enabled": true,
+    "steps_per_epoch": 1563,
+    "epochs_total": 20,
+    "objectives": [
+      8.019831143188476,
+      7.986950248718261,
+      7.971810211181641,
+      7.950351021575928,
+      7.9418788230896,
+      7.921893838500977,
+      7.923503967285156,
+      7.908733996582031,
+      7.897812454986572,
+      7.897494902801514,
+      7.89089271697998,
+      7.886255824279785,
+      7.88496423034668,
+      7.875904608154297,
+      7.870785568237305,
+      7.872417192077637,
+      7.869388186645508,
+      7.868114121246338,
+      7.861435330963134,
+      7.855906565093994
+    ],
+    "objective_mean": 7.907816247596742
+  },
+  "config": {
+    "hf": {
+      "problem": "tsp",
+      "hf_steps": 0,
+      "hf_epochs": 20,
+      "hf_instances_per_epoch": 100000,
+      "train_problem_size": 100,
+      "valid_problem_sizes": [
+        100
+      ],
+      "train_batch_size": 64,
+      "pomo_size": 100,
+      "learning_rate": 0.0003,
+      "weight_decay": 1e-06,
+      "alpha": 0.05,
+      "device": "cuda",
+      "seed": 1234,
+      "num_validation_episodes": 10000,
+      "validation_batch_size": 64,
+      "generalization_penalty_weight": 1.0,
+      "size_aggregation": "cvar",
+      "size_cvar_alpha": 0.2,
+      "pool_version": "v0"
+    },
+    "baseline_type": "po_loss"
+  }
+}

@@ -1,5 +1,5 @@
 export TZ=Asia/Shanghai
-export CUDA_VISIBLE_DEVICES=4,5,6,7
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 # PTP-DSL discovery (original pipeline).
 # nohup python -u -m ptp_discovery.run_llm_search \
@@ -11,12 +11,12 @@ export CUDA_VISIBLE_DEVICES=4,5,6,7
 #     --device cuda > nohup_ptp_dsl.out 2>&1 &
 
 # Free-form loss discovery (EoH-style). Uncomment to enable.
-nohup python ptp_discovery/run_free_loss_eoh.py \
-  --config configs/free_loss_discovery.yaml \
-  --device cuda > nohup_free_loss.out 2>&1 &
+# nohup python -u ptp_discovery/run_free_loss_eoh.py \
+#   --config configs/free_loss_discovery.yaml \
+#   --device cuda > nohup_free_loss.out 2>&1 &
 
 # Resume from the latest interrupted run (requires checkpoint.json in output_root):
-# nohup python ptp_discovery/run_free_loss_eoh.py \
-#   --config configs/free_loss_discovery.yaml \
-#   --device cuda \
-#   --resume-latest > nohup_free_loss.out 2>&1 &
+nohup python -u ptp_discovery/run_free_loss_eoh.py \
+  --config configs/free_loss_discovery.yaml \
+  --device cuda \
+  --resume-latest > nohup_free_loss.out 2>&1 &

@@ -46,10 +46,10 @@ early_eval_instances_per_epoch: 100000
 # fitness reflects full training behaviour on the canonical small-scale
 # benchmark.
 problem: tsp
-train_problem_size: 50
-valid_problem_sizes: [50]
+train_problem_size: 100
+valid_problem_sizes: [100]
 train_batch_size: 64
-pomo_size: 50
+pomo_size: 100
 learning_rate: 0.0003
 weight_decay: 0.000001
 alpha: 0.05
